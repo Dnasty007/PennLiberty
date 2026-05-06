@@ -254,10 +254,10 @@ export const team = [
 
 export const navItems = [
   { label: "Home", key: "home" },
+  { label: "For Owners", key: "property-management" },
   { label: "Rentals", key: "rentals" },
-  { label: "Property Management", key: "property-management" },
   { label: "Listings", key: "listings" },
-  { label: "Team", key: "team" },
+  { label: "About", key: "team" },
   { label: "Contact", key: "contact" },
 ] as const;
 

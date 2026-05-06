@@ -43,16 +43,16 @@ export function Hero({
           </div>
 
           <h1 className="max-w-4xl text-5xl font-semibold leading-[0.92] tracking-tight sm:text-[3.7rem] md:text-[4.8rem] xl:text-[6.15rem]">
-            Real Estate.
+            Professional Property
             <br />
-            Rentals.
+            Management in
             <br />
-            Management.
+            Philadelphia.
           </h1>
 
           <p className={`mt-7 max-w-2xl text-lg md:text-[1.55rem] md:leading-[1.35] ${mutedText}`}>
-            Built in Philadelphia. Powered by real experience. Designed for the future of rentals,
-            sales, and property management.
+            Trusted by Philadelphia property owners for reliable management, tenant placement, and
+            maximized returns. Local expertise. Hands-on service.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -60,14 +60,14 @@ export function Hero({
               className="rounded-full bg-[#d6b06a] px-8 py-7 text-lg font-semibold text-[#08111f] shadow-[0_18px_44px_rgba(214,176,106,0.28)] hover:bg-[#e4be78]"
               onClick={() => goToPage("rentals")}
             >
-              Find a Rental
+              Browse Rentals
             </Button>
             <Button
               variant="outline"
               className={`${outlineButtonClasses} font-medium`}
               onClick={() => goToPage("property-management")}
             >
-              List Your Property
+              Partner With Us
             </Button>
           </div>
         </div>
