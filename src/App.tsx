@@ -1,0 +1,340 @@
+import { useEffect, useMemo, useState } from "react";
+import { Mail, Phone } from "lucide-react";
+import { GlassCard } from "@/components/GlassCard";
+import { Header } from "@/components/Header";
+import { Hero } from "@/components/Hero";
+import { ListingsMap } from "@/components/ListingsMap";
+import { RentalsSection } from "@/components/RentalsSection";
+import { TeamSection } from "@/components/TeamSection";
+import {
+  initialRentals,
+  initialSaleListings,
+  type PageKey,
+  type Rental,
+  type SaleListing,
+} from "@/lib/data";
+import {
+  DisplayMode,
+  getThemeFromWeather,
+  PHILLY_COORDS,
+  themeMeta,
+  type WeatherTheme,
+  type WeatherState,
+} from "@/lib/theme";
+
+function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
+  if (type === "none") {
+    return null;
+  }
+
+  if (type === "rain") {
+    return (
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.14]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(105deg, rgba(255,255,255,0.45) 0px, rgba(255,255,255,0.45) 1px, transparent 2px, transparent 14px)",
+          backgroundSize: "240px 240px",
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-[0.18]"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle, rgba(255,255,255,0.9) 0.8px, transparent 1px)",
+        backgroundSize: "36px 36px",
+      }}
+    />
+  );
+}
+
+export default function App() {
+  const [rentals, setRentals] = useState<Rental[]>([...initialRentals]);
+  const [saleListings, setSaleListings] = useState<SaleListing[]>([...initialSaleListings]);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("auto");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [activePage, setActivePage] = useState<PageKey>("home");
+  const [selectedListingId, setSelectedListingId] = useState<number>(initialSaleListings[0].id);
+  const [listingSearch, setListingSearch] = useState("");
+  const [weather, setWeather] = useState<WeatherState>({
+    code: 0,
+    temperature: null,
+    loading: true,
+    error: false,
+  });
+  const [phillyMinutes, setPhillyMinutes] = useState(12 * 60);
+  const [showListingDetails, setShowListingDetails] = useState(false);
+  const [showScheduleTour, setShowScheduleTour] = useState(false);
+  const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(0);
+  const [tourForm, setTourForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const year = useMemo(() => new Date().getFullYear(), []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadWeather() {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${PHILLY_COORDS.latitude}&longitude=${PHILLY_COORDS.longitude}&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&timezone=America/New_York`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error("Weather request failed");
+        }
+
+        const data = await response.json();
+        const current = data?.current;
+
+        if (!current || !isMounted) {
+          return;
+        }
+
+        setWeather({
+          code: Number(current.weather_code ?? 0),
+          temperature: typeof current.temperature_2m === "number" ? current.temperature_2m : null,
+          loading: false,
+          error: false,
+        });
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setWeather((prev) => ({ ...prev, loading: false, error: true }));
+      }
+    }
+
+    function syncPhillyClock() {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: false,
+      }).formatToParts(new Date());
+
+      const hour = Number(parts.find((part) => part.type === "hour")?.value ?? "12");
+      const minute = Number(parts.find((part) => part.type === "minute")?.value ?? "0");
+      setPhillyMinutes(hour * 60 + minute);
+    }
+
+    loadWeather();
+    syncPhillyClock();
+
+    const weatherInterval = window.setInterval(loadWeather, 15 * 60 * 1000);
+    const clockInterval = window.setInterval(syncPhillyClock, 60 * 1000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(weatherInterval);
+      window.clearInterval(clockInterval);
+    };
+  }, []);
+
+  const isDefaultDaytime = phillyMinutes >= 6 * 60 && phillyMinutes < 17 * 60 + 30;
+  const autoTheme = getThemeFromWeather(weather.code, isDefaultDaytime);
+  const manualTheme: WeatherTheme = displayMode === "light" ? "clear-day" : "clear-night";
+  const activeTheme = displayMode === "auto" ? autoTheme : manualTheme;
+  const theme = themeMeta(activeTheme);
+  const lightMode = theme.lightMode;
+
+  const selectedListing =
+    saleListings.find((listing) => listing.id === selectedListingId) ?? saleListings[0];
+
+  const filteredListings = saleListings.filter((listing) => {
+    const q = listingSearch.trim().toLowerCase();
+
+    if (!q) {
+      return true;
+    }
+
+    return [listing.title, listing.address, listing.price].join(" ").toLowerCase().includes(q);
+  });
+
+  const goToPage = (page: PageKey) => {
+    setActivePage(page);
+    setMobileOpen(false);
+  };
+
+  const selectedListingImages = selectedListing.gallery.length
+    ? selectedListing.gallery
+    : [selectedListing.image];
+
+  const openListingDetails = () => {
+    setSelectedGalleryImageIndex(0);
+    setShowListingDetails(true);
+  };
+
+  const closeListingDetails = () => {
+    setShowListingDetails(false);
+  };
+
+  const openScheduleTour = () => {
+    setShowScheduleTour(true);
+  };
+
+  const closeScheduleTour = () => {
+    setShowScheduleTour(false);
+  };
+
+  const nextListingImage = () => {
+    setSelectedGalleryImageIndex((prev) => (prev + 1) % selectedListingImages.length);
+  };
+
+  const prevListingImage = () => {
+    setSelectedGalleryImageIndex(
+      (prev) => (prev - 1 + selectedListingImages.length) % selectedListingImages.length,
+    );
+  };
+
+  const submitTourRequest = () => {
+    const subject = encodeURIComponent(`Tour Request - ${selectedListing.title}`);
+    const body = encodeURIComponent(
+      [
+        `Listing: ${selectedListing.title}`,
+        `Address: ${selectedListing.address}`,
+        "",
+        `Name: ${tourForm.name}`,
+        `Email: ${tourForm.email}`,
+        `Phone Number: ${tourForm.phone}`,
+      ].join("\n"),
+    );
+
+    window.location.href = `mailto:info@pennlibertyre.com?subject=${subject}&body=${body}`;
+    setShowScheduleTour(false);
+  };
+
+  const rootClasses = lightMode
+    ? "min-h-screen bg-[#f5f3ee] text-black transition-colors duration-500"
+    : "min-h-screen bg-[#06101d] text-white transition-colors duration-500";
+
+  const mutedText = lightMode ? "text-black/65" : "text-white/60";
+  const subtleText = lightMode ? "text-black/50" : "text-white/45";
+  const pillClasses = lightMode
+    ? "rounded-full bg-black/8 px-4 py-2 text-sm"
+    : "rounded-full bg-black/5 px-4 py-2 text-sm";
+  const outlineButtonClasses = lightMode
+    ? "rounded-full border-black/20 bg-white/52 px-6 py-6 text-base text-black shadow-[0_16px_40px_rgba(12,18,28,0.08)] hover:bg-white/72"
+    : "rounded-full border-white/20 bg-white/[0.05] px-6 py-6 text-base text-white shadow-[0_16px_40px_rgba(0,0,0,0.24)] hover:bg-white/[0.08]";
+  const footerClasses = lightMode
+    ? "border-t border-black/10 px-4 py-8 text-black/55 md:px-8"
+    : "border-t border-white/10 px-4 py-8 text-white/55 md:px-8";
+  const inputClasses = lightMode
+    ? "border-black/15 bg-white/70"
+    : "border-white/10 bg-white/[0.04] text-white placeholder:text-white/40";
+
+  return (
+    <div className={rootClasses}>
+      <div className="relative min-h-screen overflow-hidden">
+        <div className={`${theme.overlayClass} absolute inset-0 transition-all duration-700`} />
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.82] transition-all duration-700"
+          style={{ backgroundImage: theme.backgroundImage }}
+        />
+        <AmbienceLayer type={theme.ambience} />
+
+        <Header
+          activePage={activePage}
+          displayMode={displayMode}
+          goToPage={goToPage}
+          lightMode={lightMode}
+          mobileOpen={mobileOpen}
+          setDisplayMode={setDisplayMode}
+          setMobileOpen={setMobileOpen}
+          subtleText={subtleText}
+          theme={theme}
+          weather={weather}
+        />
+
+        <main className="relative z-10 px-4 pb-16 pt-8 md:px-8 md:pb-20 md:pt-10">
+          <div className="mx-auto max-w-7xl space-y-8">
+            {activePage === "home" && (
+              <Hero
+                goToPage={goToPage}
+                lightMode={lightMode}
+                mutedText={mutedText}
+                outlineButtonClasses={outlineButtonClasses}
+                pillClasses={pillClasses}
+                subtleText={subtleText}
+                theme={theme}
+                weather={weather}
+              />
+            )}
+
+            {activePage === "rentals" && (
+              <RentalsSection
+                lightMode={lightMode}
+                mutedText={mutedText}
+                rentals={rentals}
+                subtleText={subtleText}
+              />
+            )}
+
+            {activePage === "property-management" && (
+              <section>
+                <h2 className="text-3xl font-semibold">Property Management</h2>
+                <p className={`mt-4 max-w-2xl ${mutedText}`}>
+                  We manage 100+ units across Philadelphia with a hands-on, full-service approach
+                  for owners and investors.
+                </p>
+              </section>
+            )}
+
+            {activePage === "listings" && (
+              <ListingsMap
+                filteredListings={filteredListings}
+                lightMode={lightMode}
+                listingSearch={listingSearch}
+                mutedText={mutedText}
+                onCloseListingDetails={closeListingDetails}
+                onCloseScheduleTour={closeScheduleTour}
+                onImageChange={setSelectedGalleryImageIndex}
+                onNextImage={nextListingImage}
+                onOpenListingDetails={openListingDetails}
+                onOpenScheduleTour={openScheduleTour}
+                onPrevImage={prevListingImage}
+                onSearchChange={setListingSearch}
+                onSelectListing={setSelectedListingId}
+                outlineButtonClasses={outlineButtonClasses}
+                selectedGalleryImageIndex={selectedGalleryImageIndex}
+                selectedListing={selectedListing}
+                showListingDetails={showListingDetails}
+                showScheduleTour={showScheduleTour}
+                subtleText={subtleText}
+                tourForm={tourForm}
+                onTourFormChange={setTourForm}
+                onTourSubmit={submitTourRequest}
+              />
+            )}
+
+            {activePage === "team" && <TeamSection lightMode={lightMode} mutedText={mutedText} />}
+
+            {activePage === "contact" && (
+              <section>
+                <h2 className="text-3xl font-semibold">Contact</h2>
+                <div className={`mt-4 space-y-3 ${mutedText}`}>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" /> 215-987-4444
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" /> info@pennlibertyre.com
+                  </div>
+                </div>
+              </section>
+            )}
+          </div>
+        </main>
+      </div>
+
+      <footer className={footerClasses}>
+        <div className="mx-auto max-w-7xl">© {year} Penn Liberty</div>
+      </footer>
+    </div>
+  );
+}
