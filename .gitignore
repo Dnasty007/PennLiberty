@@ -4,3 +4,16 @@ video-frames/
 *.tsbuildinfo
 .DS_Store
 Thumbs.db
+
+# Local env files - never commit secrets like GROQ_API_KEY
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Allow the example file
+!.env.example
+
+# Brainstorm session artifacts
+.superpowers/

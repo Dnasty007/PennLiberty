@@ -4,6 +4,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ListingsMap } from "@/components/ListingsMap";
+import { OwnersSection } from "@/components/owners/OwnersSection";
+import { AIAssistant } from "@/components/AIAssistant";
 import { RentalsSection } from "@/components/RentalsSection";
 import { TeamSection } from "@/components/TeamSection";
 import {
@@ -277,13 +279,7 @@ export default function App() {
             )}
 
             {activePage === "property-management" && (
-              <section>
-                <h2 className="text-3xl font-semibold">Property Management</h2>
-                <p className={`mt-4 max-w-2xl ${mutedText}`}>
-                  We manage 100+ units across Philadelphia with a hands-on, full-service approach
-                  for owners and investors.
-                </p>
-              </section>
+              <OwnersSection assistantTrigger={<AIAssistant />} />
             )}
 
             {activePage === "listings" && (
