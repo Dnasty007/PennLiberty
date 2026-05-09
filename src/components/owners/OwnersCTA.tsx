@@ -44,10 +44,6 @@ export function OwnersCTA() {
             No pitch deck, no pressure. A short conversation about your property, your goals, and
             what management - or sales - could look like.
           </p>
-          <p className="mt-3 text-sm text-white/55">
-            Or just call <strong className="text-[#d6b06a]">215-987-4444</strong>. Real person,
-            every time.
-          </p>
         </div>
         <GlassCard className="p-5 md:p-6">
           <div className="grid gap-3">
