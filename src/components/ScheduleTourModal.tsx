@@ -56,8 +56,8 @@ export function ScheduleTourModal({
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       <GlassCard
+        variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        softenChrome={!lightMode}
         className={`relative z-10 w-full max-w-[560px] p-5 md:p-7 ${shellText} ${
           lightMode ? lightShellClasses : ""
         }`}

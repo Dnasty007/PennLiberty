@@ -1,3 +1,36 @@
+export const ownersOperateIntro = {
+  eyebrow: "Systems & accountability",
+  title:
+    "Your portfolio isn’t coordinated in spreadsheets and group texts—we run it on Buildium.",
+  lead: "Buildium is the property management platform we use for applications, leases, rent, maintenance workflows, vendor coordination, and owner reporting. Owners get clearer answers because the paperwork and money trail aren’t improvised.",
+  footnote:
+    "Buildium® is a trademark of Buildium LLC. Penn Liberty names it so you understand how your property is administered day to day—we are independent and not endorsed by Buildium.",
+} as const;
+
+export type OwnersOperatePillar = {
+  title: string;
+  body: string;
+};
+
+export const ownersOperatePillars: OwnersOperatePillar[] = [
+  {
+    title: "Money you can reconcile",
+    body: "Rent collection and owner disbursements are tracked in-platform—fewer mysteries when you ask where a payment landed.",
+  },
+  {
+    title: "Leasing with a paper trail",
+    body: "Applications move through lawful screening steps; leases and resident documents stay attached to the tenancy instead of drifting between inboxes.",
+  },
+  {
+    title: "Maintenance that doesn’t evaporate",
+    body: "Work orders are routed, prioritized, and closed with history—critical when boilers fail on a holiday weekend.",
+  },
+  {
+    title: "Reporting you can rely on",
+    body: "Owner statements summarize what happened financially and operationally—you’re informed when metrics move, not when someone remembers to forward a screenshot.",
+  },
+];
+
 export type OwnersTab = {
   key: "time" | "money" | "risk" | "property" | "peace";
   label: string;
@@ -85,7 +118,6 @@ export type OwnersNeighborhood = {
   name: string;
   quote: string;
   image: string;
-  tall?: boolean;
 };
 
 export const ownersNeighborhoods: OwnersNeighborhood[] = [
@@ -95,7 +127,6 @@ export const ownersNeighborhoods: OwnersNeighborhood[] = [
     quote: "Investor-strong. Doesn't blink.",
     image:
       "https://images.unsplash.com/photo-1568526381923-caf3fd520382?auto=format&fit=crop&w=1400&q=80",
-    tall: true,
   },
   {
     key: "temple",
@@ -127,21 +158,14 @@ export const ownersNeighborhoods: OwnersNeighborhood[] = [
   },
 ];
 
-export type OwnersVoice = {
-  quote: string;
-  attribution: string;
-  polaroidImage: string;
-  polaroidCaption: string;
-};
-
-export const ownersVoice: OwnersVoice = {
-  quote:
-    "They handle our triplex like it's theirs. We hear from them when it matters - and not a minute more.",
-  attribution: "Maria - South Philly owner - with us since 2018",
-  polaroidImage:
-    "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=900&q=80",
-  polaroidCaption: "That's our city.",
-};
+/** Illustrative pin positions over the Owners coverage editorial panel (%). */
+export const ownersCoveragePinOffsets = [
+  { top: "30%", left: "54%" },
+  { top: "24%", left: "68%" },
+  { top: "42%", left: "61%" },
+  { top: "36%", left: "48%" },
+  { top: "19%", left: "58%" },
+] as const;
 
 export const ownersBackdropImage =
   "https://images.unsplash.com/photo-1559406041-c7d2bbf2fd1c?auto=format&fit=crop&w=2000&q=80";

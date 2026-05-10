@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Mail, Phone } from "lucide-react";
-import { GlassCard } from "@/components/GlassCard";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ListingsMap } from "@/components/ListingsMap";
 import { OwnersSection } from "@/components/owners/OwnersSection";
 import { AIAssistant } from "@/components/AIAssistant";
+import { ContactSection } from "@/components/ContactSection";
 import { RentalsSection } from "@/components/RentalsSection";
 import { TeamSection } from "@/components/TeamSection";
 import {
@@ -23,6 +22,14 @@ import {
   type WeatherTheme,
   type WeatherState,
 } from "@/lib/theme";
+import {
+  pickFromPool,
+  homeBackdropPool,
+  listingsMapTeaserPool,
+  ownersBackdropPool,
+  rentalsHeroPool,
+  useStablePoolIndex,
+} from "@/lib/siteImagery";
 
 function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
   if (type === "none") {
@@ -146,6 +153,20 @@ export default function App() {
   const theme = themeMeta(activeTheme);
   const lightMode = theme.lightMode;
 
+  const ownersIdx = useStablePoolIndex(ownersBackdropPool.length);
+  const rentalsIdx = useStablePoolIndex(rentalsHeroPool.length);
+  const listingsMapTeaserIdx = useStablePoolIndex(listingsMapTeaserPool.length);
+  const homeIdx = useStablePoolIndex(homeBackdropPool.length);
+
+  const ownersBackdropPick = pickFromPool(ownersBackdropPool, ownersIdx);
+  const ownersEditorialHeroPick = pickFromPool(
+    ownersBackdropPool,
+    (ownersIdx + 1) % ownersBackdropPool.length,
+  );
+  const rentalsHeroPick = pickFromPool(rentalsHeroPool, rentalsIdx);
+  const listingsMapTeaserPick = pickFromPool(listingsMapTeaserPool, listingsMapTeaserIdx);
+  const homeBackdropPick = pickFromPool(homeBackdropPool, homeIdx);
+
   const selectedListing =
     saleListings.find((listing) => listing.id === selectedListingId) ?? saleListings[0];
 
@@ -233,11 +254,14 @@ export default function App() {
 
   return (
     <div className={rootClasses}>
-      <div className="relative min-h-screen overflow-hidden">
+      <div className="relative min-h-screen overflow-x-hidden">
         <div className={`${theme.overlayClass} absolute inset-0 transition-all duration-700`} />
         <div
           className="absolute inset-0 bg-cover bg-center opacity-[0.82] transition-all duration-700"
-          style={{ backgroundImage: theme.backgroundImage }}
+          style={{
+            backgroundImage:
+              activePage === "home" ? `url('${homeBackdropPick}')` : theme.backgroundImage,
+          }}
         />
         <AmbienceLayer type={theme.ambience} />
 
@@ -254,8 +278,28 @@ export default function App() {
           weather={weather}
         />
 
-        <main className="relative z-10 px-4 pb-16 pt-8 md:px-8 md:pb-20 md:pt-10">
-          <div className="mx-auto max-w-7xl space-y-8">
+        <main
+          className={`relative z-10 px-4 pb-16 md:px-8 md:pb-20 ${
+            activePage === "listings" ||
+              activePage === "team" ||
+              activePage === "contact" ||
+              activePage === "rentals" ||
+              activePage === "property-management"
+              ? "pt-6 md:pt-8"
+              : "pt-8 md:pt-10"
+          }`}
+        >
+          <div
+            className={`mx-auto max-w-7xl ${
+              activePage === "listings" ||
+              activePage === "team" ||
+              activePage === "contact" ||
+              activePage === "rentals" ||
+              activePage === "property-management"
+                ? "space-y-5 md:space-y-6"
+                : "space-y-8"
+            }`}
+          >
             {activePage === "home" && (
               <Hero
                 goToPage={goToPage}
@@ -271,15 +315,26 @@ export default function App() {
 
             {activePage === "rentals" && (
               <RentalsSection
+                goToPage={goToPage}
                 lightMode={lightMode}
                 mutedText={mutedText}
+                outlineButtonClasses={outlineButtonClasses}
                 rentals={rentals}
+                rentalsHeroSrc={rentalsHeroPick}
                 subtleText={subtleText}
               />
             )}
 
             {activePage === "property-management" && (
-              <OwnersSection assistantTrigger={<AIAssistant />} />
+              <OwnersSection
+                assistantTrigger={<AIAssistant lightMode={lightMode} />}
+                backdropSrc={ownersBackdropPick}
+                editorialHeroSrc={ownersEditorialHeroPick}
+                goToPage={goToPage}
+                lightMode={lightMode}
+                mutedText={mutedText}
+                subtleText={subtleText}
+              />
             )}
 
             {activePage === "listings" && (
@@ -287,6 +342,7 @@ export default function App() {
                 filteredListings={filteredListings}
                 lightMode={lightMode}
                 listingSearch={listingSearch}
+                listingsMapTeaserSrc={listingsMapTeaserPick}
                 mutedText={mutedText}
                 onCloseListingDetails={closeListingDetails}
                 onCloseScheduleTour={closeScheduleTour}
@@ -309,20 +365,24 @@ export default function App() {
               />
             )}
 
-            {activePage === "team" && <TeamSection lightMode={lightMode} mutedText={mutedText} />}
+            {activePage === "team" && (
+              <TeamSection
+                goToPage={goToPage}
+                lightMode={lightMode}
+                mutedText={mutedText}
+                outlineButtonClasses={outlineButtonClasses}
+                subtleText={subtleText}
+              />
+            )}
 
             {activePage === "contact" && (
-              <section>
-                <h2 className="text-3xl font-semibold">Contact</h2>
-                <div className={`mt-4 space-y-3 ${mutedText}`}>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" /> 215-987-4444
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" /> info@pennlibertyre.com
-                  </div>
-                </div>
-              </section>
+              <ContactSection
+                goToPage={goToPage}
+                lightMode={lightMode}
+                mutedText={mutedText}
+                outlineButtonClasses={outlineButtonClasses}
+                subtleText={subtleText}
+              />
             )}
           </div>
         </main>

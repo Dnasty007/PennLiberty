@@ -7,7 +7,22 @@ export type Rental = {
   meta: string;
   area: string;
   image: string;
+  /** Optional per-unit application link (e.g. Buildium listing URL). Overrides `VITE_BUILDIUM_RENTAL_APPLICATION_URL`. */
+  applicationUrl?: string;
 };
+
+/** Same bundled skyline as Rentals hero (`siteImagery.rentalsHeroPool`) — for future map wiring. */
+export const rentalsVisualMapSrc = "/listings-philly-map-teaser.png";
+
+/** Pin positions (% of hero) aligned to `initialRentals` length at build time — adjust if you reorder. */
+export const rentalMapPinOffsets = [
+  { top: "31%", left: "54%" },
+  { top: "24%", left: "69%" },
+  { top: "19%", left: "50%" },
+  { top: "44%", left: "61%" },
+  { top: "36%", left: "73%" },
+  { top: "27%", left: "58%" },
+] as const;
 
 export type SaleListing = {
   id: number;
@@ -18,6 +33,10 @@ export type SaleListing = {
   beds: number;
   baths: number;
   sqft: number;
+  /** Map marker latitude (approx. geocode for Philly addresses). */
+  lat: number;
+  /** Map marker longitude. */
+  lng: number;
   top: string;
   left: string;
   image: string;
@@ -32,7 +51,66 @@ export type SaleListing = {
   highlights?: string[];
 };
 
-export const initialRentals: Rental[] = [];
+/**
+ * Placeholder rental cards for the site — sample copy and Unsplash stills.
+ * Replace the array (same `Rental` shape) when you wire live inventory or a feed.
+ */
+export const initialRentals: Rental[] = [
+  {
+    id: 1,
+    title: "Renovated 2BR brick row apartment",
+    price: "$1,895/mo",
+    meta: "2 bed · 1 bath · Pets case-by-case",
+    area: "Fishtown — Girard corridor & transit nearby",
+    image:
+      "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: 2,
+    title: "Efficiency studio near Broad & Cecil B.",
+    price: "$1,125/mo",
+    meta: "Studio · Updated kitchenette · Laundry in building",
+    area: "Temple / North Philly",
+    image:
+      "https://images.unsplash.com/photo-1545158539-1709fed7e2bf?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: 3,
+    title: "Garden-level 1BR with washer/dryer",
+    price: "$1,675/mo",
+    meta: "1 bed · 1 bath · Private rear patio",
+    area: "South Philly — tenant-stable blocks",
+    image:
+      "https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: 4,
+    title: "Center City alcove junior 1BR",
+    price: "$2,250/mo",
+    meta: "1 bed · 1 bath · Doorman elevator building",
+    area: "Rittenhouse / Avenue of the Arts",
+    image:
+      "https://images.unsplash.com/photo-1496564203457-11bb12075d90?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: 5,
+    title: "Loft-style 2BR with skyline views",
+    price: "$2,495/mo",
+    meta: "2 bed · 2 bath · Garage parking avail.",
+    area: "Northern Liberties",
+    image:
+      "https://images.unsplash.com/photo-1568526381923-caf3fd520382?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: 6,
+    title: "Bi-level 3BR townhome-style rental",
+    price: "$2,850/mo",
+    meta: "3 bed · 2 bath · Rooftop deck",
+    area: "Fairmount / Art Museum area",
+    image:
+      "https://images.unsplash.com/photo-1559406041-c7d2bbf2fd1c?auto=format&fit=crop&w=1200&q=85",
+  },
+];
 
 export const initialSaleListings: SaleListing[] = [
   {
@@ -46,6 +124,8 @@ export const initialSaleListings: SaleListing[] = [
     beds: 0,
     baths: 0,
     sqft: 1760,
+    lat: 39.9848,
+    lng: -75.1571,
     top: "34%",
     left: "58%",
     // These point at the current uploaded Triplex photos in /public/listings/1704-w-diamond/.
@@ -94,6 +174,8 @@ export const initialSaleListings: SaleListing[] = [
     beds: 0,
     baths: 0,
     sqft: 2184,
+    lat: 39.9891,
+    lng: -75.1567,
     top: "31%",
     left: "55%",
     image: "/listings/1711%20N%20Gratzs%20St/GetMedia.jpeg",
@@ -153,6 +235,8 @@ export const initialSaleListings: SaleListing[] = [
     baths: 0,
     sqft: 1432,
     lotSqft: 1432,
+    lat: 39.9683,
+    lng: -75.1494,
     top: "47%",
     left: "61%",
     image: "/listings/621%20W%20Girard%20Ave/GetMedia.jpeg",
@@ -193,6 +277,8 @@ export const initialSaleListings: SaleListing[] = [
     beds: 0,
     baths: 0,
     sqft: 3400,
+    lat: 39.9927,
+    lng: -75.1544,
     top: "22%",
     left: "64%",
     image: "/listings/1215%20W%20Lehigh%20Ave/GetMedia%20(1).jpeg",
@@ -234,23 +320,69 @@ export const platforms = [
   { name: "Bright MLS", mark: "B", color: "text-[#ff7d1a]" },
 ] as const;
 
-export const team = [
+export type TeamPerson = {
+  readonly name: string;
+  readonly role: string;
+  readonly bio: string;
+  /** Relative URL under `/public`, e.g. `/team/donna.jpg`. When omitted, Liberty mark shows behind initials */
+  readonly photo?: string;
+};
+
+/** Founders & principals — surfaced first on About */
+export const teamPrincipals: readonly TeamPerson[] = [
   {
-    name: "Broker / Founder",
-    role: "Sales Leadership",
-    bio: "Experienced sales leadership focused on trust, deal execution, and client relationships across Philadelphia and surrounding markets.",
+    name: "Ray",
+    role: "Broker / Founder",
+    bio: "Leads brokerage direction, deal strategy, and the firm's promise to Philadelphia clients—with the same hustle he expects from everyone on the roster.",
   },
   {
     name: "Ramon Caceres",
-    role: "Rentals & Growth",
-    bio: "Focused on rental growth, property management systems, marketing, and building the future-facing Penn Liberty experience.",
+    role: "Co-Founder",
+    bio: "Founding anchor of Penn Liberty—the father side of our family-founded firm—and a steady presence behind how we steward owners, renters, and investors.",
   },
   {
-    name: "Penn Liberty Agents",
-    role: "Sales, Rentals, Leasing",
-    bio: "A growing team supporting buyers, sellers, landlords, tenants, and property owners with responsive local service.",
+    name: "Ramon L. Caceres",
+    role: "Operations & Systems",
+    bio: "\"Ray Luke\" day-to-day—owns Penn Liberty platforms, workflows, and internal tools so leasing, listings, and property management stay fast, visible, and consistent.",
   },
 ] as const;
+
+/** Office operators, managers, and licensed agents — company roster */
+export const teamStaff: readonly TeamPerson[] = [
+  {
+    name: "Donna",
+    role: "Office Secretary",
+    bio: "First voice many hear at Penn Liberty—she keeps schedules coordinated, filings and paperwork orderly, and the front office warm and professional.",
+  },
+  {
+    name: "Dave",
+    role: "Head Property Manager · Agent",
+    bio: "Leads resident service and portfolio operations while remaining active in brokerage—your bridge between the field and closing table.",
+  },
+  {
+    name: "Brandon",
+    role: "Agent",
+    bio: "In-office licensee supporting buyers and sellers alongside the leadership team—with local Philly context and disciplined follow-through.",
+  },
+  {
+    name: "Juanita Sharperson",
+    role: "Agent",
+    bio: "Represents landlords, tenants, and investors with clear communication—from showings through lease signatures and resale opportunities.",
+  },
+  {
+    name: "Charlee Bolen",
+    role: "Agent",
+    bio: "Helps buyers and renters navigate Philly inventory with straight answers and attentive showings—from first tour to handshake.",
+  },
+  {
+    name: "Fatima",
+    role: "Agent",
+    bio: "Licensed agent rounding out our sales and leasing bench—focused on approachable service and attentive client communication.",
+  },
+] as const;
+
+/** @deprecated Use teamPrincipals + teamStaff for explicit sections */
+export const team = [...teamPrincipals, ...teamStaff] as const;
 
 export const navItems = [
   { label: "Home", key: "home" },
@@ -260,6 +392,10 @@ export const navItems = [
   { label: "About", key: "team" },
   { label: "Contact", key: "contact" },
 ] as const;
+
+/** Buildium Resident portal — tenants, owners, and vendors with Penn Liberty sign in here */
+export const manageBuildingResidentLoginUrl =
+  "https://signin.managebuilding.com/Resident/portal/global-login";
 
 export const serviceCards: { title: string; desc: string; page: PageKey; icon: LucideIcon }[] = [
   {

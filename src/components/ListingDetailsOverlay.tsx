@@ -69,8 +69,8 @@ export function ListingDetailsOverlay({
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       <GlassCard
+        variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        softenChrome={!lightMode}
         className={`relative z-10 max-h-[92vh] w-full max-w-[1320px] overflow-hidden ${shellText} ${
           lightMode ? lightShellClasses : ""
         }`}
@@ -172,11 +172,11 @@ export function ListingDetailsOverlay({
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <GlassCard lightMode={lightMode} softenChrome={!lightMode} className={`p-4 ${shellText}`}>
+                <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
                   <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Property Type</div>
                   <div className="mt-2 text-lg font-medium">{listing.propertyType ?? "Residential"}</div>
                 </GlassCard>
-                <GlassCard lightMode={lightMode} softenChrome={!lightMode} className={`p-4 ${shellText}`}>
+                <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
                   <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Overview</div>
                   <div className="mt-2 text-lg font-medium">{listingSummary(listing)}</div>
                 </GlassCard>

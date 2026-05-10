@@ -42,39 +42,38 @@ export function Hero({
             </span>
           </div>
 
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[0.92] tracking-tight sm:text-[3.7rem] md:text-[4.8rem] xl:text-[6.15rem]">
+          <h1 className="max-w-4xl text-5xl font-semibold leading-[0.92] tracking-[-1.5px] sm:text-[3.9rem] md:text-[5rem] xl:text-[6.3rem]">
             Professional Property
-            <br />
             Management in
-            <br />
             Philadelphia.
           </h1>
 
-          <p className={`mt-7 max-w-2xl text-lg md:text-[1.55rem] md:leading-[1.35] ${mutedText}`}>
-            Trusted by Philadelphia property owners for reliable management, tenant placement, and
-            maximized returns. Local expertise. Hands-on service.
+          <p className={`mt-5 max-w-2xl text-[1.1rem] md:text-[1.35rem] leading-snug ${mutedText}`}>
+            Trusted by Philadelphia owners for reliable management, tenant placement, and maximized returns.
+            Local expertise. Hands-on service.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col gap-3.5 sm:flex-row">
             <Button
-              className="rounded-full bg-[#d6b06a] px-8 py-7 text-lg font-semibold text-[#08111f] shadow-[0_18px_44px_rgba(214,176,106,0.28)] hover:bg-[#e4be78]"
+              className="rounded-full bg-[#d6b06a] px-9 py-7 text-lg font-semibold text-[#08111f] shadow-[0_18px_44px_rgba(214,176,106,0.35)] hover:bg-[#e4be78] active:scale-[0.985] transition-transform"
               onClick={() => goToPage("rentals")}
             >
               Browse Rentals
             </Button>
             <Button
               variant="outline"
-              className={`${outlineButtonClasses} font-medium`}
+              className={`${outlineButtonClasses} font-medium border-white/30 hover:bg-white/5`}
               onClick={() => goToPage("property-management")}
             >
-              Partner With Us
+              Get a Free Property Review
             </Button>
           </div>
         </div>
 
         <GlassCard
+          variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className="w-full max-w-[760px] p-8 !bg-white/[0.012] !backdrop-blur-[12px] before:!opacity-36 after:!opacity-42 lg:justify-self-end lg:min-h-[356px]"
+          className="w-full max-w-[720px] p-7 !bg-white/[0.01] !backdrop-blur-[14px] before:!opacity-30 after:!opacity-38 lg:justify-self-end lg:mt-6"
         >
           <div className="space-y-7">
             <div className={`text-[1.05rem] ${mutedText}`}>Philadelphia Portfolio</div>
@@ -82,6 +81,7 @@ export function Hero({
             <div className={`text-lg ${mutedText}`}>Managed across Philly & surrounding areas</div>
             <div className="mt-2 grid grid-cols-2 gap-5">
               <GlassCard
+                variant={lightMode ? "frost" : "soft"}
                 lightMode={lightMode}
                 className={`p-5 !rounded-[22px] ${
                   lightMode
@@ -93,6 +93,7 @@ export function Hero({
                 <div className={`mt-1.5 ${mutedText}`}>Occupancy</div>
               </GlassCard>
               <GlassCard
+                variant={lightMode ? "frost" : "soft"}
                 lightMode={lightMode}
                 className={`p-5 !rounded-[22px] ${
                   lightMode
@@ -109,24 +110,25 @@ export function Hero({
       </section>
 
       <GlassCard
+        variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
         className="p-7 !bg-white/[0.006] !backdrop-blur-[16px] before:!opacity-45 after:!opacity-35 md:p-8"
       >
         <div className="grid gap-6 md:grid-cols-[0.9fr_2.1fr] md:items-center">
           <div className="pr-2">
-            <h2 className="text-2xl font-semibold md:text-[2rem]">Your Property. Everywhere.</h2>
+            <h2 className="text-2xl font-semibold md:text-[2rem]">Listed on 8+ major platforms</h2>
             <p className={`mt-3 text-base md:text-lg ${mutedText}`}>
-              We distribute listings across all major platforms for maximum exposure.
+              Maximum exposure across the platforms that matter most.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
             {platforms.map((platform) => (
               <div
                 key={platform.name}
-                className={`${pillClasses} flex min-h-[72px] items-center gap-3 text-left text-sm md:text-base`}
+                className={`${pillClasses} flex min-h-[82px] items-center gap-4 text-left text-sm md:text-base`}
               >
                 <div
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${
                     lightMode ? "border-black/10 bg-white/46" : "border-white/10 bg-white/[0.045]"
                   } ${platform.color}`}
                 >
@@ -141,7 +143,7 @@ export function Hero({
 
       <section className="grid gap-6 md:grid-cols-3">
         {serviceCards.map((service) => (
-          <GlassCard lightMode={lightMode} key={service.title} className="p-6">
+          <GlassCard variant={lightMode ? "frost" : "chrome"} lightMode={lightMode} key={service.title} className="p-6">
             <service.icon className="mb-4 h-6 w-6 text-[#d6b06a]" />
             <h3 className="text-xl font-semibold">{service.title}</h3>
             <p className={`mt-2 ${mutedText}`}>{service.desc}</p>
@@ -152,7 +154,7 @@ export function Hero({
         ))}
       </section>
 
-      <GlassCard lightMode={lightMode} className="p-6 md:p-10">
+      <GlassCard variant={lightMode ? "frost" : "chrome"} lightMode={lightMode} className="p-6 md:p-10">
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
             <div className={`text-sm uppercase tracking-[0.2em] ${subtleText}`}>About Us</div>

@@ -1,6 +1,6 @@
 import { Menu, X } from "lucide-react";
 import { GlassCard } from "@/components/GlassCard";
-import { navItems, type PageKey } from "@/lib/data";
+import { manageBuildingResidentLoginUrl, navItems, type PageKey } from "@/lib/data";
 import type { DisplayMode, ThemeMeta, WeatherState } from "@/lib/theme";
 
 type HeaderProps = {
@@ -82,16 +82,20 @@ export function Header({
   return (
     <header className="relative z-20 px-4 pt-6 md:px-8 md:pt-8">
       <GlassCard
+        variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        className="mx-auto max-w-[1200px] px-5 py-3 md:px-7"
+        className="mx-auto max-w-[1200px] overflow-visible px-5 py-3 md:px-7"
       >
         <div className="flex items-center justify-between gap-4">
-          <button onClick={() => goToPage("home")} className="flex items-center gap-3 text-left">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden">
+          <button
+            onClick={() => goToPage("home")}
+            className="flex min-w-0 items-center gap-3 text-left"
+          >
+            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
               <img
                 src="/branding/liberty-head.png"
                 alt="Penn Liberty Liberty-head mark"
-                className="h-14 w-14 object-contain"
+                className="h-14 w-14 origin-right scale-[1.38] transform object-contain will-change-transform"
               />
             </div>
             <div>
@@ -114,6 +118,15 @@ export function Header({
                 {item.label}
               </button>
             ))}
+            <a
+              href={manageBuildingResidentLoginUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`rounded-full px-4 py-2 text-sm transition-colors duration-200 ${navIdleClasses}`}
+              aria-label="Resident login — opens Buildium Resident portal in a new tab"
+            >
+              Resident Log in
+            </a>
           </nav>
 
           <div className="hidden items-center gap-3 lg:flex">
@@ -166,6 +179,16 @@ export function Header({
                 {item.label}
               </button>
             ))}
+            <a
+              href={manageBuildingResidentLoginUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`block w-full rounded-2xl px-3 py-2.5 text-left text-sm ${mobileIdleClasses}`}
+              aria-label="Resident login — opens Buildium Resident portal in a new tab"
+              onClick={() => setMobileOpen(false)}
+            >
+              Resident Log in
+            </a>
           </div>
         )}
       </GlassCard>
