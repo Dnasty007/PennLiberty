@@ -9,7 +9,7 @@ import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
 import type { PageKey } from "@/lib/data";
 
 type OwnersSectionProps = {
-  backdropSrc: string;
+  backdropSrc?: string;
   editorialHeroSrc: string;
   assistantTrigger?: ReactNode;
   goToPage?: (page: PageKey) => void;
@@ -61,11 +61,15 @@ export function OwnersSection({
       className={`relative isolate mx-auto max-w-[1180px] overflow-hidden rounded-[32px] border ${shellBorder} ${shellShadow}`}
       aria-labelledby="owners-hero-title"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-20 bg-cover bg-center"
-        style={{ backgroundImage: `url("${backdropSrc}")`, transform: "scale(1.04)" }}
-      />
+      {backdropSrc ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-20 bg-cover bg-center"
+          style={{ backgroundImage: `url("${backdropSrc}")`, transform: "scale(1.04)" }}
+        />
+      ) : (
+        <div aria-hidden className="absolute inset-0 -z-20 bg-[#f5f3ee]" />
+      )}
       <div aria-hidden className={`absolute inset-0 -z-10 ${scrim}`} />
       <div
         aria-hidden

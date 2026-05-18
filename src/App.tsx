@@ -14,14 +14,7 @@ import {
   type Rental,
   type SaleListing,
 } from "@/lib/data";
-import {
-  DisplayMode,
-  getThemeFromWeather,
-  PHILLY_COORDS,
-  themeMeta,
-  type WeatherTheme,
-  type WeatherState,
-} from "@/lib/theme";
+import { DisplayMode, PHILLY_COORDS, themeForDisplayMode, type WeatherState } from "@/lib/theme";
 import {
   pickFromPool,
   homeBackdropPool,
@@ -64,7 +57,7 @@ function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
 export default function App() {
   const [rentals, setRentals] = useState<Rental[]>([...initialRentals]);
   const [saleListings, setSaleListings] = useState<SaleListing[]>([...initialSaleListings]);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>("auto");
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("neutral");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activePage, setActivePage] = useState<PageKey>("home");
   const [selectedListingId, setSelectedListingId] = useState<number>(initialSaleListings[0].id);
@@ -75,7 +68,6 @@ export default function App() {
     loading: true,
     error: false,
   });
-  const [phillyMinutes, setPhillyMinutes] = useState(12 * 60);
   const [showListingDetails, setShowListingDetails] = useState(false);
   const [showScheduleTour, setShowScheduleTour] = useState(false);
   const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(0);
@@ -120,38 +112,15 @@ export default function App() {
       }
     }
 
-    function syncPhillyClock() {
-      const parts = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/New_York",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: false,
-      }).formatToParts(new Date());
-
-      const hour = Number(parts.find((part) => part.type === "hour")?.value ?? "12");
-      const minute = Number(parts.find((part) => part.type === "minute")?.value ?? "0");
-      setPhillyMinutes(hour * 60 + minute);
-    }
-
     loadWeather();
-    syncPhillyClock();
 
     const weatherInterval = window.setInterval(loadWeather, 15 * 60 * 1000);
-    const clockInterval = window.setInterval(syncPhillyClock, 60 * 1000);
 
     return () => {
       isMounted = false;
       window.clearInterval(weatherInterval);
-      window.clearInterval(clockInterval);
     };
   }, []);
-
-  const isDefaultDaytime = phillyMinutes >= 6 * 60 && phillyMinutes < 17 * 60 + 30;
-  const autoTheme = getThemeFromWeather(weather.code, isDefaultDaytime);
-  const manualTheme: WeatherTheme = displayMode === "light" ? "clear-day" : "clear-night";
-  const activeTheme = displayMode === "auto" ? autoTheme : manualTheme;
-  const theme = themeMeta(activeTheme);
-  const lightMode = theme.lightMode;
 
   const ownersIdx = useStablePoolIndex(ownersBackdropPool.length);
   const rentalsIdx = useStablePoolIndex(rentalsHeroPool.length);
@@ -166,6 +135,14 @@ export default function App() {
   const rentalsHeroPick = pickFromPool(rentalsHeroPool, rentalsIdx);
   const listingsMapTeaserPick = pickFromPool(listingsMapTeaserPool, listingsMapTeaserIdx);
   const homeBackdropPick = pickFromPool(homeBackdropPool, homeIdx);
+
+  const theme = themeForDisplayMode(displayMode);
+  const lightMode = theme.lightMode;
+
+  const pageBackdropImage =
+    displayMode === "light" && activePage === "home"
+      ? `url('${homeBackdropPick}')`
+      : theme.backgroundImage;
 
   const selectedListing =
     saleListings.find((listing) => listing.id === selectedListingId) ?? saleListings[0];
@@ -256,13 +233,12 @@ export default function App() {
     <div className={rootClasses}>
       <div className="relative min-h-screen overflow-x-hidden">
         <div className={`${theme.overlayClass} absolute inset-0 transition-all duration-700`} />
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.82] transition-all duration-700"
-          style={{
-            backgroundImage:
-              activePage === "home" ? `url('${homeBackdropPick}')` : theme.backgroundImage,
-          }}
-        />
+        {theme.showBackdrop ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-[0.82] transition-all duration-700"
+            style={{ backgroundImage: pageBackdropImage }}
+          />
+        ) : null}
         <AmbienceLayer type={theme.ambience} />
 
         <Header
@@ -328,7 +304,7 @@ export default function App() {
             {activePage === "property-management" && (
               <OwnersSection
                 assistantTrigger={<AIAssistant lightMode={lightMode} />}
-                backdropSrc={ownersBackdropPick}
+                backdropSrc={displayMode === "neutral" ? undefined : ownersBackdropPick}
                 editorialHeroSrc={ownersEditorialHeroPick}
                 goToPage={goToPage}
                 lightMode={lightMode}

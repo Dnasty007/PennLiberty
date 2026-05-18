@@ -16,6 +16,16 @@ type HeaderProps = {
   weather: WeatherState;
 };
 
+const visibleDisplayModes = [
+  { key: "light", label: "Light" },
+  { key: "dark", label: "Dark" },
+] as const;
+
+/** Light/Dark only in the UI; tapping the active choice returns to hidden default (cream). */
+function pickDisplayMode(current: DisplayMode, next: "light" | "dark"): DisplayMode {
+  return current === next ? "neutral" : next;
+}
+
 function DisplayModeControl({
   mode,
   onChange,
@@ -31,13 +41,11 @@ function DisplayModeControl({
 
   return (
     <div className={`hidden items-center gap-1 rounded-full border px-1 py-1 lg:flex ${wrapper}`}>
-      {([
-        { key: "light", label: "Light" },
-        { key: "dark", label: "Dark" },
-      ] as const).map((item) => (
+      {visibleDisplayModes.map((item) => (
         <button
           key={item.key}
-          onClick={() => onChange(item.key)}
+          type="button"
+          onClick={() => onChange(pickDisplayMode(mode, item.key))}
           className={`rounded-full px-3 py-1.5 text-xs transition ${mode === item.key ? active : idle}`}
         >
           {item.label}
@@ -147,13 +155,14 @@ export function Header({
             <div className="flex items-center justify-between gap-2 pb-1">
               <span className={`text-xs uppercase tracking-[0.2em] ${subtleText}`}>Display</span>
               <div className="flex items-center gap-1">
-                {(["light", "dark"] as const).map((mode) => (
+                {visibleDisplayModes.map((item) => (
                   <button
-                    key={mode}
-                    onClick={() => setDisplayMode(mode)}
-                    className={`${mobileModeButton} ${displayMode === mode ? "ring-1 ring-[#d6b06a]/70" : ""}`}
+                    key={item.key}
+                    type="button"
+                    onClick={() => setDisplayMode(pickDisplayMode(displayMode, item.key))}
+                    className={`${mobileModeButton} ${displayMode === item.key ? "ring-1 ring-[#d6b06a]/70" : ""}`}
                   >
-                    {mode}
+                    {item.label}
                   </button>
                 ))}
               </div>

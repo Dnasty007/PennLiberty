@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Cloud, CloudRain, CloudSnow, Moon, Sun } from "lucide-react";
 import type { SaleListing } from "@/lib/data";
 
-export type DisplayMode = "auto" | "light" | "dark";
+export type DisplayMode = "neutral" | "light" | "dark";
 export type WeatherTheme =
   | "clear-day"
   | "cloudy-day"
@@ -22,12 +22,33 @@ export type WeatherState = {
 
 export type ThemeMeta = {
   lightMode: boolean;
+  /** When false, no Philadelphia photo layer is shown (neutral default). */
+  showBackdrop: boolean;
   backgroundImage: string;
   overlayClass: string;
   ambience: "none" | "rain" | "snow";
   label: string;
   icon: ReactNode;
 };
+
+/** Warm cream shell — default site look, no skyline photos. */
+export const neutralThemeMeta: ThemeMeta = {
+  lightMode: true,
+  showBackdrop: false,
+  backgroundImage: "none",
+  overlayClass: "absolute inset-0 bg-[#f5f3ee]",
+  ambience: "none",
+  label: "Philadelphia",
+  icon: <Sun className="h-4 w-4 opacity-70" />,
+};
+
+export function themeForDisplayMode(mode: DisplayMode): ThemeMeta {
+  if (mode === "neutral") {
+    return neutralThemeMeta;
+  }
+
+  return themeMeta(mode === "light" ? "clear-day" : "clear-night");
+}
 
 export const PHILLY_COORDS = {
   latitude: 39.9526,
@@ -74,6 +95,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
   const map: Record<WeatherTheme, ThemeMeta> = {
     "clear-day": {
       lightMode: true,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.skylineHistoricModern,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(255,250,243,0.60),rgba(245,243,238,0.50))]",
@@ -83,6 +105,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "cloudy-day": {
       lightMode: true,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.centerCitySunset,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(247,244,238,0.64),rgba(244,241,236,0.56))]",
@@ -92,6 +115,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "rain-day": {
       lightMode: true,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.residentialRowhomes,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(246,243,238,0.42),rgba(236,239,243,0.34))]",
@@ -101,6 +125,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "snow-day": {
       lightMode: true,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.centerStreet,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(248,247,244,0.48),rgba(239,241,244,0.40))]",
@@ -110,6 +135,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "clear-night": {
       lightMode: false,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.skylineHistoricModern,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.78),rgba(0,0,0,0.88) 50%,rgba(0,0,0,0.95))]",
@@ -119,6 +145,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "cloudy-night": {
       lightMode: false,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.centerCitySunset,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.72),rgba(0,0,0,0.82) 55%,rgba(0,0,0,0.92))]",
@@ -128,6 +155,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "rain-night": {
       lightMode: false,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.residentialRowhomes,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,16,0.54),rgba(4,8,14,0.74))]",
@@ -137,6 +165,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
     },
     "snow-night": {
       lightMode: false,
+      showBackdrop: true,
       backgroundImage: phillyBackdrop.centerStreet,
       overlayClass:
         "absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,18,0.48),rgba(5,9,16,0.68))]",
