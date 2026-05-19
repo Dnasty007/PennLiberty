@@ -21,7 +21,7 @@ const visibleDisplayModes = [
   { key: "dark", label: "Dark" },
 ] as const;
 
-/** Light/Dark only in the UI; tapping the active choice returns to hidden default (cream). */
+/** Clicking the active mode again returns to neutral (default). */
 function pickDisplayMode(current: DisplayMode, next: "light" | "dark"): DisplayMode {
   return current === next ? "neutral" : next;
 }
@@ -46,7 +46,12 @@ function DisplayModeControl({
           key={item.key}
           type="button"
           onClick={() => onChange(pickDisplayMode(mode, item.key))}
-          className={`rounded-full px-3 py-1.5 text-xs transition ${mode === item.key ? active : idle}`}
+          className={`rounded-full px-3 py-1.5 text-xs transition ${
+            mode === item.key
+              ? `${active} ring-1 ring-[#d6b06a]/55`
+              : idle
+          }`}
+          aria-pressed={mode === item.key}
         >
           {item.label}
         </button>

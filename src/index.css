@@ -23,3 +23,35 @@ button,
 input {
   font: inherit;
 }
+
+/* Full-viewport Philly backdrops (Light / Dark) — applied in App.tsx */
+/* backdrop div is position:fixed so it only ever covers viewport, never the full page height */
+.site-backdrop {
+  /* cover scales to the minimum needed — safe for both landscape and portrait source images */
+  background-size: cover;
+  background-position: center 20%;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+/* Tall/narrow viewports: keep cover, nudge focal point down slightly for portrait screens */
+@media (max-aspect-ratio: 4/5) {
+  .site-backdrop {
+    background-size: cover;
+    background-position: center 25%;
+  }
+}
+
+/* For Owners hero card — scrolls with section (fixed would parallax oddly inside card) */
+.owners-card-backdrop {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+@media (max-aspect-ratio: 4/5) {
+  .owners-card-backdrop {
+    background-size: 100% auto;
+    background-position: center center;
+  }
+}

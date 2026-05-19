@@ -1,16 +1,35 @@
 import { useRef } from "react";
 
-/** Daytime, sky-forward Philadelphia-area editorial URLs (matched exposure across routes). */
+/** Local Philadelphia backdrops under `public/backdrops/` (served at `/backdrops/...`). */
 
-export const ownersBackdropPool = [
-  "https://images.unsplash.com/photo-1578073273384-02612e23b4ea?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1559406041-c7d2bbf2fd1c?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=2400&q=85",
+export const dayBackdropPool = [
+  "/backdrops/philly-day-1.jpg",
+  "/backdrops/philly-day-2.jpg",
+  "/backdrops/philly-day-3.jpg",
 ] as const;
+
+export const nightBackdropPool = [
+  "/backdrops/philly-night-1.jpg",
+  "/backdrops/philly-night-2.jpg",
+  "/backdrops/philly-night-3.jpg",
+] as const;
+
+export const ownersBackdropPool = dayBackdropPool;
+export const homeBackdropPool = dayBackdropPool;
+
+/**
+ * Site-wide backdrop layer (see `index.css` → `.site-backdrop` for size/position/attachment).
+ * Used when `theme.showBackdrop` is true (Light / Dark display modes).
+ */
+export const siteBackdropImageClass =
+  "site-backdrop fixed inset-0 z-0 transition-all duration-700";
+
+/** For Owners hero card — `.owners-card-backdrop` in index.css (no fixed attachment). */
+export const ownersCardBackdropImageClass = "owners-card-backdrop absolute inset-0";
 
 /**
  * Philly skyline teaser — bundled under `/public` so hero always resolves (Rentals relied on
- * Unsplash URLs that often 404 or block remotely, yielding an empty-looking black hero).
+ * remote URLs that often 404 or block, yielding an empty-looking black hero).
  */
 export const rentalsHeroDefaultSrc = "/listings-philly-map-teaser.png" as const;
 
@@ -18,7 +37,7 @@ export const rentalsHeroPool = [rentalsHeroDefaultSrc] as const;
 
 /**
  * Wide distant skyline for the listings map teaser — bundled under `/public` so it always
- * resolves (no Unsplash outages / PATH-length issues during local dev).
+ * resolves (no remote outages / PATH-length issues during local dev).
  */
 export const listingsMapTeaserDefaultSrc = "/listings-philly-map-teaser.png" as const;
 
@@ -27,12 +46,6 @@ export const listingsMapTeaserPool = [listingsMapTeaserDefaultSrc] as const;
 
 /** @deprecated Use listingsMapTeaserPool */
 export const listingsHeroPool = listingsMapTeaserPool;
-
-export const homeBackdropPool = [
-  "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1578073273384-02612e23b4ea?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=2400&q=85",
-] as const;
 
 export function pickFromPool<const T extends readonly string[]>(pool: T, index: number): T[number] {
   return pool[((index % pool.length) + pool.length) % pool.length]!;

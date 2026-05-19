@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ListingsMap } from "@/components/ListingsMap";
@@ -10,17 +10,26 @@ import { TeamSection } from "@/components/TeamSection";
 import {
   initialRentals,
   initialSaleListings,
+  navItems,
   type PageKey,
   type Rental,
   type SaleListing,
 } from "@/lib/data";
-import { DisplayMode, PHILLY_COORDS, themeForDisplayMode, type WeatherState } from "@/lib/theme";
 import {
+  backdropCssUrl,
+  DisplayMode,
+  PHILLY_COORDS,
+  themeForDisplayMode,
+  type WeatherState,
+} from "@/lib/theme";
+import {
+  dayBackdropPool,
+  nightBackdropPool,
   pickFromPool,
-  homeBackdropPool,
   listingsMapTeaserPool,
   ownersBackdropPool,
   rentalsHeroPool,
+  siteBackdropImageClass,
   useStablePoolIndex,
 } from "@/lib/siteImagery";
 
@@ -122,27 +131,43 @@ export default function App() {
     };
   }, []);
 
+  const dayIdx = useStablePoolIndex(dayBackdropPool.length);
+  const nightIdx = useStablePoolIndex(nightBackdropPool.length);
   const ownersIdx = useStablePoolIndex(ownersBackdropPool.length);
   const rentalsIdx = useStablePoolIndex(rentalsHeroPool.length);
   const listingsMapTeaserIdx = useStablePoolIndex(listingsMapTeaserPool.length);
-  const homeIdx = useStablePoolIndex(homeBackdropPool.length);
-
+  const dayBackdropPick = pickFromPool(dayBackdropPool, dayIdx);
+  const nightBackdropPick = pickFromPool(nightBackdropPool, nightIdx);
   const ownersBackdropPick = pickFromPool(ownersBackdropPool, ownersIdx);
-  const ownersEditorialHeroPick = pickFromPool(
-    ownersBackdropPool,
-    (ownersIdx + 1) % ownersBackdropPool.length,
-  );
+  const ownersSectionBackdrop =
+    displayMode === "dark"
+      ? nightBackdropPick
+      : displayMode === "light"
+        ? dayBackdropPick
+        : ownersBackdropPick;
+  const ownersEditorialHeroPick =
+    displayMode === "dark"
+      ? pickFromPool(nightBackdropPool, (nightIdx + 1) % nightBackdropPool.length)
+      : pickFromPool(ownersBackdropPool, (ownersIdx + 1) % ownersBackdropPool.length);
   const rentalsHeroPick = pickFromPool(rentalsHeroPool, rentalsIdx);
   const listingsMapTeaserPick = pickFromPool(listingsMapTeaserPool, listingsMapTeaserIdx);
-  const homeBackdropPick = pickFromPool(homeBackdropPool, homeIdx);
-
-  const theme = themeForDisplayMode(displayMode);
+  const theme = themeForDisplayMode(
+    displayMode,
+    displayMode === "light"
+      ? dayBackdropPick
+      : displayMode === "dark"
+        ? nightBackdropPick
+        : undefined,
+  );
   const lightMode = theme.lightMode;
 
-  const pageBackdropImage =
-    displayMode === "light" && activePage === "home"
-      ? `url('${homeBackdropPick}')`
-      : theme.backgroundImage;
+  /** Same day/night pick on every page (Home used a separate path before — broke Light on sub-pages). */
+  const siteBackdropImage =
+    displayMode === "light"
+      ? backdropCssUrl(dayBackdropPick)
+      : displayMode === "dark"
+        ? backdropCssUrl(nightBackdropPick)
+        : undefined;
 
   const selectedListing =
     saleListings.find((listing) => listing.id === selectedListingId) ?? saleListings[0];
@@ -160,6 +185,35 @@ export default function App() {
   const goToPage = (page: PageKey) => {
     setActivePage(page);
     setMobileOpen(false);
+  };
+
+  const swipeTouchStart = useRef<{ x: number; y: number } | null>(null);
+  const pageOrder = navItems.map((item) => item.key);
+  const currentPageIndex = pageOrder.indexOf(activePage);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    swipeTouchStart.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!swipeTouchStart.current) return;
+    if (showListingDetails || showScheduleTour || mobileOpen) return;
+
+    const dx = e.changedTouches[0].clientX - swipeTouchStart.current.x;
+    const dy = e.changedTouches[0].clientY - swipeTouchStart.current.y;
+    swipeTouchStart.current = null;
+
+    // Require at least 60px horizontal, and more horizontal than vertical
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.75) return;
+
+    if (dx < 0 && currentPageIndex < pageOrder.length - 1) {
+      goToPage(pageOrder[currentPageIndex + 1] as PageKey);
+    } else if (dx > 0 && currentPageIndex > 0) {
+      goToPage(pageOrder[currentPageIndex - 1] as PageKey);
+    }
   };
 
   const selectedListingImages = selectedListing.gallery.length
@@ -210,9 +264,10 @@ export default function App() {
     setShowScheduleTour(false);
   };
 
-  const rootClasses = lightMode
-    ? "min-h-screen bg-[#f5f3ee] text-black transition-colors duration-500"
-    : "min-h-screen bg-[#06101d] text-white transition-colors duration-500";
+  const rootClasses =
+    displayMode === "dark"
+      ? "min-h-screen bg-[#06101d] text-white transition-colors duration-500"
+      : "min-h-screen bg-[#f5f3ee] text-black transition-colors duration-500";
 
   const mutedText = lightMode ? "text-black/65" : "text-white/60";
   const subtleText = lightMode ? "text-black/50" : "text-white/45";
@@ -230,15 +285,17 @@ export default function App() {
     : "border-white/10 bg-white/[0.04] text-white placeholder:text-white/40";
 
   return (
-    <div className={rootClasses}>
+    <div className={rootClasses} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div className="relative min-h-screen overflow-x-hidden">
-        <div className={`${theme.overlayClass} absolute inset-0 transition-all duration-700`} />
-        {theme.showBackdrop ? (
+        {theme.showBackdrop && siteBackdropImage ? (
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-[0.82] transition-all duration-700"
-            style={{ backgroundImage: pageBackdropImage }}
+            className={siteBackdropImageClass}
+            style={{ backgroundImage: siteBackdropImage }}
+            role="presentation"
+            aria-hidden
           />
         ) : null}
+        <div className={`${theme.overlayClass} transition-all duration-700`} />
         <AmbienceLayer type={theme.ambience} />
 
         <Header
@@ -304,7 +361,7 @@ export default function App() {
             {activePage === "property-management" && (
               <OwnersSection
                 assistantTrigger={<AIAssistant lightMode={lightMode} />}
-                backdropSrc={displayMode === "neutral" ? undefined : ownersBackdropPick}
+                backdropSrc={displayMode === "neutral" ? undefined : ownersSectionBackdrop}
                 editorialHeroSrc={ownersEditorialHeroPick}
                 goToPage={goToPage}
                 lightMode={lightMode}

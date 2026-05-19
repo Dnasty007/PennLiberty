@@ -42,7 +42,7 @@ export function Hero({
             </span>
           </div>
 
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[0.92] tracking-[-1.5px] sm:text-[3.9rem] md:text-[5rem] xl:text-[6.3rem]">
+          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.0] tracking-[-1.5px] sm:text-[3.9rem] md:text-[5rem] xl:text-[6.3rem]">
             Professional Property
             Management in
             Philadelphia.

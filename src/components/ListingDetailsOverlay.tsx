@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import type { SaleListing } from "@/lib/data";
@@ -27,6 +28,19 @@ export function ListingDetailsOverlay({
   onPrevImage,
   onScheduleTour,
 }: ListingDetailsOverlayProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowRight") onNextImage();
+      if (e.key === "ArrowLeft") onPrevImage();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, onNextImage, onPrevImage]);
+
   if (!listing) {
     return null;
   }
@@ -61,6 +75,7 @@ export function ListingDetailsOverlay({
     "border-black/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.58),rgba(255,255,255,0.46))] shadow-[0_28px_90px_rgba(12,18,28,0.14)] backdrop-blur-[20px]";
 
   return (
+    <>
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl md:p-8 ${
         lightMode ? "bg-[rgba(9,16,26,0.18)]" : "bg-[rgba(4,10,16,0.72)]"
@@ -101,8 +116,18 @@ export function ListingDetailsOverlay({
         <div className="grid max-h-[calc(92vh-73px)] overflow-y-auto xl:grid-cols-[1.15fr_0.85fr]">
           <div className={`border-b xl:border-b-0 xl:border-r ${shellBorder}`}>
             <div className="relative h-[420px] md:h-[520px] xl:h-[760px]">
-              <img src={activeImage} alt={listing.title} className="h-full w-full object-cover" />
-              <div className={imageOverlay} />
+              <button
+                type="button"
+                className="group absolute inset-0 w-full cursor-zoom-in"
+                onClick={() => setLightboxOpen(true)}
+                aria-label="View full screen"
+              >
+                <img src={activeImage} alt={listing.title} className="h-full w-full object-cover" />
+                <div className={imageOverlay} />
+                <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white opacity-0 backdrop-blur-md transition-opacity group-hover:opacity-100">
+                  <Expand className="h-4 w-4" />
+                </div>
+              </button>
 
               {images.length > 1 && (
                 <>
@@ -218,5 +243,53 @@ export function ListingDetailsOverlay({
         </div>
       </GlassCard>
     </div>
+
+    {lightboxOpen && (
+      <div
+        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/94 backdrop-blur-sm"
+        onClick={() => setLightboxOpen(false)}
+      >
+        <button
+          type="button"
+          className="absolute right-4 top-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/[0.08] text-white backdrop-blur-md transition hover:bg-white/[0.15]"
+          onClick={() => setLightboxOpen(false)}
+          aria-label="Close fullscreen"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <img
+          src={activeImage}
+          alt={listing.title}
+          className="max-h-screen max-w-full object-contain px-14 py-14"
+          onClick={(e) => e.stopPropagation()}
+        />
+
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="absolute left-3 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.08] text-white backdrop-blur-md transition hover:bg-white/[0.15]"
+              onClick={(e) => { e.stopPropagation(); onPrevImage(); }}
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.08] text-white backdrop-blur-md transition hover:bg-white/[0.15]"
+              onClick={(e) => { e.stopPropagation(); onNextImage(); }}
+              aria-label="Next image"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full border border-white/20 bg-black/50 px-4 py-1.5 text-sm text-white backdrop-blur-md">
+              {currentImageIndex + 1} / {images.length}
+            </div>
+          </>
+        )}
+      </div>
+    )}
+  </>
   );
 }
