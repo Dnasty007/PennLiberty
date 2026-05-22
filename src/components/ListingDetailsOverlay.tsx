@@ -58,7 +58,7 @@ export function ListingDetailsOverlay({
   const secondaryButton = lightMode
     ? "rounded-full border-black/12 bg-white/40 px-6 py-6 text-black hover:bg-white/60"
     : "rounded-full border-white/15 bg-white/[0.04] px-6 py-6 text-white hover:bg-white/[0.08]";
-  const detailMutedText = lightMode ? "text-black/62" : "text-white/68";
+  const detailMutedText = lightMode ? "text-black/78" : "text-white/68";
   const highlightCardClasses = lightMode
     ? "border-black/10 bg-white/34 text-black"
     : "border-white/10 bg-white/[0.05] text-white";

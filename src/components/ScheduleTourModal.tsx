@@ -43,7 +43,7 @@ export function ScheduleTourModal({
   const cancelButton = lightMode
     ? "rounded-full border-black/12 bg-white/40 px-6 py-6 text-black hover:bg-white/60"
     : "rounded-full border-white/15 bg-white/[0.04] px-6 py-6 text-white hover:bg-white/[0.08]";
-  const detailMutedText = lightMode ? "text-black/62" : "text-white/68";
+  const detailMutedText = lightMode ? "text-black/78" : "text-white/68";
   const lightShellClasses =
     "border-black/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.58),rgba(255,255,255,0.46))] shadow-[0_28px_90px_rgba(12,18,28,0.14)] backdrop-blur-[20px]";
 

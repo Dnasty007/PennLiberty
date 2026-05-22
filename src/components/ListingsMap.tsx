@@ -155,7 +155,7 @@ export function ListingsMap({
           <div className="relative">
             <Search
               className={`pointer-events-none absolute left-4 top-1/2 z-[1] h-[18px] w-[18px] -translate-y-1/2 md:left-4 ${
-                lightMode ? "text-black/40" : "text-white/45"
+                lightMode ? "text-black/58" : "text-white/45"
               }`}
               aria-hidden
             />

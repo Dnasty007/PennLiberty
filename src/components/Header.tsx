@@ -37,7 +37,7 @@ function DisplayModeControl({
 }) {
   const wrapper = lightMode ? "border-black/12 bg-white/50" : "border-white/16 bg-white/[0.045]";
   const active = lightMode ? "bg-black/6 text-black shadow-sm" : "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]";
-  const idle = lightMode ? "text-black/65 hover:bg-black/5 hover:text-black" : "text-white/72 hover:bg-white/[0.06] hover:text-white";
+  const idle = lightMode ? "text-black/78 hover:bg-black/5 hover:text-black" : "text-white/72 hover:bg-white/[0.06] hover:text-white";
 
   return (
     <div className={`hidden items-center gap-1 rounded-full border px-1 py-1 lg:flex ${wrapper}`}>

@@ -10,7 +10,7 @@ export function SectionDivider({ label, number, lightMode }: SectionDividerProps
 
   const rule = lightMode ? "border-black/10" : "border-white/[0.08]";
   const mono = lightMode ? "text-[#a67c32]" : "text-[#dcb672]";
-  const heading = lightMode ? "text-black/54" : "text-white/54";
+  const heading = lightMode ? "text-black/70" : "text-white/54";
 
   return (
     <div className="relative mb-7 md:mb-9">

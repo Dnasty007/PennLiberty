@@ -23,7 +23,7 @@ const softClasses =
   "border-white/10 bg-[linear-gradient(180deg,rgba(8,15,26,0.84),rgba(8,15,26,0.74))] shadow-[0_28px_84px_rgba(0,0,0,0.38)] backdrop-blur-[14px]";
 
 const frostClasses =
-  "border-black/10 bg-white/34 shadow-[0_20px_70px_rgba(12,18,28,0.08)] backdrop-blur-[14px]";
+  "border-black/[0.11] bg-white/[0.58] shadow-[0_20px_70px_rgba(12,18,28,0.13)] backdrop-blur-[16px]";
 
 function resolveVariant(
   variant: GlassCardVariant | undefined,

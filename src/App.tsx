@@ -269,8 +269,8 @@ export default function App() {
       ? "min-h-screen bg-[#06101d] text-white transition-colors duration-500"
       : "min-h-screen bg-[#f5f3ee] text-black transition-colors duration-500";
 
-  const mutedText = lightMode ? "text-black/65" : "text-white/60";
-  const subtleText = lightMode ? "text-black/50" : "text-white/45";
+  const mutedText = lightMode ? "text-black/80" : "text-white/60";
+  const subtleText = lightMode ? "text-black/62" : "text-white/45";
   const pillClasses = lightMode
     ? "rounded-full bg-black/8 px-4 py-2 text-sm"
     : "rounded-full bg-black/5 px-4 py-2 text-sm";
@@ -278,7 +278,7 @@ export default function App() {
     ? "rounded-full border-black/20 bg-white/52 px-6 py-6 text-base text-black shadow-[0_16px_40px_rgba(12,18,28,0.08)] hover:bg-white/72"
     : "rounded-full border-white/20 bg-white/[0.05] px-6 py-6 text-base text-white shadow-[0_16px_40px_rgba(0,0,0,0.24)] hover:bg-white/[0.08]";
   const footerClasses = lightMode
-    ? "border-t border-black/10 px-4 py-8 text-black/55 md:px-8"
+    ? "border-t border-black/10 px-4 py-8 text-black/70 md:px-8"
     : "border-t border-white/10 px-4 py-8 text-white/55 md:px-8";
   const inputClasses = lightMode
     ? "border-black/15 bg-white/70"

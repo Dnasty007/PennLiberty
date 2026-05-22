@@ -2,6 +2,48 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/GlassCard";
 import { platforms, serviceCards, type PageKey } from "@/lib/data";
 import type { ThemeMeta, WeatherState } from "@/lib/theme";
+import { use3DTilt } from "@/lib/use3DTilt";
+
+function ServiceCard({
+  service,
+  lightMode,
+  mutedText,
+  goToPage,
+}: {
+  service: (typeof serviceCards)[number];
+  lightMode: boolean;
+  mutedText: string;
+  goToPage: (page: PageKey) => void;
+}) {
+  const tilt = use3DTilt({ maxRotateDeg: 7, trackLightSpot: true });
+
+  const bgClasses = lightMode
+    ? "border-black/[0.11] bg-white/[0.58] shadow-[0_20px_70px_rgba(12,18,28,0.13)] backdrop-blur-[16px]"
+    : "border-white/[0.09] bg-[linear-gradient(180deg,rgba(8,15,26,0.84),rgba(8,15,26,0.74))] shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-[14px]";
+
+  return (
+    <div
+      ref={tilt.ref}
+      onMouseMove={tilt.onMouseMove}
+      onMouseLeave={tilt.onMouseLeave}
+      className={`relative overflow-hidden rounded-[30px] border p-6 [transform-style:preserve-3d] ${bgClasses} before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-[radial-gradient(420px_circle_at_var(--mx,50%)_var(--my,50%),rgba(214,176,106,0.18),transparent_58%)] before:opacity-0 before:transition-opacity before:duration-200 data-[tilt-active=true]:before:opacity-100`}
+    >
+      <div className="relative z-10 flex h-full flex-col justify-between gap-4 [transform:translateZ(24px)]">
+        <div>
+          <service.icon className="mb-3.5 h-6 w-6 text-[#d6b06a]" />
+          <h3 className="text-xl font-semibold tracking-tight">{service.title}</h3>
+          <p className={`mt-1.5 text-[0.9375rem] leading-relaxed ${mutedText}`}>{service.desc}</p>
+        </div>
+        <button
+          onClick={() => goToPage(service.page)}
+          className={`text-[13px] font-semibold ${lightMode ? "text-black/60" : "text-[#d6b06a]"}`}
+        >
+          Explore <span className="ml-0.5">→</span>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type HeroProps = {
   goToPage: (page: PageKey) => void;
@@ -37,7 +79,7 @@ export function Hero({
           >
             {theme.icon}
             <span>
-              {theme.label}
+              Philadelphia
               {weather.temperature !== null ? ` - ${Math.round(weather.temperature)}°` : ""}
             </span>
           </div>
@@ -73,10 +115,12 @@ export function Hero({
         <GlassCard
           variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className="w-full max-w-[720px] p-7 !bg-white/[0.01] !backdrop-blur-[14px] before:!opacity-30 after:!opacity-38 lg:justify-self-end lg:mt-6"
+          className={`w-full max-w-[720px] p-7 lg:justify-self-end lg:mt-6 ${
+            lightMode ? "" : "!bg-white/[0.01] !backdrop-blur-[14px] before:!opacity-30 after:!opacity-38"
+          }`}
         >
           <div className="space-y-7">
-            <div className={`text-[1.05rem] ${mutedText}`}>Philadelphia Portfolio</div>
+            <div className="text-center text-[2.2rem] font-semibold italic tracking-wide text-[#d6b06a] md:text-[2.8rem] [font-family:'Cormorant_Garamond',serif] [text-shadow:0_0_24px_rgba(214,176,106,0.65),0_0_60px_rgba(214,176,106,0.3),0_0_100px_rgba(214,176,106,0.12)]">Our Portfolio</div>
             <div className="text-5xl font-semibold tracking-tight md:text-[4.4rem]">100+ Units</div>
             <div className={`text-lg ${mutedText}`}>Managed across Philly & surrounding areas</div>
             <div className="mt-2 grid grid-cols-2 gap-5">
@@ -112,7 +156,7 @@ export function Hero({
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        className="p-7 !bg-white/[0.006] !backdrop-blur-[16px] before:!opacity-45 after:!opacity-35 md:p-8"
+        className={`p-7 md:p-8 ${lightMode ? "" : "!bg-white/[0.006] !backdrop-blur-[16px] before:!opacity-45 after:!opacity-35"}`}
       >
         <div className="grid gap-6 md:grid-cols-[0.9fr_2.1fr] md:items-center">
           <div className="pr-2">
@@ -143,14 +187,13 @@ export function Hero({
 
       <section className="grid gap-6 md:grid-cols-3">
         {serviceCards.map((service) => (
-          <GlassCard variant={lightMode ? "frost" : "chrome"} lightMode={lightMode} key={service.title} className="p-6">
-            <service.icon className="mb-4 h-6 w-6 text-[#d6b06a]" />
-            <h3 className="text-xl font-semibold">{service.title}</h3>
-            <p className={`mt-2 ${mutedText}`}>{service.desc}</p>
-            <button onClick={() => goToPage(service.page)} className="mt-4 text-sm text-[#d6b06a]">
-              Explore →
-            </button>
-          </GlassCard>
+          <ServiceCard
+            key={service.title}
+            service={service}
+            lightMode={lightMode}
+            mutedText={mutedText}
+            goToPage={goToPage}
+          />
         ))}
       </section>
 
@@ -183,11 +226,11 @@ export function Hero({
             ].map((value) => (
               <div
                 key={value}
-                className={
+                className={`rounded-2xl border p-4 font-semibold ${
                   lightMode
-                    ? "rounded-2xl border border-black/10 bg-black/5 p-4"
-                    : "rounded-2xl border border-white/10 bg-black/5 p-4"
-                }
+                    ? "border-black/10 bg-black/5"
+                    : "border-white/10 bg-black/5 text-white"
+                }`}
               >
                 {value}
               </div>

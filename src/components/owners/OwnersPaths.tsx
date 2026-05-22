@@ -1,6 +1,5 @@
 import { ownersPaths, type OwnersPath } from "@/lib/owners";
 import { SectionDivider } from "@/components/owners/SectionDivider";
-import type { PageKey } from "@/lib/data";
 import { use3DTilt } from "@/lib/use3DTilt";
 
 const OPERATE_ANCHOR = "owners-operate-heading";
@@ -39,7 +38,7 @@ function PathCard({
     : "min-h-[200px] border-white/[0.09] bg-[rgba(255,255,255,0.02)] xl:min-h-[240px]";
 
   const ringOffset = lightMode ? "focus-visible:ring-offset-[rgba(246,243,239,1)]" : "focus-visible:ring-offset-[rgba(10,21,39,1)]";
-  const eyebrowDefault = lightMode ? "text-black/45" : "text-white/48";
+  const eyebrowDefault = lightMode ? "text-black/64" : "text-white/48";
   const eyebrowFeatured = lightMode ? "text-[#7a5916]" : "text-[#e5c98a]";
   const titleInk = lightMode ? "text-black" : "text-white";
   const bodyInk = lightMode ? "text-black/[0.68]" : "text-white/[0.72]";
@@ -85,23 +84,20 @@ function PathCard({
   );
 }
 
+type InterestPreset = "I want help managing" | "I'm thinking of selling" | "I'm not sure yet";
+
 type OwnersPathsProps = {
   lightMode: boolean;
   mutedText: string;
   subtleText: string;
-  /** Contact page (“Explore selling”); mail bootstrap uses `sessionStorage` key `pl-contact-bootstrap`. */
-  goToPage?: (page: PageKey) => void;
-  /** Align the property-review interest select before we scroll there (management / exploratory paths). */
-  onPresetPropertyReviewInterest?: (
-    preset: "I want help managing" | "I'm thinking of selling" | "I'm not sure yet",
-  ) => void;
+  /** Scrolls to section 03 and pre-selects the interest option. */
+  onPresetPropertyReviewInterest?: (preset: InterestPreset) => void;
 };
 
 export function OwnersPaths({
   lightMode,
   mutedText,
   subtleText,
-  goToPage,
   onPresetPropertyReviewInterest,
 }: OwnersPathsProps) {
   const sorted = [...ownersPaths].sort((a, b) => Number(b.featured) - Number(a.featured));
@@ -110,22 +106,13 @@ export function OwnersPaths({
     switch (path.key) {
       case "manage":
         onPresetPropertyReviewInterest?.("I want help managing");
-        scrollElementIntoViewPreferStart(OPERATE_ANCHOR);
+        scrollElementIntoViewPreferStart(REVIEW_SECTION);
+        focusAfterScroll(`#${REVIEW_NAME_FIELD}`);
         break;
       case "sell":
-        try {
-          sessionStorage.setItem(
-            "pl-contact-bootstrap",
-            JSON.stringify({
-              draft:
-                "Hi Penn Liberty,\n\nI'm reaching out about selling (or valuing) a Philadelphia property and would appreciate guidance on next steps.\n",
-              focusCompose: true,
-            }),
-          );
-        } catch {
-          /* ignore quota / privacy mode */
-        }
-        goToPage?.("contact");
+        onPresetPropertyReviewInterest?.("I'm thinking of selling");
+        scrollElementIntoViewPreferStart(REVIEW_SECTION);
+        focusAfterScroll(`#${REVIEW_NAME_FIELD}`);
         break;
       case "unsure":
         onPresetPropertyReviewInterest?.("I'm not sure yet");
@@ -142,13 +129,6 @@ export function OwnersPaths({
   return (
     <section>
       <SectionDivider lightMode={lightMode} label="However we can help" number="02" />
-      <p className={`mt-6 max-w-2xl text-sm leading-snug md:text-[0.95rem] md:leading-relaxed ${introMuted}`}>
-        Three doors — each card jumps somewhere real on this site (Buildium rundown, Contact for selling /
-        valuations, or the owner review form).
-        <span className={`block mt-3 text-[0.8125rem] leading-snug md:text-[0.875rem] ${subtleText}`}>
-          Tilt on desktop stays decorative; taps and keyboards use the same routes.
-        </span>
-      </p>
       <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {sorted.map((path) => (
           <PathCard

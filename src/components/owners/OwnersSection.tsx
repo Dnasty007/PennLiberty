@@ -7,6 +7,7 @@ import { OwnersCTA } from "@/components/owners/OwnersCTA";
 import { OwnersCoverageBand } from "@/components/owners/OwnersCoverageBand";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
 import type { PageKey } from "@/lib/data";
+import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
 
 type OwnersSectionProps = {
   backdropSrc?: string;
@@ -48,7 +49,7 @@ export function OwnersSection({
 
   const scrim =
     lightMode
-      ? "bg-[radial-gradient(760px_480px_at_82%_-8%,rgba(214,176,106,0.24)_0%,transparent_54%),radial-gradient(560px_400px_at_12%_100%,rgba(82,124,196,0.09)_0%,transparent_50%),linear-gradient(180deg,rgba(255,252,246,0.82)_0%,rgba(246,242,236,0.9)_74%,rgba(235,229,219,0.95)_100%)]"
+      ? "bg-[radial-gradient(760px_480px_at_82%_-8%,rgba(214,176,106,0.2)_0%,transparent_54%),radial-gradient(560px_400px_at_12%_100%,rgba(82,124,196,0.08)_0%,transparent_50%),linear-gradient(180deg,rgba(255,252,246,0.45)_0%,rgba(246,242,236,0.55)_74%,rgba(235,229,219,0.62)_100%)]"
       : "bg-[radial-gradient(820px_500px_at_82%_-8%,rgba(214,176,106,0.16)_0%,transparent_55%),radial-gradient(640px_420px_at_12%_100%,rgba(82,124,196,0.11)_0%,transparent_50%),linear-gradient(180deg,rgba(10,21,37,0.48)_0%,rgba(7,13,26,0.88)_76%,rgba(5,11,21,0.94)_100%)]";
 
   const bodyTrayRule = lightMode ? "border-black/[0.08]" : "border-white/[0.07]";
@@ -64,8 +65,8 @@ export function OwnersSection({
       {backdropSrc ? (
         <div
           aria-hidden
-          className="absolute inset-0 -z-20 bg-cover bg-center"
-          style={{ backgroundImage: `url("${backdropSrc}")`, transform: "scale(1.04)" }}
+          className={`${ownersCardBackdropImageClass} -z-20`}
+          style={{ backgroundImage: `url("${backdropSrc}")` }}
         />
       ) : (
         <div aria-hidden className="absolute inset-0 -z-20 bg-[#f5f3ee]" />
@@ -88,7 +89,6 @@ export function OwnersSection({
             lightMode={lightMode}
             mutedText={mutedText}
             subtleText={subtleText}
-            goToPage={goToPage}
             onPresetPropertyReviewInterest={presetInterestForCards}
           />
           <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
