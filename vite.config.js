@@ -42,6 +42,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 import path from "node:path";
+import fs from "node:fs";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 function ownerChatDevPlugin() {
@@ -127,8 +128,90 @@ function ownerChatDevPlugin() {
         },
     };
 }
+function devImageSavePlugin() {
+    return {
+        name: "dev-image-save",
+        apply: "serve",
+        configureServer: function (server) {
+            var _this = this;
+            var middleware = function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
+                var chunks, chunk, e_2_1, body, base64, buffer, safe, dest, publicPath, err_1;
+                var _a, req_2, req_2_1;
+                var _b, e_2, _c, _d;
+                return __generator(this, function (_e) {
+                    switch (_e.label) {
+                        case 0:
+                            if (req.url !== "/api/dev/save-image" || req.method !== "POST") {
+                                next();
+                                return [2 /*return*/];
+                            }
+                            _e.label = 1;
+                        case 1:
+                            _e.trys.push([1, 14, , 15]);
+                            chunks = [];
+                            _e.label = 2;
+                        case 2:
+                            _e.trys.push([2, 7, 8, 13]);
+                            _a = true, req_2 = __asyncValues(req);
+                            _e.label = 3;
+                        case 3: return [4 /*yield*/, req_2.next()];
+                        case 4:
+                            if (!(req_2_1 = _e.sent(), _b = req_2_1.done, !_b)) return [3 /*break*/, 6];
+                            _d = req_2_1.value;
+                            _a = false;
+                            chunk = _d;
+                            chunks.push(chunk);
+                            _e.label = 5;
+                        case 5:
+                            _a = true;
+                            return [3 /*break*/, 3];
+                        case 6: return [3 /*break*/, 13];
+                        case 7:
+                            e_2_1 = _e.sent();
+                            e_2 = { error: e_2_1 };
+                            return [3 /*break*/, 13];
+                        case 8:
+                            _e.trys.push([8, , 11, 12]);
+                            if (!(!_a && !_b && (_c = req_2.return))) return [3 /*break*/, 10];
+                            return [4 /*yield*/, _c.call(req_2)];
+                        case 9:
+                            _e.sent();
+                            _e.label = 10;
+                        case 10: return [3 /*break*/, 12];
+                        case 11:
+                            if (e_2) throw e_2.error;
+                            return [7 /*endfinally*/];
+                        case 12: return [7 /*endfinally*/];
+                        case 13:
+                            body = JSON.parse(Buffer.concat(chunks).toString("utf-8"));
+                            base64 = body.dataUrl.replace(/^data:image\/\w+;base64,/, "");
+                            buffer = Buffer.from(base64, "base64");
+                            safe = body.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+                            dest = path.resolve(__dirname, "public", "backdrops", safe);
+                            fs.mkdirSync(path.dirname(dest), { recursive: true });
+                            fs.writeFileSync(dest, buffer);
+                            publicPath = "/backdrops/".concat(safe);
+                            console.log("[dev-image-save] Saved \u2192 ".concat(dest));
+                            res.statusCode = 200;
+                            res.setHeader("Content-Type", "application/json");
+                            res.end(JSON.stringify({ ok: true, path: publicPath }));
+                            return [3 /*break*/, 15];
+                        case 14:
+                            err_1 = _e.sent();
+                            console.error("[dev-image-save] Error:", err_1);
+                            res.statusCode = 500;
+                            res.end(JSON.stringify({ ok: false, error: String(err_1) }));
+                            return [3 /*break*/, 15];
+                        case 15: return [2 /*return*/];
+                    }
+                });
+            }); };
+            server.middlewares.use(middleware);
+        },
+    };
+}
 export default defineConfig({
-    plugins: [react(), ownerChatDevPlugin()],
+    plugins: [react(), ownerChatDevPlugin(), devImageSavePlugin()],
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),

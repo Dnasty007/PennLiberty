@@ -32,7 +32,7 @@ const load  = <T,>(k: string, fb: T): T => { try { return JSON.parse(localStorag
 const store = (k: string, v: unknown) => localStorage.setItem(k, JSON.stringify(v));
 
 /* ─── DOM utilities ───────────────────────────────────────────────────────── */
-const PANEL_IDS = "#pl-ed-main, #pl-ed-inspector, #pl-ed-hover";
+const PANEL_IDS = "#pl-ed-main, #pl-ed-inspector, #pl-ed-hover, #pl-ed-file";
 
 function kebab(s: string) { return s.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()); }
 
@@ -75,13 +75,20 @@ function findBgAncestor(el: HTMLElement): HTMLElement | null {
   return null;
 }
 
-/** In Image Mode: resolve a click to the nearest image (or background-image) element. */
-function resolveImage(t: HTMLElement): HTMLElement | null {
-  const img = t.closest("img") as HTMLElement | null;
-  if (img) return img;
-  const inner = t.querySelector("img") as HTMLElement | null;
-  if (inner) return inner;
-  return findBgAncestor(t);
+/** In Image Mode: find the topmost image (or background-image) under the cursor,
+ *  looking THROUGH text / gradients / overlays stacked on top of it. */
+function resolveImageAt(x: number, y: number): HTMLElement | null {
+  const stack = document.elementsFromPoint(x, y) as HTMLElement[];
+  for (const el of stack) {
+    if (el.closest(PANEL_IDS)) continue;          // ignore the editor's own panels
+    if (el.tagName === "IMG") return el;          // a real <img>
+    if (el.style.backgroundImage && el.style.backgroundImage !== "none") return el; // inline bg
+    if (getBgUrl(el)) return el;                  // computed bg-image
+  }
+  // Fallback: nearest <img> ancestor/descendant of the literal target
+  const t = stack[0];
+  if (!t) return null;
+  return (t.closest("img") as HTMLElement) ?? (t.querySelector("img") as HTMLElement) ?? findBgAncestor(t);
 }
 
 /** Read current CSS `translate` offset (px) from override map or computed style. */
@@ -328,6 +335,7 @@ export function DevImageEditor() {
 
   /* re-apply everything after each render */
   useEffect(() => {
+    if (dragRef.current.active) return; // never fight an in-progress drag
     const activePath = selectedRef.current?.path ?? null;
     reapplyAll(editsRef.current, activePath);
     swapDataRef.current.forEach((dataUrl, path) => {
@@ -356,14 +364,16 @@ export function DevImageEditor() {
     const isImg = el.tagName === "IMG";
     const hasBg = !isImg && !!getBgUrl(el);
     const orig = el.getAttribute("data-original-text") ?? (isPureText(el) ? el.innerText.trim() : "");
-    setSelected({
+    const next: Selected = {
       el, path, tag: el.tagName.toLowerCase(), className: el.className?.toString?.() ?? "",
       isPure: isPureText(el), isImg, hasBg,
       originalText: existing?.originalText ?? orig,
       text: existing?.text ?? (isPureText(el) ? el.innerText.trim() : ""),
       styles: existing ? { ...existing.styles } : {},
       swapName: null, savedPath: existing?.swapSrc ?? null,
-    });
+    };
+    selectedRef.current = next; // sync immediately so re-apply uses the right active path
+    setSelected(next);
   }, []);
 
   /* on mount: re-apply saved edits repeatedly to catch late-rendering content */
@@ -375,23 +385,34 @@ export function DevImageEditor() {
 
   /* click + hover + drag-to-move interceptors */
   useEffect(() => {
-    /** which element a click/drag targets given the active mode */
-    const pick = (t: HTMLElement): HTMLElement | null => {
+    /** which element a click/drag targets given the active mode + cursor position */
+    const pick = (e: MouseEvent): HTMLElement | null => {
+      const t = e.target as HTMLElement;
       if (t.closest(PANEL_IDS)) return null;
-      if (imageModeRef.current) return resolveImage(t);
+      if (imageModeRef.current) return resolveImageAt(e.clientX, e.clientY);
       if (editModeRef.current)  return t;
       return null;
     };
 
     const onDown = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      const el = pick(t);
-      if (!el) return;
+      // a fresh press clears any stale click-suppression from a prior drag
+      suppressClickRef.current = false;
+      if (!editModeRef.current && !imageModeRef.current) return;
+      const el = pick(e);
+      if (!el) {
+        // active mode but nothing valid under cursor — still swallow so the
+        // site doesn't navigate/act while you're editing
+        const t = e.target as HTMLElement;
+        if (!t.closest(PANEL_IDS)) { e.preventDefault(); e.stopPropagation(); }
+        return;
+      }
       e.preventDefault(); e.stopPropagation();
       // Select immediately AND arm a drag in the same gesture
       selectEl(el);
       const base = parseTranslate(el, undefined);
-      dragRef.current = { active: true, el, sx: e.clientX, sy: e.clientY, bx: base.x, by: base.y, moved: false } as typeof dragRef.current;
+      // Kill CSS transitions so the element snaps to the cursor instead of easing/floating
+      el.style.setProperty("transition", "none", "important");
+      dragRef.current = { active: true, el, sx: e.clientX, sy: e.clientY, bx: base.x, by: base.y, moved: false };
       ring(el, "sel");
     };
 
@@ -412,13 +433,14 @@ export function DevImageEditor() {
       if (!active) { ring(null, "hover"); return; }
       const t = e.target as HTMLElement;
       if (t.closest(PANEL_IDS)) { ring(null, "hover"); return; }
-      ring(imageModeRef.current ? resolveImage(t) : t, "hover");
+      ring(imageModeRef.current ? resolveImageAt(e.clientX, e.clientY) : t, "hover");
     };
 
     const onUp = (e: MouseEvent) => {
       const d = dragRef.current;
       if (!d.active) return;
       d.active = false;
+      if (d.el) d.el.style.removeProperty("transition"); // restore normal transitions
       if (d.moved && d.el) {
         suppressClickRef.current = true;
         const dx = Math.round(d.bx + (e.clientX - d.sx));
@@ -426,13 +448,20 @@ export function DevImageEditor() {
         const movedEl = d.el;
         movedEl.style.translate = `${dx}px ${dy}px`;
         // record into inspector state so Save / sliders reflect it
-        setSelected((prev) => prev && prev.el === movedEl ? { ...prev, styles: { ...prev.styles, translate: `${dx}px ${dy}px` } } : prev);
+        setSelected((prev) => {
+          const base = prev && prev.el === movedEl ? prev : selectedRef.current;
+          if (!base || base.el !== movedEl) return prev;
+          const updated = { ...base, styles: { ...base.styles, translate: `${dx}px ${dy}px` } };
+          selectedRef.current = updated;
+          return updated;
+        });
       }
+      d.el = null;
     };
 
     const onClick = (e: MouseEvent) => {
       if (suppressClickRef.current) { suppressClickRef.current = false; e.preventDefault(); e.stopPropagation(); return; }
-      // selection already handled in onDown; just swallow the click in active modes
+      // selection already handled in onDown; swallow the click in active modes
       const t = e.target as HTMLElement;
       if (t.closest(PANEL_IDS)) return;
       if (editModeRef.current || imageModeRef.current) { e.preventDefault(); e.stopPropagation(); }
@@ -620,7 +649,32 @@ export function DevImageEditor() {
     navigator.clipboard.writeText(text).then(() => { setCopied("all"); setTimeout(() => setCopied(""), 1800); });
   };
 
-  const clearAll = () => { editsRef.current = {}; swapDataRef.current.clear(); store(EDITS_KEY, {}); setHistory({}); };
+  const clearAll = () => {
+    // Reset every edited element back to its original look, surgically — only
+    // removing the props WE added, so app-set inline styles (pin top/left) survive.
+    Object.entries(editsRef.current).forEach(([path, edit]) => {
+      const el = elFromPath(path);
+      if (!el) return;
+      Object.keys(edit.styles).forEach((p) => el.style.removeProperty(p));
+      el.style.removeProperty("translate");
+      el.style.removeProperty("transition");
+      if (edit.text != null) {
+        const o = el.getAttribute("data-original-text");
+        if (o != null) el.innerText = o;
+      }
+      if (edit.swapSrc) {
+        if (el.tagName === "IMG") { const o = el.getAttribute("data-original-src"); if (o) (el as HTMLImageElement).src = o; }
+        else { const o = el.getAttribute("data-original-bg"); el.style.backgroundImage = o ?? ""; }
+      }
+    });
+    editsRef.current = {};
+    swapDataRef.current.clear();
+    store(EDITS_KEY, {});
+    setHistory({});
+    setSelected(null);
+    selectedRef.current = null;
+    if (selRingRef.current) selRingRef.current.style.display = "none";
+  };
 
   const count = Object.keys(history).length;
 
@@ -634,7 +688,7 @@ export function DevImageEditor() {
   /* ═══════════════════════════════════════════════════════════════════════ */
   return (
     <>
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
+      <input id="pl-ed-file" ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
 
       {/* ── MAIN PANEL ──────────────────────────────────────────────────── */}
       <div id="pl-ed-main" className={`fixed z-[9999] w-56 ${PANEL}`} style={{ left: main.pos.x, top: main.pos.y, fontFamily: "monospace" }}>

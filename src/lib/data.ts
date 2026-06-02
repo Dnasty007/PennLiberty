@@ -61,8 +61,8 @@ const diamond3fGallery = rentalGallery("1704-w-diamond-st-3f", diamond3fPhotos);
 
 /** Pin positions (% of hero) aligned to `initialRentals` length at build time — adjust if you reorder. */
 export const rentalMapPinOffsets = [
-  { top: "18%", left: "54%" },
-  { top: "24%", left: "69%" },
+  { top: "18%", left: "54%", nudge: "-196px -47px" },
+  { top: "24%", left: "69%", nudge: "-77px 19px" },
   { top: "19%", left: "50%" },
   { top: "44%", left: "61%" },
   { top: "36%", left: "73%" },

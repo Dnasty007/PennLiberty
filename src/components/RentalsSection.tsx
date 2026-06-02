@@ -187,6 +187,7 @@ export function RentalsSection({
                   <button
                     type="button"
                     onClick={() => onOpenRentalDetails?.(rental.id)}
+                    style={{ translate: "nudge" in position ? position.nudge : undefined }}
                     className="max-w-[11rem] rounded-2xl border border-[#d6b06a]/25 bg-black/58 px-3 py-2 text-center text-xs font-medium text-white shadow-[0_12px_34px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-[#d6b06a]/60 hover:bg-black/75 hover:scale-105 hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] sm:max-w-[12rem]"
                   >
                     <span className="line-clamp-2 leading-snug">{rental.title}</span>
