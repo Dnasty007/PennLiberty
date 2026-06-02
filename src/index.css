@@ -27,11 +27,13 @@ input {
 /* Full-viewport Philly backdrops (Light / Dark) — applied in App.tsx */
 /* backdrop div is position:fixed so it only ever covers viewport, never the full page height */
 .site-backdrop {
-  /* cover scales to the minimum needed — safe for both landscape and portrait source images */
-  background-size: cover;
-  background-position: 47% 100%;
+  background-size: 100%;
+  --bd-y: 25%; /* starting vertical frame (top of page); scroll reveals downward from here */
+  background-position: 47% var(--bd-y);
   background-repeat: no-repeat;
   background-attachment: scroll;
+  will-change: background-position;
+  backface-visibility: hidden;
 }
 
 /* Tall/narrow viewports: keep cover, nudge focal point down slightly for portrait screens */

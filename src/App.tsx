@@ -173,6 +173,32 @@ export default function App() {
         ? backdropCssUrl(nightBackdropPick)
         : undefined;
 
+  /* Scroll-reveal: pan the backdrop downward from its starting frame (--bd-y),
+     locked 1:1 to scroll (no easing = no lag), sub-pixel + rAF-throttled so it
+     tracks the page perfectly and stays smooth. */
+  useEffect(() => {
+    const el = document.querySelector(".site-backdrop") as HTMLElement | null;
+    if (!el) return;
+    const baseY = parseFloat(getComputedStyle(el).getPropertyValue("--bd-y")) || 0;
+    const travel = 55; // % of the image revealed across a full scroll
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      el.style.backgroundPositionY = `${(baseY + p * travel).toFixed(3)}%`;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [siteBackdropImage, activePage]);
+
   const selectedListing =
     saleListings.find((listing) => listing.id === selectedListingId) ?? saleListings[0];
 

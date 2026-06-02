@@ -91,6 +91,31 @@ function resolveImageAt(x: number, y: number): HTMLElement | null {
   return (t.closest("img") as HTMLElement) ?? (t.querySelector("img") as HTMLElement) ?? findBgAncestor(t);
 }
 
+/** Background pan metrics: current width %, overflow per axis (px), current position %. */
+function bgPanBase(el: HTMLElement, nat: { w: number; h: number } | undefined) {
+  const r = el.getBoundingClientRect();
+  const cs = getComputedStyle(el);
+  // width as a % of container — use inline % if set, else compute the cover %
+  let sizePct: number;
+  const inline = el.style.backgroundSize;
+  if (inline && inline.endsWith("%")) {
+    sizePct = parseFloat(inline) || 100;
+  } else if (nat && r.width && r.height) {
+    const coverScale = Math.max(r.width / nat.w, r.height / nat.h);
+    sizePct = ((nat.w * coverScale) / r.width) * 100;
+  } else {
+    sizePct = 100;
+  }
+  const aspect = nat && nat.w ? nat.h / nat.w : 0.66;
+  const imgW = (r.width * sizePct) / 100;
+  const imgH = imgW * aspect;
+  const overflowX = Math.max(imgW - r.width, 1);
+  const overflowY = Math.max(imgH - r.height, 1);
+  const pos = (el.style.backgroundPosition || cs.backgroundPosition || "50% 50%").split(/\s+/);
+  const px = parseFloat(pos[0]); const py = parseFloat(pos[1]);
+  return { sizePct, overflowX, overflowY, px: Number.isFinite(px) ? px : 50, py: Number.isFinite(py) ? py : 50 };
+}
+
 /** Read current CSS `translate` offset (px) from override map or computed style. */
 function parseTranslate(el: HTMLElement, override?: string): { x: number; y: number } {
   const v = override ?? el.style.translate ?? getComputedStyle(el).translate;
@@ -302,7 +327,8 @@ export function DevImageEditor() {
   const selRingRef   = useRef<HTMLDivElement | null>(null);
   const hoverRingRef = useRef<HTMLDivElement | null>(null);
   const fileRef      = useRef<HTMLInputElement>(null);
-  const dragRef      = useRef<{ active: boolean; el: HTMLElement | null; sx: number; sy: number; bx: number; by: number; moved: boolean }>({ active: false, el: null, sx: 0, sy: 0, bx: 0, by: 0, moved: false });
+  const dragRef      = useRef<{ active: boolean; el: HTMLElement | null; mode: "translate" | "bg"; sx: number; sy: number; bx: number; by: number; ox: number; oy: number; moved: boolean }>({ active: false, el: null, mode: "translate", sx: 0, sy: 0, bx: 0, by: 0, ox: 1, oy: 1, moved: false });
+  const bgNatRef     = useRef<Map<string, { w: number; h: number }>>(new Map());
   const suppressClickRef = useRef(false);
 
   const main = useDraggable({ x: Math.max(8, window.innerWidth - 232), y: 80 });
@@ -374,6 +400,11 @@ export function DevImageEditor() {
     };
     selectedRef.current = next; // sync immediately so re-apply uses the right active path
     setSelected(next);
+    // preload natural dimensions of a background image so drag-to-pan has real math
+    if (hasBg && !bgNatRef.current.has(path)) {
+      const u = getBgUrl(el);
+      if (u) { const im = new Image(); im.onload = () => bgNatRef.current.set(path, { w: im.naturalWidth, h: im.naturalHeight }); im.src = u; }
+    }
   }, []);
 
   /* on mount: re-apply saved edits repeatedly to catch late-rendering content */
@@ -409,10 +440,19 @@ export function DevImageEditor() {
       e.preventDefault(); e.stopPropagation();
       // Select immediately AND arm a drag in the same gesture
       selectEl(el);
-      const base = parseTranslate(el, undefined);
-      // Kill CSS transitions so the element snaps to the cursor instead of easing/floating
-      el.style.setProperty("transition", "none", "important");
-      dragRef.current = { active: true, el, sx: e.clientX, sy: e.clientY, bx: base.x, by: base.y, moved: false };
+      el.style.setProperty("transition", "none", "important"); // snap to cursor, no easing
+
+      const isBg = el.tagName !== "IMG" && !!getBgUrl(el);
+      if (isBg) {
+        // Dragging a background PANS the image (like a crop tool), not the div
+        const m = bgPanBase(el, bgNatRef.current.get(getPath(el)));
+        el.style.backgroundSize = `${m.sizePct}%`;   // normalize to % so panning is reliable
+        el.style.backgroundRepeat = "no-repeat";
+        dragRef.current = { active: true, el, mode: "bg", sx: e.clientX, sy: e.clientY, bx: m.px, by: m.py, ox: m.overflowX, oy: m.overflowY, moved: false };
+      } else {
+        const base = parseTranslate(el, undefined);
+        dragRef.current = { active: true, el, mode: "translate", sx: e.clientX, sy: e.clientY, bx: base.x, by: base.y, ox: 1, oy: 1, moved: false };
+      }
       ring(el, "sel");
     };
 
@@ -421,9 +461,16 @@ export function DevImageEditor() {
       if (d.active && d.el) {
         if (Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) > 3) d.moved = true;
         if (d.moved) {
-          const dx = Math.round(d.bx + (e.clientX - d.sx));
-          const dy = Math.round(d.by + (e.clientY - d.sy));
-          d.el.style.translate = `${dx}px ${dy}px`;
+          if (d.mode === "bg") {
+            // grab-and-slide: drag down reveals the top, etc.
+            const nx = Math.max(0, Math.min(100, d.bx - ((e.clientX - d.sx) / d.ox) * 100));
+            const ny = Math.max(0, Math.min(100, d.by - ((e.clientY - d.sy) / d.oy) * 100));
+            d.el.style.backgroundPosition = `${Math.round(nx)}% ${Math.round(ny)}%`;
+          } else {
+            const dx = Math.round(d.bx + (e.clientX - d.sx));
+            const dy = Math.round(d.by + (e.clientY - d.sy));
+            d.el.style.translate = `${dx}px ${dy}px`;
+          }
           ring(d.el, "sel");
         }
         e.preventDefault();
@@ -443,15 +490,26 @@ export function DevImageEditor() {
       if (d.el) d.el.style.removeProperty("transition"); // restore normal transitions
       if (d.moved && d.el) {
         suppressClickRef.current = true;
-        const dx = Math.round(d.bx + (e.clientX - d.sx));
-        const dy = Math.round(d.by + (e.clientY - d.sy));
         const movedEl = d.el;
-        movedEl.style.translate = `${dx}px ${dy}px`;
-        // record into inspector state so Save / sliders reflect it
+        const patch: Record<string, string> = {};
+        if (d.mode === "bg") {
+          const nx = Math.round(Math.max(0, Math.min(100, d.bx - ((e.clientX - d.sx) / d.ox) * 100)));
+          const ny = Math.round(Math.max(0, Math.min(100, d.by - ((e.clientY - d.sy) / d.oy) * 100)));
+          movedEl.style.backgroundPosition = `${nx}% ${ny}%`;
+          patch["background-position"] = `${nx}% ${ny}%`;
+          patch["background-size"] = movedEl.style.backgroundSize;
+          patch["background-repeat"] = "no-repeat";
+        } else {
+          const dx = Math.round(d.bx + (e.clientX - d.sx));
+          const dy = Math.round(d.by + (e.clientY - d.sy));
+          movedEl.style.translate = `${dx}px ${dy}px`;
+          patch["translate"] = `${dx}px ${dy}px`;
+        }
+        // record into inspector state so Save persists it
         setSelected((prev) => {
           const base = prev && prev.el === movedEl ? prev : selectedRef.current;
           if (!base || base.el !== movedEl) return prev;
-          const updated = { ...base, styles: { ...base.styles, translate: `${dx}px ${dy}px` } };
+          const updated = { ...base, styles: { ...base.styles, ...patch } };
           selectedRef.current = updated;
           return updated;
         });
@@ -774,7 +832,9 @@ export function DevImageEditor() {
             {/* POSITION (drag to move) */}
             <Section title="Position — drag to move" defaultOpen>
               <p className="text-[8px] text-white/30 leading-relaxed">
-                Grab the highlighted element on the page and drag it, or nudge with X / Y.
+                {selected.hasBg
+                  ? "Drag the image on the page to pan it (zoom in first to reveal more). Or nudge X / Y below."
+                  : "Grab the highlighted element on the page and drag it, or nudge with X / Y."}
               </p>
               {(() => {
                 const tr = parseTranslate(selected.el, selected.styles.translate);
@@ -874,14 +934,24 @@ export function DevImageEditor() {
                   </>
                 ) : (
                   <>
-                    <NumRow label="Size" value={parseFloat(val("background-size", "100")) || 100} unit="%" min={50} max={250}
-                      onChange={(v) => setStyle("background-size", `${v}%`)} />
+                    <BtnGroup label="Fit" value={["cover", "contain"].includes(val("background-size", "")) ? val("background-size", "") : "custom"}
+                      options={[{ v: "cover", l: "Cover" }, { v: "contain", l: "Whole" }, { v: "custom", l: "Custom" }]}
+                      onChange={(v) => { if (v === "custom") { setStyle("background-size", "100%"); } else { setStyle("background-size", v); } setStyle("background-repeat", "no-repeat"); }} />
+                    <SliderRow label="Zoom" min={15} max={350} step={1} unit="%"
+                      value={parseFloat(val("background-size", "100")) || 100}
+                      onChange={(v) => { setStyle("background-size", `${v}%`); setStyle("background-repeat", "no-repeat"); }} />
+                    <NumRow label="Zoom %" value={parseFloat(val("background-size", "100")) || 100} unit="%" min={10} max={600}
+                      onChange={(v) => { setStyle("background-size", `${v}%`); setStyle("background-repeat", "no-repeat"); }} />
                     <div className="grid grid-cols-2 gap-2">
-                      <NumRow label="X" value={parseFloat(val("background-position", "50% 50%").split(" ")[0]) || 50} unit="%" min={0} max={100}
-                        onChange={(v) => { const y = val("background-position", "50% 50%").split(" ")[1] ?? "50%"; setStyle("background-position", `${v}% ${y}`); }} />
-                      <NumRow label="Y" value={parseFloat(val("background-position", "50% 50%").split(" ")[1]) || 50} unit="%" min={0} max={100}
-                        onChange={(v) => { const x = val("background-position", "50% 50%").split(" ")[0] ?? "50%"; setStyle("background-position", `${x} ${v}%`); }} />
+                      <NumRow label="X" value={Math.round(parseFloat(val("background-position", cs?.backgroundPosition ?? "50% 50%").split(" ")[0]) || 50)} unit="%" min={-50} max={150}
+                        onChange={(v) => { const y = val("background-position", cs?.backgroundPosition ?? "50% 50%").split(" ")[1] ?? "50%"; setStyle("background-position", `${v}% ${y}`); }} />
+                      <NumRow label="Y" value={Math.round(parseFloat(val("background-position", cs?.backgroundPosition ?? "50% 50%").split(" ")[1]) || 50)} unit="%" min={-50} max={150}
+                        onChange={(v) => { const x = val("background-position", cs?.backgroundPosition ?? "50% 50%").split(" ")[0] ?? "50%"; setStyle("background-position", `${x} ${v}%`); }} />
                     </div>
+                    <button onClick={() => { clearStyle("background-size"); clearStyle("background-repeat"); }}
+                      className="w-full text-[9px] text-white/35 hover:text-[#d6b06a] transition text-center">
+                      reset zoom to cover
+                    </button>
                   </>
                 )}
                 <button onClick={onSwap} className="w-full rounded-lg border border-[#d6b06a]/25 py-2 text-[10px] font-bold text-[#d6b06a] transition hover:border-[#d6b06a]/55 hover:bg-[#d6b06a]/10">
