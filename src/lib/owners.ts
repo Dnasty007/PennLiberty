@@ -1,10 +1,10 @@
 export const ownersOperateIntro = {
   eyebrow: "Systems & accountability",
   title:
-    "Your portfolio isn’t coordinated in spreadsheets and group texts—we run it on Buildium.",
+    "Your portfolio isn’t coordinated in spreadsheets and group texts. We run it on Buildium.",
   lead: "Buildium is the property management platform we use for applications, leases, rent, maintenance workflows, vendor coordination, and owner reporting. Owners get clearer answers because the paperwork and money trail aren’t improvised.",
   footnote:
-    "Buildium® is a trademark of Buildium LLC. Penn Liberty names it so you understand how your property is administered day to day—we are independent and not endorsed by Buildium.",
+    "Buildium® is a trademark of Buildium LLC. Penn Liberty names it so you understand how your property is administered day to day. We are independent and not endorsed by Buildium.",
 } as const;
 
 export type OwnersOperatePillar = {
@@ -15,7 +15,7 @@ export type OwnersOperatePillar = {
 export const ownersOperatePillars: OwnersOperatePillar[] = [
   {
     title: "Money you can reconcile",
-    body: "Rent collection and owner disbursements are tracked in-platform—fewer mysteries when you ask where a payment landed.",
+    body: "Rent collection and owner disbursements are tracked in-platform. Fewer mysteries when you ask where a payment landed.",
   },
   {
     title: "Leasing with a paper trail",
@@ -23,11 +23,11 @@ export const ownersOperatePillars: OwnersOperatePillar[] = [
   },
   {
     title: "Maintenance that doesn’t evaporate",
-    body: "Work orders are routed, prioritized, and closed with history—critical when boilers fail on a holiday weekend.",
+    body: "Work orders are routed, prioritized, and closed with history. Critical when boilers fail on a holiday weekend.",
   },
   {
     title: "Reporting you can rely on",
-    body: "Owner statements summarize what happened financially and operationally—you’re informed when metrics move, not when someone remembers to forward a screenshot.",
+    body: "Owner statements summarize what happened financially and operationally. You’re informed when metrics move, not when someone remembers to forward a screenshot.",
   },
 ];
 

@@ -31,15 +31,13 @@ export const ownersCardBackdropImageClass = "owners-card-backdrop absolute inset
  * Philly skyline teaser — bundled under `/public` so hero always resolves (Rentals relied on
  * remote URLs that often 404 or block, yielding an empty-looking black hero).
  */
-export const rentalsHeroDefaultSrc = "/listings-philly-map-teaser.png" as const;
-
-export const rentalsHeroPool = [rentalsHeroDefaultSrc] as const;
+export const rentalsHeroPool = ["/backdrops/philly-rentals-hero.jpg"] as const;
 
 /**
  * Wide distant skyline for the listings map teaser — bundled under `/public` so it always
  * resolves (no remote outages / PATH-length issues during local dev).
  */
-export const listingsMapTeaserDefaultSrc = "/listings-philly-map-teaser.png" as const;
+export const listingsMapTeaserDefaultSrc = "/backdrops/philly-listings-teaser.jpg" as const;
 
 /** Single stable pick; kept as a tuple so `pickFromPool` + `useStablePoolIndex` stay unchanged at call sites. */
 export const listingsMapTeaserPool = [listingsMapTeaserDefaultSrc] as const;

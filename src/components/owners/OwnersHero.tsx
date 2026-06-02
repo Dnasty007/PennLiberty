@@ -49,9 +49,9 @@ export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: Owner
             Penn Liberty has been managing and selling Philadelphia properties since 2009. Day to day we run
             leasing, accounting, maintenance, and owner reporting through{" "}
             <strong className={`font-semibold ${strongInk}`}>Buildium property management software</strong>
-            —so approvals, disbursements, and work orders aren&apos;t improvised in side threads. Whether
+            , so approvals, disbursements, and work orders aren&apos;t improvised in side threads. Whether
             you&apos;re a first-time landlord or running a portfolio, we&apos;ll walk you through what disciplined
-            management protects — and why it matters more than most owners expect.
+            management protects and why it matters more than most owners expect.
           </p>
         </header>
 

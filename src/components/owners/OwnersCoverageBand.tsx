@@ -55,28 +55,28 @@ export function OwnersCoverageBand({
               id="owners-coverage-heading"
               className={`mt-3 text-[1.875rem] font-semibold tracking-tight md:text-[2rem] xl:text-[2.125rem] ${heading}`}
             >
-              Philadelphia blocks — not flyover markets.
+              Philadelphia blocks, not flyover markets.
             </h2>
             <p className={`mt-4 text-[0.9675rem] leading-relaxed md:text-[1rem] md:leading-[1.6] ${mutedText}`}>
               We operate where rowhomes meet investors and reliable tenants stick. Pins are illustrative;
-              neighborhoods are familiar ground—from Northern Liberties to South Philly corridors, owners get the
+              neighborhoods are familiar ground, from Northern Liberties to South Philly corridors, owners get the
               same playbook.
             </p>
             <div className={`mt-7 rounded-2xl border px-5 py-4 ${insetBox}`}>
               <div className={`text-[10px] font-bold uppercase tracking-[0.22em] ${insetLabel}`}>Corridor snapshot</div>
               <p className={`mt-4 text-[13px] leading-relaxed ${insetBody}`}>
                 Disciplined marketing, lawful screening, clear reporting, and local vendors who pick up when something
-                breaks—all documented in-platform so expectations stay lined up with reality.
+                breaks. All documented in-platform so expectations stay lined up with reality.
               </p>
               <p className={`mt-5 border-t pt-4 text-[12px] leading-relaxed ${footerRule} ${footerInk}`}>
-                Chips on the image are illustrative, not GIS pins—and will upgrade cleanly when live map data is ready.
+                Chips on the image are illustrative, not GIS pins. Will upgrade cleanly when live map data is ready.
               </p>
             </div>
           </div>
 
           <div className={`order-1 overflow-hidden rounded-[26px] border p-4 md:p-5 xl:order-2 ${frameOuter}`}>
             <div className={`relative isolate min-h-[min(420px,55vh)] overflow-hidden rounded-[22px] border md:rounded-[24px] xl:min-h-[min(544px,calc(85vh))] ${imageWell}`}>
-              <span className="sr-only">Philadelphia — neighborhoods we actively manage alongside owners.</span>
+              <span className="sr-only">Philadelphia neighborhoods we actively manage alongside owners.</span>
               <img
                 src={editorialHeroSrc}
                 alt=""

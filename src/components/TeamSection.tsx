@@ -134,7 +134,12 @@ function TeamPortraitCard({
         >
           {person.role}
         </p>
-        <p className={`flex-1 text-[13px] leading-relaxed md:text-[0.9375rem] ${mutedText} ${isPrincipal ? "mt-3 min-h-[5.75rem]" : "mt-2.5"}`}>{person.bio}</p>
+        <p className={`text-[13px] leading-relaxed md:text-[0.9375rem] ${mutedText} ${isPrincipal ? "mt-3 min-h-[5.75rem]" : "mt-2.5"}`}>{person.bio}</p>
+        {person.tagline && (
+          <p className={`mt-2 text-[13px] italic leading-relaxed md:text-[0.9375rem] text-[#d6b06a]`}>
+            {person.tagline}
+          </p>
+        )}
       </div>
     </article>
   );
@@ -144,7 +149,7 @@ const pillars = [
   {
     icon: LandPlot,
     title: "Rooted here",
-    body: "We work neighborhoods we know—not flyover markets—with relationships that compound over time.",
+    body: "We work neighborhoods we know, not flyover markets, with relationships that compound over time.",
   },
   {
     icon: ShieldCheck,
@@ -183,7 +188,7 @@ export function TeamSection({
         <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${subtleText}`}>About</div>
 
         <h1
-          className={`mt-3 max-w-[22ch] font-semibold leading-[0.92] tracking-[-1.5px] text-[2.4rem] sm:text-[3rem] md:text-[3.55rem] lg:text-[4.1rem] ${
+          className={`mt-3 max-w-[22ch] font-semibold leading-[1.04] tracking-[-1.5px] text-[2.4rem] sm:text-[3rem] md:text-[3.55rem] lg:text-[4.1rem] ${
             lightMode ? "text-black" : "text-white"
           }`}
         >
@@ -191,7 +196,7 @@ export function TeamSection({
         </h1>
 
         <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.22rem] ${mutedText}`}>
-          Penn Liberty pairs sales, leasing, and property management inside one disciplined practice—so decisions
+          Penn Liberty pairs sales, leasing, and property management inside one disciplined practice, so decisions
           move faster and communication stays humane.
         </p>
       </div>
@@ -242,10 +247,10 @@ export function TeamSection({
           <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
           <p className={`mt-4 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>Leadership</p>
           <h2 id="about-team" className={`mt-3 text-xl font-semibold tracking-tight md:text-[1.35rem] ${lightMode ? "text-black" : "text-white"}`}>
-            The Penn Liberty roster
+            The Penn Liberty Team
           </h2>
           <p className={`mt-2 max-w-2xl text-sm ${mutedText}`}>
-            Founders and operators first—the rest of our licensed agents rounding out brokerage and leasing at the desk and in the field.
+            Founders and operators first. The rest of our licensed agents round out brokerage and leasing at the desk and in the field.
           </p>
         </div>
 
@@ -277,7 +282,7 @@ export function TeamSection({
           <p className={`text-[11px] font-bold uppercase tracking-[0.26em] ${subtleText}`}>Next step</p>
           <h2 className={`mt-3 text-xl font-semibold tracking-tight md:text-2xl ${lightMode ? "text-black" : "text-white"}`}>Tell us what you&apos;re aiming for.</h2>
           <p className={`mt-3 text-sm leading-relaxed md:text-base ${mutedText}`}>
-            A question about a lease, listing, investment, or your building—the fastest path is a direct conversation.
+            A question about a lease, listing, investment, or your building. The fastest path is a direct conversation.
           </p>
         </div>
         <div className="mt-6 flex shrink-0 flex-col gap-3 sm:flex-row lg:mt-0">

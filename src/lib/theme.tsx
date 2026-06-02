@@ -37,7 +37,7 @@ export const neutralThemeMeta: ThemeMeta = {
   lightMode: true,
   showBackdrop: false,
   backgroundImage: "none",
-  overlayClass: "absolute inset-0 z-[1] pointer-events-none bg-[#f5f3ee]",
+  overlayClass: "fixed inset-0 z-[1] pointer-events-none bg-[#f5f3ee]",
   ambience: "none",
   label: "Philadelphia",
   icon: <Sun className="h-4 w-4 opacity-70" />,
@@ -95,7 +95,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       backgroundImage: backdropCssUrl(dayBackdropPool[0]),
       /* overlay on top of .site-backdrop: cover, center, fixed (see index.css) */
       overlayClass:
-        "absolute inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(255,250,243,0.14),rgba(245,243,238,0.06))]",
+        "fixed inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(255,250,243,0.14),rgba(245,243,238,0.06))]",
       ambience: "none",
       label: "Sunny Philly",
       icon: <Sun className="h-4 w-4" />,
@@ -105,7 +105,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       showBackdrop: true,
       backgroundImage: backdropCssUrl(dayBackdropPool[1]),
       overlayClass:
-        "absolute inset-0 bg-[linear-gradient(180deg,rgba(247,244,238,0.64),rgba(244,241,236,0.56))]",
+        "fixed inset-0 bg-[linear-gradient(180deg,rgba(247,244,238,0.64),rgba(244,241,236,0.56))]",
       ambience: "none",
       label: "Cloudy Philly",
       icon: <Cloud className="h-4 w-4" />,
@@ -115,7 +115,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       showBackdrop: true,
       backgroundImage: backdropCssUrl(dayBackdropPool[2]),
       overlayClass:
-        "absolute inset-0 bg-[linear-gradient(180deg,rgba(246,243,238,0.42),rgba(236,239,243,0.34))]",
+        "fixed inset-0 bg-[linear-gradient(180deg,rgba(246,243,238,0.42),rgba(236,239,243,0.34))]",
       ambience: "rain",
       label: "Rain in Philly",
       icon: <CloudRain className="h-4 w-4" />,
@@ -125,7 +125,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       showBackdrop: true,
       backgroundImage: backdropCssUrl(dayBackdropPool[0]),
       overlayClass:
-        "absolute inset-0 bg-[linear-gradient(180deg,rgba(248,247,244,0.48),rgba(239,241,244,0.40))]",
+        "fixed inset-0 bg-[linear-gradient(180deg,rgba(248,247,244,0.48),rgba(239,241,244,0.40))]",
       ambience: "snow",
       label: "Snow in Philly",
       icon: <CloudSnow className="h-4 w-4" />,
@@ -136,7 +136,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       backgroundImage: backdropCssUrl(nightBackdropPool[0]),
       /* overlay on top of .site-backdrop: cover, center, fixed (see index.css) */
       overlayClass:
-        "absolute inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.72)_50%,rgba(0,0,0,0.82))]",
+        "fixed inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.72)_50%,rgba(0,0,0,0.82))]",
       ambience: "none",
       label: "Philly at Night",
       icon: <Moon className="h-4 w-4" />,
@@ -146,7 +146,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       showBackdrop: true,
       backgroundImage: backdropCssUrl(nightBackdropPool[1]),
       overlayClass:
-        "absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.72),rgba(0,0,0,0.82) 55%,rgba(0,0,0,0.92))]",
+        "fixed inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.72),rgba(0,0,0,0.82) 55%,rgba(0,0,0,0.92))]",
       ambience: "none",
       label: "Cloudy Night",
       icon: <Cloud className="h-4 w-4" />,
@@ -156,7 +156,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       showBackdrop: true,
       backgroundImage: backdropCssUrl(nightBackdropPool[2]),
       overlayClass:
-        "absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,16,0.54),rgba(4,8,14,0.74))]",
+        "fixed inset-0 bg-[linear-gradient(180deg,rgba(5,9,16,0.54),rgba(4,8,14,0.74))]",
       ambience: "rain",
       label: "Rainy Night",
       icon: <CloudRain className="h-4 w-4" />,
@@ -166,7 +166,7 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
       showBackdrop: true,
       backgroundImage: backdropCssUrl(nightBackdropPool[0]),
       overlayClass:
-        "absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,18,0.48),rgba(5,9,16,0.68))]",
+        "fixed inset-0 bg-[linear-gradient(180deg,rgba(6,10,18,0.48),rgba(5,9,16,0.68))]",
       ambience: "snow",
       label: "Snowy Night",
       icon: <CloudSnow className="h-4 w-4" />,
@@ -176,13 +176,27 @@ export function themeMeta(theme: WeatherTheme): ThemeMeta {
   return map[theme];
 }
 
-export function listingSummary(listing: SaleListing) {
+export function propertyOverview(listing: {
+  beds: number;
+  baths: number;
+  sqft?: number;
+  propertyType?: string;
+  units?: number;
+  lotSqft?: number;
+}) {
   if (listing.propertyType === "Land") {
     const lotSize = listing.lotSqft ?? listing.sqft;
-    return `${lotSize.toLocaleString()} sqft lot`;
+    if (lotSize) return `${lotSize.toLocaleString()} sqft lot`;
   }
 
-  return "units" in listing && listing.units
-    ? `${listing.units} Units • ${listing.sqft.toLocaleString()} sqft`
-    : `${listing.beds} Beds • ${listing.baths} Baths • ${listing.sqft.toLocaleString()} sqft`;
+  if (listing.units && listing.sqft) {
+    return `${listing.units} Units • ${listing.sqft.toLocaleString()} sqft`;
+  }
+
+  const sqftPart = listing.sqft ? ` • ${listing.sqft.toLocaleString()} sqft` : "";
+  return `${listing.beds} Beds • ${listing.baths} Baths${sqftPart}`;
+}
+
+export function listingSummary(listing: SaleListing) {
+  return propertyOverview(listing);
 }

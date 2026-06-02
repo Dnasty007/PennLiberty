@@ -136,7 +136,7 @@ export function Header({
               target="_blank"
               rel="noopener noreferrer"
               className={`rounded-full px-4 py-2 text-sm transition-colors duration-200 ${navIdleClasses}`}
-              aria-label="Resident login — opens Buildium Resident portal in a new tab"
+              aria-label="Resident login, opens Buildium Resident portal in a new tab"
             >
               Resident Log in
             </a>
@@ -198,7 +198,7 @@ export function Header({
               target="_blank"
               rel="noopener noreferrer"
               className={`block w-full rounded-2xl px-3 py-2.5 text-left text-sm ${mobileIdleClasses}`}
-              aria-label="Resident login — opens Buildium Resident portal in a new tab"
+              aria-label="Resident login, opens Buildium Resident portal in a new tab"
               onClick={() => setMobileOpen(false)}
             >
               Resident Log in

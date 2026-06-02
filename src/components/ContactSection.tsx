@@ -1,20 +1,25 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import emailjs from "@emailjs/browser";
 import { Clock, Mail, MapPinned, MessageSquare, Phone, Send } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import type { PageKey } from "@/lib/data";
 
-const PENN_PHONE_DISPLAY = "215-987-4444";
-const PENN_PHONE_TEL = "+12159874444";
+const EMAILJS_SERVICE_ID  = "Owner_Email_Website";
+const EMAILJS_TEMPLATE_ID = "template_mol56qf";
+const EMAILJS_PUBLIC_KEY  = "ykKMeoPCgTNLT5di1";
+
+const PENN_PHONE_DISPLAY = "215-922-7900";
+const PENN_PHONE_TEL = "+12159227900";
 const PENN_EMAIL = "info@pennlibertyre.com";
 
-const PENN_CONTACT_SUBJECT_DEFAULT = "Penn Liberty — website inquiry";
+const PENN_CONTACT_SUBJECT_DEFAULT = "Penn Liberty: website inquiry";
 
 /** Shared with deep links — subject + starter body cue many mail handlers to open Compose, not the inbox listing. */
 function penWebsiteMailtoHref(draft: string): string {
   const body =
     draft.trim().length > 0
-      ? `${draft.trim()}\n\n—\nSent from pennlibertyre.com/contact`
+      ? `${draft.trim()}\n\nSent from pennlibertyre.com/contact`
       : `Hi Penn Liberty,\n\n\nThanks,\n`;
   return (
     `mailto:${PENN_EMAIL}?subject=${encodeURIComponent(PENN_CONTACT_SUBJECT_DEFAULT)}` +
@@ -25,7 +30,7 @@ function penWebsiteMailtoHref(draft: string): string {
 function gmailWebComposeHref(draft: string): string {
   const body =
     draft.trim().length > 0
-      ? `${draft.trim()}\n\n—\nSent from pennlibertyre.com/contact`
+      ? `${draft.trim()}\n\nSent from pennlibertyre.com/contact`
       : `Hi Penn Liberty,\n\n\nThanks,\n`;
   const q = new URLSearchParams({
     view: "cm",
@@ -71,6 +76,32 @@ export function ContactSection({
   subtleText,
 }: ContactSectionProps) {
   const [noteDraft, setNoteDraft] = useState("");
+  const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const sendMessage = async () => {
+    if (!noteDraft.trim()) return;
+    setSendStatus("sending");
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          title:   "Contact Page",
+          name:    "Website visitor",
+          email:   "Not provided",
+          phone:   "N/A",
+          address: "N/A",
+          message: noteDraft.trim(),
+          time:    new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+        },
+        EMAILJS_PUBLIC_KEY,
+      );
+      setSendStatus("success");
+      setNoteDraft("");
+    } catch {
+      setSendStatus("error");
+    }
+  };
 
   useEffect(() => {
     const data = readAndConsumeContactBootstrap();
@@ -133,12 +164,12 @@ export function ContactSection({
         <h1
           className={`mt-3 font-semibold leading-[0.94] tracking-[-1.2px] text-[2.35rem] sm:text-[3rem] md:text-[3.45rem] lg:text-[4rem] ${lightMode ? "text-black" : "text-white"}`}
         >
-          Reach the desk—fast paths, same team.
+          Reach the desk. Fast paths, same team.
         </h1>
 
         <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.2rem] ${mutedText}`}>
           Prefer a voice, an email thread, or a quick note routed through your own mail client. We operate across
-          listings, leasing, and property management in Philadelphia—we&apos;ll steer you right.
+          listings, leasing, and property management in Philadelphia. We&apos;ll steer you right.
         </p>
       </div>
 
@@ -199,7 +230,7 @@ export function ContactSection({
                     Use Gmail in the browser instead (opens compose in a new tab)
                   </a>
                   <p className={`text-[12px] leading-relaxed ${mutedText}`}>
-                    Bare mailto links can land on Gmail’s inbox depending on Chrome settings—we pass subject and a
+                    Bare mailto links can land on Gmail’s inbox depending on Chrome settings. We pass subject and a
                     starter message so handlers open a draft when they can.
                   </p>
                 </div>
@@ -212,7 +243,7 @@ export function ContactSection({
                 <div className={`flex items-start gap-3 text-sm leading-relaxed md:text-[0.9375rem] ${mutedText}`}>
                   <MapPinned className="mt-1 h-[18px] w-[18px] shrink-0 text-[#d6b06a]" aria-hidden />
                   <span>
-                    Field visits and showings across the neighborhoods we lease and sell—we&apos;ll match you with the
+                    Field visits and showings across the neighborhoods we lease and sell. We&apos;ll match you with the
                     right licensee.
                   </span>
                 </div>
@@ -235,41 +266,55 @@ export function ContactSection({
         </GlassCard>
 
         <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className="p-6 md:p-8 lg:p-9">
-          <div className="mb-5 md:mb-6">
-            <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
-            <p className={`mt-4 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>Compose here</p>
-            <h2 className={`mt-3 text-xl font-semibold tracking-tight md:text-[1.35rem] ${lightMode ? "text-black" : "text-white"}`}>
-              Drop a note from your mailbox
-            </h2>
-            <p className={`mt-2 text-sm ${mutedText}`}>
-              Buttons below reuse the same starter subject—the big gold action matches what the mail-app link sends.
-            </p>
-          </div>
+          {sendStatus === "success" ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#d6b06a]/15 text-3xl">✓</div>
+              <p className="text-[1.25rem] font-semibold text-[#d6b06a]">Message sent!</p>
+              <p className={`max-w-[260px] text-[14px] leading-relaxed ${subtleText}`}>
+                We received your note and will be in touch shortly.
+              </p>
+              <button type="button" onClick={() => setSendStatus("idle")} className={`mt-2 text-[13px] underline underline-offset-2 ${subtleText}`}>
+                Send another message
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="mb-5 md:mb-6">
+                <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
+                <p className={`mt-4 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>Send a message</p>
+                <h2 className={`mt-3 text-xl font-semibold tracking-tight md:text-[1.35rem] ${lightMode ? "text-black" : "text-white"}`}>
+                  Drop us a note
+                </h2>
+              </div>
 
-          <label className={`mb-2 block text-xs font-semibold uppercase tracking-[0.16em] ${subtleText}`} htmlFor="contact-note-draft">
-            What should we know?
-          </label>
-          <textarea
-            id="contact-note-draft"
-            value={noteDraft}
-            onChange={(e) => setNoteDraft(e.target.value)}
-            rows={7}
-            placeholder="Example: I'm underwriting a duplex near Temple—can someone walk comps and leasing expectations this week?"
-            className={`min-h-[9.5rem] w-full resize-y ${textareaBase}`}
-          />
+              <div className="flex flex-col gap-3">
+                <textarea
+                  id="contact-note-draft"
+                  value={noteDraft}
+                  onChange={(e) => setNoteDraft(e.target.value)}
+                  rows={6}
+                  placeholder="Example: I'm underwriting a duplex near Temple. Can someone walk comps and leasing expectations this week?"
+                  className={`w-full resize-y ${textareaBase}`}
+                />
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <Button
-              type="button"
-              onClick={openMailComposerInSystemHandler}
-              className="rounded-full bg-[#d6b06a] px-8 py-6 text-[15px] font-semibold text-[#08111f] shadow-[0_14px_32px_rgba(214,176,106,0.35)] hover:bg-[#e4be78]"
-            >
-              <span className="inline-flex items-center gap-2">
-                <Send className="h-4 w-4" aria-hidden />
-                Send via email client
-              </span>
-            </Button>
-          </div>
+                {sendStatus === "error" && (
+                  <p className="text-[12px] text-red-500">Something went wrong. Please call us directly at 215-922-7900.</p>
+                )}
+
+                <Button
+                  type="button"
+                  onClick={sendMessage}
+                  disabled={sendStatus === "sending" || !noteDraft.trim()}
+                  className="rounded-full bg-[#d6b06a] py-6 text-[15px] font-semibold text-[#08111f] shadow-[0_14px_32px_rgba(214,176,106,0.35)] hover:bg-[#e4be78] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <Send className="h-4 w-4" aria-hidden />
+                    {sendStatus === "sending" ? "Sending…" : "Send Message"}
+                  </span>
+                </Button>
+              </div>
+            </>
+          )}
         </GlassCard>
       </div>
 

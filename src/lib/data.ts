@@ -1,37 +1,78 @@
 import { Briefcase, Building2, Home, type LucideIcon } from "lucide-react";
 
-export type Rental = {
-  id: number;
-  title: string;
-  price: string;
-  meta: string;
-  area: string;
-  image: string;
-  /** Optional per-unit application link (e.g. Buildium listing URL). Overrides `VITE_BUILDIUM_RENTAL_APPLICATION_URL`. */
-  applicationUrl?: string;
-};
-
-/** Same bundled skyline as Rentals hero (`siteImagery.rentalsHeroPool`) — for future map wiring. */
-export const rentalsVisualMapSrc = "/listings-philly-map-teaser.png";
-
-/** Pin positions (% of hero) aligned to `initialRentals` length at build time — adjust if you reorder. */
-export const rentalMapPinOffsets = [
-  { top: "31%", left: "54%" },
-  { top: "24%", left: "69%" },
-  { top: "19%", left: "50%" },
-  { top: "44%", left: "61%" },
-  { top: "36%", left: "73%" },
-  { top: "27%", left: "58%" },
-] as const;
-
-export type SaleListing = {
-  id: number;
-  slug?: string;
+/** Shared fields for sale listings and rental detail overlays. */
+export type PropertyDetail = {
   title: string;
   price: string;
   address: string;
   beds: number;
   baths: number;
+  image: string;
+  gallery: string[];
+  propertyType?: string;
+  status?: string;
+  mlsNumber?: string;
+  brokerage?: string;
+  description?: string;
+  highlights?: string[];
+  sqft?: number;
+};
+
+export type Rental = PropertyDetail & {
+  id: number;
+  slug: string;
+  /** Short line for cards, e.g. "2 bed · 1 bath · Available 05/01/26" */
+  meta: string;
+  /** Neighborhood / area label for card badge */
+  area: string;
+  /** Optional per-unit application link (e.g. Buildium listing URL). Overrides `VITE_BUILDIUM_RENTAL_APPLICATION_URL`. */
+  applicationUrl?: string;
+  dateAvailable?: string;
+  securityDeposit?: string;
+  applicationFee?: string;
+};
+
+function rentalAsset(slug: string, filename: string): string {
+  return `/Rentals/${slug}/${filename}`;
+}
+
+function rentalGallery(slug: string, filenames: readonly string[]): string[] {
+  return filenames.map((filename) => rentalAsset(slug, filename));
+}
+
+const diamond2fPhotos = [
+  "cover.png",
+  "img-2.png",
+  "img-3.png",
+  ...Array.from({ length: 22 }, (_, index) => `IMG_${index + 4}.jpg`),
+] as const;
+
+const diamond3fPhotos = [
+  "cover.png",
+  "img-2.png",
+  "img-3.png",
+  ...Array.from({ length: 6 }, (_, index) => `IMG_${index + 4}.jpg`),
+  ...Array.from({ length: 20 }, (_, index) => `IMG_${index + 10}.jpg`),
+  "IMG_430.jpg",
+] as const;
+
+const diamond2fGallery = rentalGallery("1704-w-diamond-st-2f", diamond2fPhotos);
+const diamond3fGallery = rentalGallery("1704-w-diamond-st-3f", diamond3fPhotos);
+
+/** Pin positions (% of hero) aligned to `initialRentals` length at build time — adjust if you reorder. */
+export const rentalMapPinOffsets = [
+  { top: "18%", left: "54%" },
+  { top: "24%", left: "69%" },
+  { top: "19%", left: "50%" },
+  { top: "44%", left: "61%" },
+  { top: "36%", left: "73%" },
+  { top: "27%", left: "58%" },
+  { top: "38%", left: "48%" },
+] as const;
+
+export type SaleListing = PropertyDetail & {
+  id: number;
+  slug?: string;
   sqft: number;
   /** Map marker latitude (approx. geocode for Philly addresses). */
   lat: number;
@@ -39,76 +80,67 @@ export type SaleListing = {
   lng: number;
   top: string;
   left: string;
-  image: string;
-  gallery: string[];
-  propertyType?: string;
   units?: number;
   lotSqft?: number;
-  status?: string;
-  mlsNumber?: string;
-  brokerage?: string;
-  description?: string;
-  highlights?: string[];
 };
 
 /**
- * Placeholder rental cards for the site — sample copy and Unsplash stills.
- * Replace the array (same `Rental` shape) when you wire live inventory or a feed.
+ * Live rental inventory — add units here as photos and MLS details are ready.
  */
 export const initialRentals: Rental[] = [
   {
     id: 1,
-    title: "Renovated 2BR brick row apartment",
-    price: "$1,895/mo",
-    meta: "2 bed · 1 bath · Pets case-by-case",
-    area: "Fishtown — Girard corridor & transit nearby",
-    image:
-      "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=85",
+    slug: "1704-w-diamond-st-2f",
+    title: "1704 W Diamond St, Unit 2F",
+    price: "$1,150/mo",
+    address: "1704 W Diamond St #2, Philadelphia, PA 19121",
+    beds: 2,
+    baths: 1,
+    meta: "2 bed · 1 bath · Available 05/01/26",
+    area: "Temple University",
+    image: diamond2fGallery[0],
+    gallery: diamond2fGallery,
+    propertyType: "Residential Lease",
+    status: "Active",
+    mlsNumber: "PAPH2609562",
+    brokerage: "Penn Liberty Real Estate",
+    dateAvailable: "05/01/26",
+    securityDeposit: "$1,150",
+    applicationFee: "$50",
+    description:
+      "Great opportunity to rent this beautiful 2nd floor apartment in the heart of Temple University's campus. The unit features 2 spacious bedrooms, an outdoor deck, a full kitchen, and 1 bathroom. Additional features include basement laundry and an unfinished basement for storage space. The property is a stone's throw away from Temple University's main campus and is convenient to all major campus buildings. Move-in ready. Proof of income required, no evictions.",
+    highlights: [
+      "2 spacious bedrooms · 1 full bath",
+      "Outdoor deck",
+      "Basement laundry · storage in unfinished basement",
+      "Central A/C · forced air heat (tenant pays electric, gas, heat)",
+      "12–24 month lease · $50 application fee",
+      "No pets · no smoking",
+      "Steps from Temple University main campus",
+    ],
   },
   {
     id: 2,
-    title: "Efficiency studio near Broad & Cecil B.",
-    price: "$1,125/mo",
-    meta: "Studio · Updated kitchenette · Laundry in building",
-    area: "Temple / North Philly",
-    image:
-      "https://images.unsplash.com/photo-1545158539-1709fed7e2bf?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 3,
-    title: "Garden-level 1BR with washer/dryer",
-    price: "$1,675/mo",
-    meta: "1 bed · 1 bath · Private rear patio",
-    area: "South Philly — tenant-stable blocks",
-    image:
-      "https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 4,
-    title: "Center City alcove junior 1BR",
-    price: "$2,250/mo",
-    meta: "1 bed · 1 bath · Doorman elevator building",
-    area: "Rittenhouse / Avenue of the Arts",
-    image:
-      "https://images.unsplash.com/photo-1496564203457-11bb12075d90?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 5,
-    title: "Loft-style 2BR with skyline views",
-    price: "$2,495/mo",
-    meta: "2 bed · 2 bath · Garage parking avail.",
-    area: "Northern Liberties",
-    image:
-      "https://images.unsplash.com/photo-1568526381923-caf3fd520382?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 6,
-    title: "Bi-level 3BR townhome-style rental",
-    price: "$2,850/mo",
-    meta: "3 bed · 2 bath · Rooftop deck",
-    area: "Fairmount / Art Museum area",
-    image:
-      "https://images.unsplash.com/photo-1559406041-c7d2bbf2fd1c?auto=format&fit=crop&w=1200&q=85",
+    slug: "1704-w-diamond-st-3f",
+    title: "1704 W Diamond St, Unit 3F",
+    price: "Contact for rent",
+    address: "1704 W Diamond St #3, Philadelphia, PA 19121",
+    beds: 2,
+    baths: 1,
+    meta: "2 bed · 1 bath · Temple University area",
+    area: "Temple University",
+    image: diamond3fGallery[0],
+    gallery: diamond3fGallery,
+    propertyType: "Residential Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    description:
+      "Third-floor apartment in the same classic Temple University area rowhome as our 2F listing. Contact Penn Liberty for current rent, move-in date, and application details.",
+    highlights: [
+      "Third-floor unit in 3-unit building (1915 masonry row)",
+      "Temple University neighborhood",
+      "Contact office for current rent and availability",
+    ],
   },
 ];
 
@@ -324,6 +356,8 @@ export type TeamPerson = {
   readonly name: string;
   readonly role: string;
   readonly bio: string;
+  /** Optional italic line rendered below the bio */
+  readonly tagline?: string;
   /** Relative URL under `/public`, e.g. `/team/donna.jpg`. When omitted, Liberty mark shows behind initials */
   readonly photo?: string;
 };
@@ -331,53 +365,49 @@ export type TeamPerson = {
 /** Founders & principals — surfaced first on About */
 export const teamPrincipals: readonly TeamPerson[] = [
   {
-    name: "Ray",
-    role: "Broker / Founder",
-    bio: "Leads brokerage direction, deal strategy, and the firm's promise to Philadelphia clients—with the same hustle he expects from everyone on the roster.",
+    name: "Ray Caceres",
+    role: "Broker / Founder / U.S. Marine",
+    bio: "Leads brokerage direction, deal strategy, and the firm's Foundation to the Company and his Clients.",
+    tagline: "If there's a problem to be solved, he has the Answer.",
   },
   {
     name: "Ramon Caceres",
     role: "Co-Founder",
-    bio: "Founding anchor of Penn Liberty—the father side of our family-founded firm—and a steady presence behind how we steward owners, renters, and investors.",
+    bio: "Founding anchor of Penn Liberty, the father side of our family-founded firm, and a steady presence in our office.",
   },
   {
     name: "Ramon L. Caceres",
-    role: "Operations & Systems",
-    bio: "\"Ray Luke\" day-to-day—owns Penn Liberty platforms, workflows, and internal tools so leasing, listings, and property management stay fast, visible, and consistent.",
+    role: "Operations & Systems Management",
+    bio: "Property Maintenance, overseeing the portal side of the business dealing with Owners and Vendors.",
   },
 ] as const;
 
 /** Office operators, managers, and licensed agents — company roster */
 export const teamStaff: readonly TeamPerson[] = [
   {
-    name: "Donna",
+    name: "Donna Wunderle",
     role: "Office Secretary",
-    bio: "First voice many hear at Penn Liberty—she keeps schedules coordinated, filings and paperwork orderly, and the front office warm and professional.",
+    bio: "First voice many hear at Penn Liberty. She keeps schedules coordinated, filings and paperwork orderly.",
   },
   {
-    name: "Dave",
-    role: "Head Property Manager · Agent",
-    bio: "Leads resident service and portfolio operations while remaining active in brokerage—your bridge between the field and closing table.",
+    name: "David Froelich",
+    role: "Head Property Manager / Agent",
+    bio: "Leads resident service and the Company Books while remaining active in brokerage.",
   },
   {
-    name: "Brandon",
+    name: "Brandon Lohr",
     role: "Agent",
-    bio: "In-office licensee supporting buyers and sellers alongside the leadership team—with local Philly context and disciplined follow-through.",
+    bio: "A licensee supporting buyers and sellers throughout Philadelphia.",
   },
   {
     name: "Juanita Sharperson",
     role: "Agent",
-    bio: "Represents landlords, tenants, and investors with clear communication—from showings through lease signatures and resale opportunities.",
+    bio: "Represents landlords and investors with clear communication, from showings through lease signatures and resale opportunities.",
   },
   {
-    name: "Charlee Bolen",
+    name: "Fatima Aguilar",
     role: "Agent",
-    bio: "Helps buyers and renters navigate Philly inventory with straight answers and attentive showings—from first tour to handshake.",
-  },
-  {
-    name: "Fatima",
-    role: "Agent",
-    bio: "Licensed agent rounding out our sales and leasing bench—focused on approachable service and attentive client communication.",
+    bio: "Licensed agent throughout the Philadelphia area.",
   },
 ] as const;
 

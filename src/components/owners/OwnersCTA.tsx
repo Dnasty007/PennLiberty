@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { SectionDivider } from "@/components/owners/SectionDivider";
 
@@ -137,7 +138,7 @@ export function OwnersCTA({
             </span>
           </h3>
           <p className={`mt-6 max-w-lg text-[0.985rem] leading-relaxed md:text-[1.02rem] ${mutedText}`}>
-            No glossy pitch deck — a short pulse check on ownership goals, timelines, condition, and what
+            No glossy pitch deck. A short pulse check on ownership goals, timelines, condition, and what
             you&apos;ve already explored. Responses route straight to Penn Liberty inbox.
           </p>
           <div className={`mt-10 flex flex-wrap gap-x-7 gap-y-3 border-y py-6 text-[13px] md:text-sm ${metaRule}`}>
@@ -217,14 +218,14 @@ export function OwnersCTA({
                 />
               </div>
 
-              {/* Property */}
+              {/* Property — Google Places autocomplete */}
               <div className="grid gap-1">
                 {attempted && propertyEmpty && fieldLabel("Property address")}
-                <Input
+                <AddressAutocomplete
                   value={property}
-                  onChange={(e) => setProperty(e.target.value)}
+                  onChange={setProperty}
                   placeholder="Property address (or neighborhood)"
-                  className={attempted && propertyEmpty ? inputError : inputBase}
+                  className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${attempted && propertyEmpty ? inputError : inputBase}`}
                 />
               </div>
 
@@ -244,7 +245,7 @@ export function OwnersCTA({
               {/* Send error */}
               {status === "error" && (
                 <p className="text-[12px] text-red-500">
-                  Something went wrong — please try again or call us directly.
+                  Something went wrong. Please try again or call us directly.
                 </p>
               )}
 
@@ -259,7 +260,7 @@ export function OwnersCTA({
               </Button>
 
               <p className={`mt-1 text-[12px] leading-relaxed ${footInk}`}>
-                We never share your information — this goes straight to Penn Liberty.
+                We never share your information. This goes straight to Penn Liberty.
               </p>
             </div>
           )}

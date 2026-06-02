@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
+import { DevImageEditor } from "@/components/DevImageEditor";
 import { Hero } from "@/components/Hero";
+import { ListingDetailsOverlay } from "@/components/ListingDetailsOverlay";
 import { ListingsMap } from "@/components/ListingsMap";
 import { OwnersSection } from "@/components/owners/OwnersSection";
 import { AIAssistant } from "@/components/AIAssistant";
@@ -80,12 +82,14 @@ export default function App() {
   const [showListingDetails, setShowListingDetails] = useState(false);
   const [showScheduleTour, setShowScheduleTour] = useState(false);
   const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(0);
+  const [showRentalDetails, setShowRentalDetails] = useState(false);
+  const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
+  const [rentalGalleryImageIndex, setRentalGalleryImageIndex] = useState(0);
   const [tourForm, setTourForm] = useState({
     name: "",
     email: "",
     phone: "",
   });
-  const year = useMemo(() => new Date().getFullYear(), []);
 
   useEffect(() => {
     let isMounted = true;
@@ -182,6 +186,55 @@ export default function App() {
     return [listing.title, listing.address, listing.price].join(" ").toLowerCase().includes(q);
   });
 
+  const selectedRental = rentals.find((r) => r.id === selectedRentalId) ?? null;
+  const selectedRentalImages = selectedRental
+    ? selectedRental.gallery.length ? selectedRental.gallery : [selectedRental.image]
+    : [];
+
+  const openRentalDetails = (id: number) => {
+    setSelectedRentalId(id);
+    setRentalGalleryImageIndex(0);
+    setShowRentalDetails(true);
+  };
+
+  const closeRentalDetails = () => setShowRentalDetails(false);
+
+  const nextRentalImage = () =>
+    setRentalGalleryImageIndex((prev) => (prev + 1) % selectedRentalImages.length);
+
+  const prevRentalImage = () =>
+    setRentalGalleryImageIndex(
+      (prev) => (prev - 1 + selectedRentalImages.length) % selectedRentalImages.length,
+    );
+
+  const submitRentalApplication = () => {
+    if (!selectedRental) return;
+    const listingUrl = selectedRental.applicationUrl?.trim();
+    const globalUrl = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim() || undefined;
+    const url = listingUrl || globalUrl;
+    if (url && /^https?:\/\//i.test(url)) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      const subject = encodeURIComponent(`Rental inquiry: ${selectedRental.title}`);
+      const body = encodeURIComponent(
+        [
+          "Hi Penn Liberty,",
+          "",
+          `I'm interested in this rental: ${selectedRental.title}`,
+          selectedRental.address,
+          `Advertised rent: ${selectedRental.price}`,
+          selectedRental.meta,
+          "",
+          "My move-in timeline:",
+          "",
+          "Questions:",
+        ].join("\n"),
+      );
+      window.location.href = `mailto:info@pennlibertyre.com?subject=${subject}&body=${body}`;
+    }
+    closeRentalDetails();
+  };
+
   const goToPage = (page: PageKey) => {
     setActivePage(page);
     setMobileOpen(false);
@@ -200,7 +253,7 @@ export default function App() {
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!swipeTouchStart.current) return;
-    if (showListingDetails || showScheduleTour || mobileOpen) return;
+    if (showListingDetails || showScheduleTour || showRentalDetails || mobileOpen) return;
 
     const dx = e.changedTouches[0].clientX - swipeTouchStart.current.x;
     const dy = e.changedTouches[0].clientY - swipeTouchStart.current.y;
@@ -278,8 +331,8 @@ export default function App() {
     ? "rounded-full border-black/20 bg-white/52 px-6 py-6 text-base text-black shadow-[0_16px_40px_rgba(12,18,28,0.08)] hover:bg-white/72"
     : "rounded-full border-white/20 bg-white/[0.05] px-6 py-6 text-base text-white shadow-[0_16px_40px_rgba(0,0,0,0.24)] hover:bg-white/[0.08]";
   const footerClasses = lightMode
-    ? "border-t border-black/10 px-4 py-8 text-black/70 md:px-8"
-    : "border-t border-white/10 px-4 py-8 text-white/55 md:px-8";
+    ? "px-4 py-8 text-black/70 md:px-8"
+    : "px-4 py-8 text-white/55 md:px-8";
   const inputClasses = lightMode
     ? "border-black/15 bg-white/70"
     : "border-white/10 bg-white/[0.04] text-white placeholder:text-white/40";
@@ -295,7 +348,7 @@ export default function App() {
             aria-hidden
           />
         ) : null}
-        <div className={`${theme.overlayClass} transition-all duration-700`} />
+        <div className={`pointer-events-none ${theme.overlayClass} transition-all duration-700`} />
         <AmbienceLayer type={theme.ambience} />
 
         <Header
@@ -351,6 +404,7 @@ export default function App() {
                 goToPage={goToPage}
                 lightMode={lightMode}
                 mutedText={mutedText}
+                onOpenRentalDetails={openRentalDetails}
                 outlineButtonClasses={outlineButtonClasses}
                 rentals={rentals}
                 rentalsHeroSrc={rentalsHeroPick}
@@ -421,8 +475,37 @@ export default function App() {
         </main>
       </div>
 
-      <footer className={footerClasses}>
-        <div className="mx-auto max-w-7xl">© {year} Penn Liberty</div>
+      <DevImageEditor />
+
+      {showRentalDetails && selectedRental && (
+        <ListingDetailsOverlay
+          currentImageIndex={rentalGalleryImageIndex}
+          lightMode={lightMode}
+          listing={selectedRental}
+          mutedText={mutedText}
+          onClose={closeRentalDetails}
+          onImageChange={setRentalGalleryImageIndex}
+          onNextImage={nextRentalImage}
+          onPrevImage={prevRentalImage}
+          onScheduleTour={submitRentalApplication}
+          primaryActionLabel="Submit Application"
+          backLabel="Back to Rentals"
+        />
+      )}
+
+      <footer className={`relative z-10 ${footerClasses}`}>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 py-2">
+          <span className="text-sm">&copy;2008 Penn Liberty</span>
+          <img
+            src="/branding/matthew-419-logo.png"
+            alt="Matthew 4:19"
+            className={`h-20 w-auto transition-all ${
+              lightMode
+                ? "opacity-80 mix-blend-multiply"
+                : "invert grayscale opacity-75"
+            }`}
+          />
+        </div>
       </footer>
     </div>
   );

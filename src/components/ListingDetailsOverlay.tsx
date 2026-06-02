@@ -2,19 +2,21 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
-import type { SaleListing } from "@/lib/data";
-import { listingSummary } from "@/lib/theme";
+import type { PropertyDetail } from "@/lib/data";
+import { propertyOverview } from "@/lib/theme";
 
 type ListingDetailsOverlayProps = {
   currentImageIndex: number;
   lightMode: boolean;
-  listing: SaleListing | null;
+  listing: PropertyDetail | null;
   mutedText: string;
   onClose: () => void;
   onImageChange: (index: number) => void;
   onNextImage: () => void;
   onPrevImage: () => void;
   onScheduleTour: () => void;
+  primaryActionLabel?: string;
+  backLabel?: string;
 };
 
 export function ListingDetailsOverlay({
@@ -27,6 +29,8 @@ export function ListingDetailsOverlay({
   onNextImage,
   onPrevImage,
   onScheduleTour,
+  primaryActionLabel = "Schedule Tour",
+  backLabel = "Back to Listings",
 }: ListingDetailsOverlayProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -159,7 +163,7 @@ export function ListingDetailsOverlay({
                   const isActive = index === currentImageIndex;
                   return (
                     <button
-                      key={`${listing.id}-thumb-${index}`}
+                      key={`${listing.title}-thumb-${index}`}
                       onClick={() => onImageChange(index)}
                       className={`overflow-hidden rounded-[18px] border transition ${
                         isActive
@@ -203,7 +207,7 @@ export function ListingDetailsOverlay({
                 </GlassCard>
                 <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
                   <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Overview</div>
-                  <div className="mt-2 text-lg font-medium">{listingSummary(listing)}</div>
+                  <div className="mt-2 text-lg font-medium">{propertyOverview(listing)}</div>
                 </GlassCard>
               </div>
 
@@ -232,10 +236,10 @@ export function ListingDetailsOverlay({
                   className="rounded-full bg-[#d6b06a] px-6 py-6 text-[#08111f] hover:bg-[#e4be78]"
                   onClick={onScheduleTour}
                 >
-                  Schedule Tour
+                  {primaryActionLabel}
                 </Button>
                 <Button variant="outline" className={secondaryButton} onClick={onClose}>
-                  Back to Listings
+                  {backLabel}
                 </Button>
               </div>
             </div>

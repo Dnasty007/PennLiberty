@@ -101,7 +101,6 @@ export function ListingsMap({
   const [leafletMounted, setLeafletMounted] = useState(false);
   const [teaserFade, setTeaserFade] = useState(false);
   const [teaserGone, setTeaserGone] = useState(false);
-  const [teaserDescExpanded, setTeaserDescExpanded] = useState(false);
 
   const activateMap = () => {
     if (leafletMounted) return;
@@ -197,7 +196,7 @@ export function ListingsMap({
           </div>
 
           {filteredListings.length === 0 ? (
-            <p className={`py-10 text-center text-sm ${mutedText}`}>Nothing matches your search — try adjusting filters.</p>
+            <p className={`py-10 text-center text-sm ${mutedText}`}>Nothing matches your search. Try adjusting filters.</p>
           ) : (
             <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
               {filteredListings.map((listing) => {
@@ -207,10 +206,7 @@ export function ListingsMap({
                   <li key={listing.id} className="min-w-0">
                     <button
                       type="button"
-                      onClick={() => {
-                        onSelectListing(listing.id);
-                        setTeaserDescExpanded(false);
-                      }}
+                      onClick={() => onSelectListing(listing.id)}
                       className={`group relative flex min-h-[200px] w-full flex-col overflow-hidden rounded-[20px] text-left outline-none ring-offset-4 transition-[box-shadow,border-color,transform] duration-300 md:min-h-0 md:rounded-[23px] ${
                         lightMode
                           ? isSelected
@@ -339,8 +335,8 @@ export function ListingsMap({
                   <div className="absolute inset-0">
                     <img
                       src={listingsMapTeaserSrc}
-                      alt="Philadelphia skyline — map preview"
-                      className="h-full w-full scale-[1.03] object-cover object-[center_35%]"
+                      alt="Philadelphia skyline map preview"
+                      className="h-full w-full scale-[1.05] object-cover object-[center_68%]"
                     />
                     <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(4,12,26,0.72)_0%,rgba(10,18,26,0.22)_42%,transparent_78%)]" />
                   </div>
@@ -359,32 +355,17 @@ export function ListingsMap({
                         aria-hidden
                       />
                       <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center px-6 pb-[5.75rem] pt-[4.75rem] sm:px-8 md:pb-24 md:pt-28">
-                        <div className="pointer-events-auto w-full max-w-lg rounded-[22px] border border-white/18 bg-black/62 px-5 py-4 shadow-[0_24px_56px_rgba(0,0,0,0.5)] backdrop-blur-xl md:max-h-[min(48vh,340px)] md:max-w-xl md:overflow-y-auto">
-                        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#e8cc8b]">
-                          Selected listing
-                        </div>
-                        <div className="mt-2 text-base font-semibold leading-snug text-white">
-                          {selectedListing.title}
-                        </div>
-                        <div className={`mt-1 text-xs leading-relaxed text-white/62`}>{selectedListing.address}</div>
-                        <p
-                          className={`mt-3 text-sm leading-relaxed text-white/82 ${
-                            teaserDescExpanded ? "max-h-[min(220px,32vh)] overflow-y-auto pr-1" : "line-clamp-5"
-                          }`}
-                        >
-                          {teaserParagraph}
-                        </p>
-                        {(teaserParagraph.length > 180 || teaserDescExpanded) && (
-                          <button
-                            type="button"
-                            onClick={() => setTeaserDescExpanded((e) => !e)}
-                            className={`mt-2 text-xs font-semibold transition ${
-                              reduceMotion ? "" : "duration-150"
-                            } text-[#d6b06a] hover:text-[#e4cd98]`}
-                          >
-                            {teaserDescExpanded ? "Show less" : "Read more"}
-                          </button>
-                        )}
+                        <div className="pointer-events-auto w-full max-w-lg rounded-[22px] border border-white/20 bg-black/88 px-5 py-4 shadow-[0_24px_56px_rgba(0,0,0,0.65)] backdrop-blur-xl md:max-w-xl md:max-h-[min(52vh,380px)] md:overflow-y-auto">
+                          <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#e8cc8b]">
+                            Selected listing
+                          </div>
+                          <div className="mt-2 text-base font-semibold leading-snug text-white">
+                            {selectedListing.title}
+                          </div>
+                          <div className="mt-1 text-xs leading-relaxed text-white/80">{selectedListing.address}</div>
+                          <p className="mt-3 text-[13.5px] leading-relaxed text-white">
+                            {teaserParagraph}
+                          </p>
                         </div>
                       </div>
                     </>
@@ -395,7 +376,7 @@ export function ListingsMap({
                       <button
                         type="button"
                         onClick={activateMap}
-                        aria-label="Explore the metro map — loads interactive Philadelphia map"
+                        aria-label="Explore the metro map, interactive Philadelphia map"
                         className="inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-[#d6b06a]/35 bg-black/62 px-5 py-3 text-sm font-medium text-white shadow-[0_12px_32px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-[border-color,background-color,box-shadow] duration-150 hover:border-[#d6b06a]/55 hover:bg-black/74 hover:shadow-[0_16px_40px_rgba(0,0,0,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d6b06a]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent md:px-6 md:py-3.5"
                       >
                         <span className="relative flex h-2 w-2 shrink-0">
@@ -439,7 +420,7 @@ export function ListingsMap({
               <div className="mt-1 text-[2rem] font-semibold tracking-tighter text-[#d6b06a] md:text-[2.15rem]">
                 {selectedListing.price}
               </div>
-              <div className="mt-1.5 text-lg font-semibold leading-snug">{selectedListing.title}</div>
+              <div className={`mt-1.5 text-lg font-semibold leading-snug ${lightMode ? "text-black/92" : "text-white"}`}>{selectedListing.title}</div>
               <div className={`mt-2 text-sm leading-relaxed ${mutedText}`}>{selectedListing.address}</div>
               <div
                 className={`mt-4 rounded-2xl border px-4 py-3 text-sm leading-relaxed ${

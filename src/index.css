@@ -29,7 +29,7 @@ input {
 .site-backdrop {
   /* cover scales to the minimum needed — safe for both landscape and portrait source images */
   background-size: cover;
-  background-position: center 20%;
+  background-position: 47% 100%;
   background-repeat: no-repeat;
   background-attachment: scroll;
 }
@@ -55,3 +55,4 @@ input {
     background-position: center center;
   }
 }
+
