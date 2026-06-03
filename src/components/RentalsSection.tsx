@@ -132,7 +132,7 @@ export function RentalsSection({
             role="presentation"
             loading="eager"
             decoding="async"
-            className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-[58%_80%] scale-[1.14]"
+            className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-[50%_80%] scale-[1.14]"
             fetchPriority="high"
           />
           <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_bottom,rgba(6,10,18,0.12),rgba(5,10,18,0.42))]" />
@@ -303,7 +303,7 @@ export function RentalsSection({
             <Button
               type="button"
               variant="outline"
-              className={`rounded-full px-8 py-6 text-[15px] ${outlineButtonClasses}`}
+              className={`rounded-full px-8 py-6 text-[15px] [translate:5px_18px] ${outlineButtonClasses}`}
               onClick={() => goToPage("contact")}
             >
               Go to contact

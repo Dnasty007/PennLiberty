@@ -368,7 +368,6 @@ export const teamPrincipals: readonly TeamPerson[] = [
     name: "Ray Caceres",
     role: "Broker / Founder / U.S. Marine",
     bio: "Leads brokerage direction, deal strategy, and the firm's Foundation to the Company and his Clients.",
-    tagline: "If there's a problem to be solved, he has the Answer.",
   },
   {
     name: "Ramon Caceres",

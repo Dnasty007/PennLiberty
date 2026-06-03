@@ -27,7 +27,7 @@ input {
 /* Full-viewport Philly backdrops (Light / Dark) — applied in App.tsx */
 /* backdrop div is position:fixed so it only ever covers viewport, never the full page height */
 .site-backdrop {
-  background-size: 100%;
+  background-size: 134%;
   --bd-y: 25%; /* starting vertical frame (top of page); scroll reveals downward from here */
   background-position: 47% var(--bd-y);
   background-repeat: no-repeat;

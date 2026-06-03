@@ -525,6 +525,7 @@ export default function App() {
           <img
             src="/branding/matthew-419-logo.png"
             alt="Matthew 4:19"
+            style={{ translate: "203px 43px" }}
             className={`h-20 w-auto transition-all ${
               lightMode
                 ? "opacity-80 mix-blend-multiply"

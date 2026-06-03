@@ -298,7 +298,7 @@ export function ListingsMap({
                 href={mapsSearchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="pointer-events-auto absolute right-6 top-2.5 z-[3] inline-flex shrink-0 items-center rounded-full border border-white/18 bg-black/54 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/82 shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:border-white/32 hover:bg-black/62 sm:right-7 sm:top-3"
+                className="pointer-events-auto absolute right-6 top-2.5 z-[3] inline-flex shrink-0 items-center rounded-full border border-white/18 bg-black/54 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d6b06a] shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:border-white/32 hover:bg-black/62 sm:right-7 sm:top-3"
               >
                 Open selection in Maps
               </a>
