@@ -35,21 +35,31 @@ input {
   font: inherit;
 }
 
-/* Full-viewport Philly backdrops (Light / Dark) — applied in App.tsx */
-/* backdrop div is position:fixed so it only ever covers viewport, never the full page height */
+/* Full-viewport Philly backdrops (Light / Dark) — `<img>` in App.tsx */
 .site-backdrop {
-  background-size: 100%;
-  background-position: 100% 43%;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
+  overflow: hidden;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
-/* Tall/narrow viewports — same frame as desktop (locked via dev editor) */
+.site-backdrop__img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 47% 25%;
+  transform: scale(1.34);
+  transform-origin: 47% 25%;
+}
+
+/* Phones / tall narrow: always cover the viewport (never 100% width — that leaves gaps) */
 @media (max-aspect-ratio: 4/5) {
-  .site-backdrop {
-    background-size: 100%;
-    background-position: 100% 43%;
+  .site-backdrop__img {
+    object-position: center 25%;
+    transform: none;
   }
 }
 

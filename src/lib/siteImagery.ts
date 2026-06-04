@@ -62,7 +62,7 @@ export const homeBackdropPool = dayBackdropPool;
  * Used when `theme.showBackdrop` is true (Light / Dark display modes).
  */
 export const siteBackdropImageClass =
-  "site-backdrop fixed inset-0 z-0 transition-all duration-700";
+  "site-backdrop pointer-events-none fixed inset-0 z-0 transition-opacity duration-700";
 
 /** For Owners hero card — `.owners-card-backdrop` in index.css (no fixed attachment). */
 export const ownersCardBackdropImageClass = "owners-card-backdrop absolute inset-0";

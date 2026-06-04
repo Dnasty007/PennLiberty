@@ -18,7 +18,6 @@ import {
   type SaleListing,
 } from "@/lib/data";
 import {
-  backdropCssUrl,
   DisplayMode,
   PHILLY_COORDS,
   themeForDisplayMode,
@@ -33,7 +32,6 @@ import {
   ownersPageBackdropDarkPool,
   rentalsHeroPool,
   rentalsHeroDarkPool,
-  siteBackdropFramingBySrc,
   siteBackdropImageClass,
   usePoolIndexCycler,
 } from "@/lib/siteImagery";
@@ -213,11 +211,6 @@ export default function App() {
       : displayMode === "dark"
         ? nightBackdropPick
         : undefined;
-  const siteBackdropImage = siteBackdropSrc ? backdropCssUrl(siteBackdropSrc) : undefined;
-  const siteBackdropFrame = siteBackdropSrc
-    ? siteBackdropFramingBySrc[siteBackdropSrc]
-    : undefined;
-
   /* Scroll-reveal disabled — background stays fixed. */
 
   const selectedListing =
@@ -464,21 +457,16 @@ export default function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {theme.showBackdrop && siteBackdropImage ? (
-        <div
-          className={siteBackdropImageClass}
-          style={{
-            backgroundImage: siteBackdropImage,
-            ...(siteBackdropFrame?.backgroundSize && {
-              backgroundSize: siteBackdropFrame.backgroundSize,
-            }),
-            ...(siteBackdropFrame?.backgroundPosition && {
-              backgroundPosition: siteBackdropFrame.backgroundPosition,
-            }),
-          }}
-          role="presentation"
-          aria-hidden
-        />
+      {theme.showBackdrop && siteBackdropSrc ? (
+        <div className={siteBackdropImageClass} role="presentation" aria-hidden>
+          <img
+            src={siteBackdropSrc}
+            alt=""
+            className="site-backdrop__img"
+            decoding="async"
+            fetchPriority="high"
+          />
+        </div>
       ) : null}
       <div className={`pointer-events-none ${theme.overlayClass} transition-all duration-700`} />
       <AmbienceLayer type={theme.ambience} />
