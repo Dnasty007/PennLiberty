@@ -19,11 +19,7 @@ html {
 
 body {
   margin: 0;
-  /* Belt-and-suspenders against horizontal swipe panning / iOS rubber-band overscroll. */
-  overflow-x: hidden;
   overscroll-behavior-x: none;
-  width: 100%;
-  position: relative;
 }
 
 button,
