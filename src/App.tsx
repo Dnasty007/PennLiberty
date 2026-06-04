@@ -387,7 +387,7 @@ export default function App() {
 
   return (
     <div
-      className={`${rootClasses} touch-pan-y`}
+      className={rootClasses}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
