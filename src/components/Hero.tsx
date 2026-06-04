@@ -68,8 +68,8 @@ export function Hero({
 }: HeroProps) {
   return (
     <>
-      <section className="grid items-center gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:pt-6">
-        <div className="max-w-3xl">
+      <section className="grid min-w-0 items-center gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:pt-6">
+        <div className="min-w-0 max-w-3xl">
           <div
             className={`mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm backdrop-blur-xl ${
               lightMode
@@ -84,7 +84,7 @@ export function Hero({
             </span>
           </div>
 
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.0] tracking-[-1.5px] sm:text-[3.9rem] md:text-[5rem] xl:text-[6.3rem]">
+          <h1 className="max-w-4xl break-words text-5xl font-semibold leading-[1.0] tracking-[-1.5px] sm:text-[3.9rem] md:text-[5rem] xl:text-[6.3rem]">
             Professional Property
             Management in
             Philadelphia.

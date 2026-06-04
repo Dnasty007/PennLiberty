@@ -25,6 +25,11 @@ body {
   overscroll-behavior-x: none;
 }
 
+/* Horizontal tab strips / carousels */
+[data-pl-horizontal-scroll] {
+  touch-action: pan-x pinch-zoom;
+}
+
 button,
 input {
   font: inherit;

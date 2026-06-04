@@ -68,13 +68,8 @@ export const rentalsHeroPool = [
   "/rentals-hero/rentals-3.jpg",
 ] as const;
 
-/** Rentals hero DARK MODE — under `public/rentals-hero/dark/`. */
-export const rentalsHeroDarkPool = [
-  "/rentals-hero/dark/rentals-1.jpg",
-  "/rentals-hero/dark/rentals-2.jpg",
-  "/rentals-hero/dark/rentals-3.jpg",
-  "/rentals-hero/dark/rentals-4.jpg",
-] as const;
+/** Rentals hero DARK MODE — under `public/rentals-hero/dark/` (one background + overlays in `overlays/`). */
+export const rentalsHeroDarkPool = ["/rentals-hero/dark/rentals-1.jpg"] as const;
 
 /**
  * Per-image framing for the Rentals hero background.
@@ -89,9 +84,6 @@ export const rentalsHeroFramingBySrc: Record<string, { backgroundSize?: string; 
   "/rentals-hero/rentals-3.jpg": { backgroundSize: "cover", backgroundPosition: "50% 80%" },
   // Dark mode
   "/rentals-hero/dark/rentals-1.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
-  "/rentals-hero/dark/rentals-2.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
-  "/rentals-hero/dark/rentals-3.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
-  "/rentals-hero/dark/rentals-4.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
 };
 
 /**
@@ -138,11 +130,39 @@ export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]>
       zIndex: 0,
     },
   ],
-  // Dark mode (add overlays later)
-  "/rentals-hero/dark/rentals-1.jpg": [],
-  "/rentals-hero/dark/rentals-2.jpg": [],
-  "/rentals-hero/dark/rentals-3.jpg": [],
-  "/rentals-hero/dark/rentals-4.jpg": [],
+  // Dark mode — files live in public/rentals-hero/dark/overlays/
+  "/rentals-hero/dark/rentals-1.jpg": [
+    {
+      src: "/rentals-hero/dark/overlays/overlay-1.jpg",
+      top: 0,
+      left: 70.31610994305308,
+      width: 30,
+      height: 100,
+      opacity: 0.5,
+      blendMode: "normal",
+      zIndex: 0,
+    },
+    {
+      src: "/rentals-hero/dark/overlays/overlay-2.jpg",
+      top: 0,
+      left: 30.079479213147952,
+      width: 40.32333758120799,
+      height: 100,
+      opacity: 0.5,
+      blendMode: "normal",
+      zIndex: 1,
+    },
+    {
+      src: "/rentals-hero/dark/overlays/overlay-3.jpg",
+      top: 0,
+      left: 0,
+      width: 30,
+      height: 100,
+      opacity: 0.5,
+      blendMode: "normal",
+      zIndex: 2,
+    },
+  ],
 };
 
 /**

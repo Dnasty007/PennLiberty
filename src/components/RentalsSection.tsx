@@ -197,7 +197,7 @@ export function RentalsSection({
     };
     window.addEventListener("pl-collage-layer", onLayerChange);
     return () => window.removeEventListener("pl-collage-layer", onLayerChange);
-  }, []);
+  }, [updateOverlays]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -208,7 +208,7 @@ export function RentalsSection({
     };
     window.addEventListener("pl-collage-delete", onDelete);
     return () => window.removeEventListener("pl-collage-delete", onDelete);
-  }, []);
+  }, [updateOverlays]);
 
   const onOverlayFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -243,7 +243,7 @@ export function RentalsSection({
     };
     window.addEventListener("pl-collage-opacity", onOpacity);
     return () => window.removeEventListener("pl-collage-opacity", onOpacity);
-  }, []);
+  }, [updateOverlays]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -253,13 +253,14 @@ export function RentalsSection({
     };
     window.addEventListener("pl-collage-blend", onBlend);
     return () => window.removeEventListener("pl-collage-blend", onBlend);
-  }, []);
+  }, [updateOverlays]);
 
   const onOverlayMouseDown = (id: string, e: React.MouseEvent) => {
     if (!collageMode) return;
     e.preventDefault();
     e.stopPropagation();
     setSelectedOverlay(id);
+    window.dispatchEvent(new CustomEvent("pl-collage-select", { detail: id }));
     const container = heroRef.current;
     if (!container) return;
     const rect = container.getBoundingClientRect();
@@ -399,7 +400,7 @@ export function RentalsSection({
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        className={`overflow-visible p-4 md:p-5 lg:p-6 ${lightMode ? "ring-1 ring-black/[0.04]" : `${listingsRailChromeClass} ring-1 ring-white/[0.06]`}`}
+        className={`overflow-hidden p-4 md:p-5 lg:p-6 ${lightMode ? "ring-1 ring-black/[0.04]" : `${listingsRailChromeClass} ring-1 ring-white/[0.06]`}`}
       >
         <div ref={heroRef} className="relative isolate min-h-[420px] overflow-hidden rounded-[26px] border border-[#d6b06a]/18 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] sm:min-h-[480px] md:min-h-[520px]">
           <span className="sr-only">
@@ -437,7 +438,6 @@ export function RentalsSection({
                 width: `${overlay.width}%`,
                 height: `${overlay.height}%`,
                 zIndex: 5 + overlay.zIndex,
-                opacity: overlay.opacity,
                 mixBlendMode: overlay.blendMode as React.CSSProperties["mixBlendMode"],
               }}
             >
@@ -445,7 +445,10 @@ export function RentalsSection({
                 src={overlay.src}
                 alt=""
                 className="h-full w-full rounded-lg object-cover shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
-                style={{ transform: overlay.scale ? `scale(${overlay.scale})` : undefined }}
+                style={{
+                  opacity: overlay.opacity,
+                  transform: overlay.scale ? `scale(${overlay.scale})` : undefined,
+                }}
                 draggable={false}
               />
             </div>
@@ -466,10 +469,9 @@ export function RentalsSection({
                 width: `${overlay.width}%`,
                 height: `${overlay.height}%`,
                 zIndex: 10 + overlay.zIndex,
-                opacity: overlay.opacity,
                 mixBlendMode: overlay.blendMode as React.CSSProperties["mixBlendMode"],
-                backgroundColor: "rgba(214,176,106,0.3)",
-                border: "2px dashed #d6b06a",
+                backgroundColor: collageMode ? "rgba(214,176,106,0.3)" : undefined,
+                border: collageMode ? "2px dashed #d6b06a" : undefined,
               }}
               onMouseDown={(e) => onOverlayMouseDown(overlay.id, e)}
             >
@@ -477,6 +479,7 @@ export function RentalsSection({
                 src={overlay.src}
                 alt=""
                 className="h-full w-full rounded-lg object-cover shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+                style={{ opacity: overlay.opacity }}
                 draggable={false}
                 onError={(e) => { console.error("Image failed to load:", overlay.id); (e.target as HTMLImageElement).style.display = "none"; }}
               />

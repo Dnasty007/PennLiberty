@@ -85,22 +85,10 @@ export const rentalPinOffsetsBySrc: Record<string, { top: string; left: string }
     { top: "87.4%", left: "48.2%" },
     { top: "16.3%", left: "68.4%" },
   ],
-  // Dark mode (adjust positions once images are placed)
+  // Dark mode
   "/rentals-hero/dark/rentals-1.jpg": [
-    { top: "50%", left: "50%" },
-    { top: "30%", left: "70%" },
-  ],
-  "/rentals-hero/dark/rentals-2.jpg": [
-    { top: "50%", left: "50%" },
-    { top: "30%", left: "70%" },
-  ],
-  "/rentals-hero/dark/rentals-3.jpg": [
-    { top: "50%", left: "50%" },
-    { top: "30%", left: "70%" },
-  ],
-  "/rentals-hero/dark/rentals-4.jpg": [
-    { top: "50%", left: "50%" },
-    { top: "30%", left: "70%" },
+    { top: "84.8%", left: "23.4%" },
+    { top: "25.8%", left: "66.1%" },
   ],
 };
 

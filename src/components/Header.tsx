@@ -97,7 +97,7 @@ export function Header({
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        className="mx-auto max-w-[1200px] overflow-visible px-5 py-3 md:px-7"
+        className="mx-auto max-w-[1200px] overflow-hidden px-5 py-3 md:px-7"
       >
         <div className="flex items-center justify-between gap-4">
           <button

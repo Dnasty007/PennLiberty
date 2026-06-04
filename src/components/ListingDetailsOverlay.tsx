@@ -81,6 +81,7 @@ export function ListingDetailsOverlay({
   return (
     <>
     <div
+      data-pl-no-page-swipe
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl md:p-8 ${
         lightMode ? "bg-[rgba(9,16,26,0.18)]" : "bg-[rgba(4,10,16,0.72)]"
       }`}
@@ -250,6 +251,7 @@ export function ListingDetailsOverlay({
 
     {lightboxOpen && (
       <div
+        data-pl-no-page-swipe
         className="fixed inset-0 z-[200] flex items-center justify-center bg-black/94 backdrop-blur-sm"
         onClick={() => setLightboxOpen(false)}
       >

@@ -59,7 +59,8 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
         <nav
           role="tablist"
           aria-label="Why management pillars"
-          className="flex flex-row gap-2 overflow-x-auto pb-2 lg:sticky lg:top-[6.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"
+          className="pl-touch-scroll-x flex flex-row gap-2 overflow-x-auto pb-2 lg:sticky lg:top-[6.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"
+          data-pl-horizontal-scroll
         >
           {ownersTabs.map((tab) => {
             const isActive = tab.key === active;

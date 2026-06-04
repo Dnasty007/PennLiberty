@@ -378,6 +378,13 @@ export function DevImageEditor({ imagery }: { imagery?: DevImageryCycleProps }) 
     return () => window.removeEventListener("pl-collage-overlays", onOverlays);
   }, []);
 
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const onSelect = (e: Event) => setSelectedCollageId((e as CustomEvent<string>).detail);
+    window.addEventListener("pl-collage-select", onSelect);
+    return () => window.removeEventListener("pl-collage-select", onSelect);
+  }, []);
+
   /* receive live pin positions from OwnersCoverageBand */
   useEffect(() => {
     const onPos = (e: Event) => setPinData((e as CustomEvent).detail);
@@ -953,7 +960,18 @@ export function DevImageEditor({ imagery }: { imagery?: DevImageryCycleProps }) 
                   ))}
                   <button
                     onClick={() => {
-                      const code = `"${collageHeroSrc}": ` + JSON.stringify(collageOverlays.map(({ src, ...rest }) => ({ ...rest, src: "/* replace with saved path */" })), null, 2);
+                      const code =
+                        `"${collageHeroSrc}": ` +
+                        JSON.stringify(
+                          collageOverlays.map(({ id: _i, ...rest }) => ({
+                            ...rest,
+                            src: rest.src.startsWith("/")
+                              ? rest.src
+                              : "/* save image under public/rentals-hero/overlays/ and use /rentals-hero/overlays/your-file.jpg */",
+                          })),
+                          null,
+                          2,
+                        );
                       navigator.clipboard.writeText(code).then(() => { setCollageCopied(true); setTimeout(() => setCollageCopied(false), 1800); });
                     }}
                     className={`w-full rounded-lg py-1.5 text-[9px] font-bold uppercase tracking-wider transition ${collageCopied ? "bg-green-500/20 text-green-400" : "bg-[#5ec8ff]/15 text-[#5ec8ff] hover:bg-[#5ec8ff]/25"}`}

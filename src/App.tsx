@@ -282,47 +282,58 @@ export default function App() {
     setMobileOpen(false);
   };
 
-  const swipeTouchStart = useRef<{ x: number; y: number } | null>(null);
-  const pageOrder = navItems.map((item) => item.key);
+  const pageOrder = useMemo(() => navItems.map((item) => item.key), []);
   const currentPageIndex = pageOrder.indexOf(activePage);
+  const swipeTouchStart = useRef<{ x: number; y: number } | null>(null);
+  const swipeBlockedRef = useRef(false);
+  const currentPageIndexRef = useRef(currentPageIndex);
+  const goToPageRef = useRef(goToPage);
+
+  currentPageIndexRef.current = currentPageIndex;
+  goToPageRef.current = goToPage;
+
+  useEffect(() => {
+    swipeBlockedRef.current = Boolean(
+      showListingDetails || showScheduleTour || showRentalDetails || mobileOpen,
+    );
+  }, [showListingDetails, showScheduleTour, showRentalDetails, mobileOpen]);
 
   // ⚠️ LOAD-BEARING — DO NOT "SIMPLIFY" THIS INTO CSS. ⚠️
-  // This is what makes mobile swipe-between-pages work WITHOUT the page sliding
-  // sideways, while keeping normal vertical scroll. It went through several
-  // broken attempts; here is what does NOT work on iOS Safari and why:
-  //   • `touch-action: pan-y` on a div  → iOS ignores it for document panning.
-  //   • `touch-action: pan-y` on <html> → iOS fires touchcancel instead of
-  //                                        touchend, so page-swipe stops firing.
-  //   • `overflow-x: hidden` on <body>  → iOS treats body as a scroll container
-  //                                        and KILLS vertical scrolling.
-  // The only reliable fix: a non-passive touchmove listener that preventDefault()s
-  // ONLY on horizontal drags. Vertical scroll and touchend (page-swipe) stay intact.
+  // Non-passive touchmove + preventDefault on horizontal drags stops iOS sideways pan
+  // without breaking vertical scroll or touchend page-swipe (see comment on index.css).
   useEffect(() => {
     let startX = 0;
     let startY = 0;
     let directionLocked: "horizontal" | "vertical" | null = null;
 
+    const isIgnoredTarget = (target: EventTarget | null) => {
+      const el = target as HTMLElement | null;
+      return Boolean(
+        el?.closest(
+          ".leaflet-container, [data-pl-horizontal-scroll], [data-pl-no-page-swipe]",
+        ),
+      );
+    };
+
     const onStart = (e: TouchEvent) => {
+      if (isIgnoredTarget(e.target)) return;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       directionLocked = null;
     };
 
     const onMove = (e: TouchEvent) => {
-      // Let Leaflet maps handle their own touch.
-      const target = e.target as HTMLElement | null;
-      if (target?.closest(".leaflet-container")) return;
+      if (isIgnoredTarget(e.target)) return;
 
       const dx = Math.abs(e.touches[0].clientX - startX);
       const dy = Math.abs(e.touches[0].clientY - startY);
 
-      // Lock direction once we know which way the finger is going.
       if (!directionLocked && (dx > 4 || dy > 4)) {
         directionLocked = dx > dy ? "horizontal" : "vertical";
       }
 
       if (directionLocked === "horizontal") {
-        e.preventDefault(); // stops the page from sliding sideways
+        e.preventDefault();
       }
     };
 
@@ -336,12 +347,21 @@ export default function App() {
   }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Don't hijack gestures that start inside the map — Leaflet pans it horizontally itself.
-    const target = e.target as HTMLElement | null;
-    if (target?.closest(".leaflet-container")) {
+    if (swipeBlockedRef.current) {
       swipeTouchStart.current = null;
       return;
     }
+
+    const target = e.target as HTMLElement | null;
+    if (
+      target?.closest(
+        ".leaflet-container, [data-pl-horizontal-scroll], [data-pl-no-page-swipe]",
+      )
+    ) {
+      swipeTouchStart.current = null;
+      return;
+    }
+
     swipeTouchStart.current = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
@@ -349,20 +369,19 @@ export default function App() {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!swipeTouchStart.current) return;
-    if (showListingDetails || showScheduleTour || showRentalDetails || mobileOpen) return;
+    if (!swipeTouchStart.current || swipeBlockedRef.current) return;
 
     const dx = e.changedTouches[0].clientX - swipeTouchStart.current.x;
     const dy = e.changedTouches[0].clientY - swipeTouchStart.current.y;
     swipeTouchStart.current = null;
 
-    // Require at least 60px horizontal, and more horizontal than vertical
-    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.75) return;
+    if (Math.abs(dx) < 80 || Math.abs(dy) > Math.abs(dx) * 0.5) return;
 
-    if (dx < 0 && currentPageIndex < pageOrder.length - 1) {
-      goToPage(pageOrder[currentPageIndex + 1] as PageKey);
-    } else if (dx > 0 && currentPageIndex > 0) {
-      goToPage(pageOrder[currentPageIndex - 1] as PageKey);
+    const idx = currentPageIndexRef.current;
+    if (dx < 0 && idx < pageOrder.length - 1) {
+      goToPage(pageOrder[idx + 1] as PageKey);
+    } else if (dx > 0 && idx > 0) {
+      goToPage(pageOrder[idx - 1] as PageKey);
     }
   };
 
@@ -416,8 +435,8 @@ export default function App() {
 
   const rootClasses =
     displayMode === "dark"
-      ? "min-h-screen bg-[#06101d] text-white transition-colors duration-500"
-      : "min-h-screen bg-[#f5f3ee] text-black transition-colors duration-500";
+      ? "min-h-dvh overflow-x-hidden bg-[#06101d] text-white transition-colors duration-500"
+      : "min-h-dvh overflow-x-hidden bg-[#f5f3ee] text-black transition-colors duration-500";
 
   const mutedText = lightMode ? "text-black/80" : "text-white/60";
   const subtleText = lightMode ? "text-black/62" : "text-white/45";
@@ -440,19 +459,18 @@ export default function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative min-h-screen overflow-x-hidden">
-        {theme.showBackdrop && siteBackdropImage ? (
-          <div
-            className={siteBackdropImageClass}
-            style={{ backgroundImage: siteBackdropImage }}
-            role="presentation"
-            aria-hidden
-          />
-        ) : null}
-        <div className={`pointer-events-none ${theme.overlayClass} transition-all duration-700`} />
-        <AmbienceLayer type={theme.ambience} />
+      {theme.showBackdrop && siteBackdropImage ? (
+        <div
+          className={siteBackdropImageClass}
+          style={{ backgroundImage: siteBackdropImage }}
+          role="presentation"
+          aria-hidden
+        />
+      ) : null}
+      <div className={`pointer-events-none ${theme.overlayClass} transition-all duration-700`} />
+      <AmbienceLayer type={theme.ambience} />
 
-        <Header
+      <Header
           activePage={activePage}
           displayMode={displayMode}
           goToPage={goToPage}
@@ -465,8 +483,8 @@ export default function App() {
           weather={weather}
         />
 
-        <main
-          className={`relative z-10 px-4 pb-16 md:px-8 md:pb-20 ${
+      <main
+        className={`relative z-10 min-w-0 w-full px-4 pb-8 md:px-8 md:pb-12 ${
             activePage === "listings" ||
               activePage === "team" ||
               activePage === "contact" ||
@@ -477,7 +495,7 @@ export default function App() {
           }`}
         >
           <div
-            className={`mx-auto max-w-7xl ${
+            className={`mx-auto min-w-0 max-w-7xl ${
               activePage === "listings" ||
               activePage === "team" ||
               activePage === "contact" ||
@@ -573,8 +591,7 @@ export default function App() {
               />
             )}
           </div>
-        </main>
-      </div>
+      </main>
 
       <DevImageEditor
         imagery={{
@@ -608,14 +625,15 @@ export default function App() {
         />
       )}
 
-      <footer className={`relative z-10 ${footerClasses}`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 py-2">
+      <footer
+        className={`relative z-10 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] ${footerClasses}`}
+      >
+        <div className="mx-auto flex max-w-7xl flex-col items-start gap-4 py-2 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm">&copy;2008 Penn Liberty</span>
           <img
             src="/branding/matthew-419-logo.png"
             alt="Matthew 4:19"
-            style={{ translate: "203px 43px" }}
-            className={`h-20 w-auto transition-all ${
+            className={`h-16 w-auto sm:h-20 md:ml-auto ${
               lightMode
                 ? "opacity-80 mix-blend-multiply"
                 : "invert grayscale opacity-75"
