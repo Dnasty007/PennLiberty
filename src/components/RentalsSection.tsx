@@ -1,14 +1,14 @@
-import { ClipboardList, KeyRound, Mail, MapPin } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Mail, MapPin } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
+import { RentalDetailsModal } from "@/components/RentalDetailsModal";
 import type { PageKey } from "@/lib/data";
 import { rentalMapPinOffsets, type Rental } from "@/lib/data";
 
-const PENN_PHONE_TEL = "+12159874444";
 const PENN_EMAIL = "info@pennlibertyre.com";
 
 type RentalsSectionProps = {
-  /** Navigate to Contact, etc. */
   goToPage?: (page: PageKey) => void;
   lightMode: boolean;
   mutedText: string;
@@ -56,6 +56,156 @@ function openRentalInquiry(rental: Rental) {
   window.location.href = `mailto:${PENN_EMAIL}?subject=${subject}&body=${body}`;
 }
 
+function openShowingRequest(rental: Rental) {
+  const subject = encodeURIComponent(`Schedule a showing: ${rental.title}`);
+  const body = encodeURIComponent(
+    [
+      "Hi Penn Liberty —",
+      "",
+      `I'd like to schedule a showing for: ${rental.title}`,
+      `Advertised rent: ${rental.price}`,
+      rental.area,
+      "",
+      "My preferred times:",
+      "",
+      "Name:",
+      "Phone:",
+    ].join("\n"),
+  );
+  window.location.href = `mailto:${PENN_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+type RentalCardProps = {
+  rental: Rental;
+  lightMode: boolean;
+  mutedText: string;
+  onOpen: () => void;
+};
+
+function RentalCard({ rental, lightMode, mutedText, onOpen }: RentalCardProps) {
+  const images = rental.gallery?.length ? rental.gallery : [rental.image];
+  const total = images.length;
+
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [prevIdx, setPrevIdx] = useState<number | null>(null);
+  const [fading, setFading] = useState(false);
+  const hovered = useRef(false);
+
+  useEffect(() => {
+    if (total <= 1) return;
+    const id = setInterval(() => {
+      if (hovered.current) return;
+      setPrevIdx(currentIdx);
+      setFading(true);
+      setCurrentIdx((i) => (i + 1) % total);
+    }, 2000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total, currentIdx]);
+
+  useEffect(() => {
+    if (!fading) return;
+    const t = setTimeout(() => {
+      setPrevIdx(null);
+      setFading(false);
+    }, 700);
+    return () => clearTimeout(t);
+  }, [fading]);
+
+  const activeImage = images[currentIdx] ?? images[0];
+  const previousImage = prevIdx !== null ? images[prevIdx] : null;
+
+  return (
+    <article
+      className={`group flex h-full flex-col overflow-hidden rounded-[22px] border transition-colors duration-300 md:rounded-[24px] ${
+        lightMode
+          ? "border-black/[0.08] bg-gradient-to-br from-white/88 to-white/45 shadow-[0_14px_42px_rgba(12,18,28,0.07)] hover:border-[#d6b06a]/38"
+          : "border-white/[0.09] bg-gradient-to-b from-white/[0.08] to-white/[0.025] shadow-[0_14px_48px_rgba(0,0,0,0.26)] hover:border-[#d6b06a]/28"
+      }`}
+    >
+      {/* Image area — click opens modal */}
+      <button
+        type="button"
+        className="relative isolate aspect-[16/11] w-full shrink-0 cursor-pointer overflow-hidden bg-[#0f1824] text-left"
+        onClick={onOpen}
+        onMouseEnter={() => { hovered.current = true; }}
+        onMouseLeave={() => { hovered.current = false; }}
+        aria-label={`View details for ${rental.title}`}
+      >
+        {/* Previous image fading out */}
+        {previousImage && (
+          <img
+            src={previousImage}
+            alt=""
+            aria-hidden
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${fading ? "opacity-0" : "opacity-100"}`}
+          />
+        )}
+        {/* Current image */}
+        <img
+          src={activeImage}
+          alt={rental.title}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover transition-[transform] duration-500 motion-safe:group-hover:scale-[1.04]"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050a11]/88 via-[#050a11]/25 to-transparent" />
+
+        {/* Price overlay */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-3.5 pb-3.5 pt-10">
+          <p className="text-lg font-semibold tabular-nums tracking-tight text-[#f8e9c8] drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]">
+            {rental.price}
+          </p>
+        </div>
+
+        {/* Area badge */}
+        <div
+          className={`pointer-events-none absolute left-3 top-3 inline-flex max-w-[calc(100%-4.5rem)] items-center rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] backdrop-blur-md ${
+            lightMode ? "bg-white/88 text-black/62 ring-1 ring-black/12" : "bg-black/54 text-[#efd9a9] ring-1 ring-white/16"
+          }`}
+        >
+          <MapPin className="mr-1.5 h-3 w-3 shrink-0 text-[#d6b06a]" aria-hidden />
+          <span className="truncate">{rental.area}</span>
+        </div>
+
+        {/* Photo counter */}
+        {total > 1 && (
+          <div className="pointer-events-none absolute bottom-3 right-3 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-md">
+            {currentIdx + 1}/{total}
+          </div>
+        )}
+      </button>
+
+      {/* Card body */}
+      <div className="flex flex-1 flex-col px-4 pb-5 pt-4 sm:px-5 sm:pt-4">
+        <button
+          type="button"
+          className="cursor-pointer text-left"
+          onClick={onOpen}
+          tabIndex={-1}
+          aria-hidden
+        >
+          <h3 className={`text-base font-semibold leading-snug tracking-tight sm:text-lg ${lightMode ? "text-black/95" : "text-white/[0.96]"}`}>
+            {rental.title}
+          </h3>
+          <p className={`mt-2 text-sm leading-relaxed ${mutedText}`}>{rental.meta}</p>
+        </button>
+        <Button
+          type="button"
+          variant="outline"
+          className={`mt-5 w-full rounded-full py-5 text-sm font-semibold ${
+            lightMode
+              ? "border-black/12 bg-white/50 text-black/80 hover:bg-white/70 hover:text-black"
+              : "border-white/15 bg-white/[0.04] text-white/85 hover:bg-white/[0.09] hover:text-white"
+          }`}
+          onClick={onOpen}
+        >
+          View Details &amp; Apply
+        </Button>
+      </div>
+    </article>
+  );
+}
+
 export function RentalsSection({
   goToPage,
   lightMode,
@@ -66,6 +216,7 @@ export function RentalsSection({
   subtleText,
 }: RentalsSectionProps) {
   const hasRentals = rentals.length > 0;
+  const [selectedRental, setSelectedRental] = useState<Rental | null>(null);
 
   const mailGeneralLeasing = () => {
     window.location.href =
@@ -82,7 +233,7 @@ export function RentalsSection({
               : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
           }`}
         >
-          <KeyRound className="h-4 w-4 shrink-0 text-[#d6b06a]" aria-hidden />
+          <MapPin className="h-4 w-4 shrink-0 text-[#d6b06a]" aria-hidden />
           <span>Leasing desk · Philadelphia metro</span>
         </div>
 
@@ -95,22 +246,18 @@ export function RentalsSection({
         </h1>
 
         <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.2rem] ${mutedText}`}>
-          Sample units below mirror the rowhomes, walk-ups, and tower apartments we actually move—swap
+          Sample units below mirror the rowhomes, walk-ups, and tower apartments we actually move — swap
           titles, photos, and rent when your feed is ready. Pins on the visual are placeholders.
         </p>
         <p className={`mt-3 text-sm md:text-[0.9375rem] ${subtleText}`}>
-          Availability turns over fast — call{" "}
-          <a href={`tel:${PENN_PHONE_TEL}`} className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/55 underline-offset-[3px]">
-            215-987-4444
-          </a>{" "}
-          or{" "}
+          Availability turns over fast —{" "}
           <a
             href={`mailto:${PENN_EMAIL}`}
             className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/55 underline-offset-[3px]"
           >
-            email
+            email leasing
           </a>{" "}
-          for today&apos;s applications, pets policy, and showing windows.
+          for today&apos;s schedule, pet policy, and showing windows.
         </p>
       </div>
 
@@ -203,62 +350,28 @@ export function RentalsSection({
             <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
             <p className={`mt-4 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>Featured leases</p>
             <h2 className={`mt-3 text-xl font-semibold tracking-tight md:text-[1.35rem] ${lightMode ? "text-black" : "text-white"}`}>
-              Placeholder inventory ({rentals.length})
+              Available now ({rentals.length})
             </h2>
-            <p className={`mt-2 max-w-2xl text-sm ${mutedText}`}>
-              Swap each block in <code className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[13px] dark:bg-white/[0.07]">initialRentals</code> when your real photos and copy land.
+          </div>
+
+          {/* Owner scarcity message */}
+          <div className="mb-6 flex items-start gap-4">
+            <div className={`mt-1 h-14 w-1 shrink-0 rounded-full ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
+            <p className={`text-[0.9375rem] leading-relaxed md:text-base ${mutedText}`}>
+              We currently have very limited availability. Our properties stay at 98% occupancy because we
+              actually maintain them and treat them like our own. When something opens up, it doesn&apos;t last long.
             </p>
           </div>
 
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 xl:gap-5">
             {rentals.map((rental) => (
               <li key={rental.id} className="min-w-0">
-                <article
-                  className={`group flex h-full flex-col overflow-hidden rounded-[22px] border transition-colors duration-300 md:rounded-[24px] ${
-                    lightMode
-                      ? "border-black/[0.08] bg-gradient-to-br from-white/88 to-white/45 shadow-[0_14px_42px_rgba(12,18,28,0.07)] hover:border-[#d6b06a]/38"
-                      : "border-white/[0.09] bg-gradient-to-b from-white/[0.08] to-white/[0.025] shadow-[0_14px_48px_rgba(0,0,0,0.26)] hover:border-[#d6b06a]/28"
-                  }`}
-                >
-                  <div className="relative isolate aspect-[16/11] shrink-0 overflow-hidden bg-[#0f1824]">
-                    <img
-                      src={rental.image}
-                      alt={rental.title}
-                      loading="lazy"
-                      className={`h-full w-full object-cover transition-[transform] duration-500 motion-safe:group-hover:scale-[1.04]`}
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050a11]/88 via-[#050a11]/25 to-transparent" />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-3.5 pb-3.5 pt-10">
-                      <p className="text-lg font-semibold tabular-nums tracking-tight text-[#f8e9c8] drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]">
-                        {rental.price}
-                      </p>
-                    </div>
-                    <div
-                      className={`pointer-events-none absolute left-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] backdrop-blur-md ${
-                        lightMode ? "bg-white/88 text-black/62 ring-1 ring-black/12" : "bg-black/54 text-[#efd9a9] ring-1 ring-white/16"
-                      }`}
-                    >
-                      <MapPin className="mr-1.5 h-3 w-3 shrink-0 text-[#d6b06a]" aria-hidden />
-                      <span className="truncate">{rental.area}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-1 flex-col px-4 pb-5 pt-4 sm:px-5 sm:pt-4">
-                    <h3 className={`text-base font-semibold leading-snug tracking-tight sm:text-lg ${lightMode ? "text-black/95" : "text-white/[0.96]"}`}>
-                      {rental.title}
-                    </h3>
-                    <p className={`mt-2 text-sm leading-relaxed ${mutedText}`}>{rental.meta}</p>
-                    <Button
-                      type="button"
-                      className="mt-5 w-full rounded-full bg-[#d6b06a] py-5 text-sm font-semibold text-[#08111f] shadow-[0_12px_28px_rgba(214,176,106,0.3)] hover:bg-[#e4be78]"
-                      onClick={() => openRentalApplication(rental)}
-                    >
-                      <span className="inline-flex items-center justify-center gap-2">
-                        <ClipboardList className="h-4 w-4 shrink-0" aria-hidden />
-                        Submit your application
-                      </span>
-                    </Button>
-                  </div>
-                </article>
+                <RentalCard
+                  rental={rental}
+                  lightMode={lightMode}
+                  mutedText={mutedText}
+                  onOpen={() => setSelectedRental(rental)}
+                />
               </li>
             ))}
           </ul>
@@ -309,6 +422,22 @@ export function RentalsSection({
           </div>
         ) : null}
       </GlassCard>
+
+      {selectedRental && (
+        <RentalDetailsModal
+          rental={selectedRental}
+          lightMode={lightMode}
+          onClose={() => setSelectedRental(null)}
+          onApply={() => {
+            openRentalApplication(selectedRental);
+            setSelectedRental(null);
+          }}
+          onScheduleShowing={() => {
+            openShowingRequest(selectedRental);
+            setSelectedRental(null);
+          }}
+        />
+      )}
     </section>
   );
 }

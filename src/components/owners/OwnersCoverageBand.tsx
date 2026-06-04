@@ -1,15 +1,18 @@
+import { Suspense, lazy } from "react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
-import { ownersCoveragePinOffsets, ownersNeighborhoods } from "@/lib/owners";
+
+const OwnersCoverageLeaflet = lazy(() =>
+  import("@/components/owners/OwnersCoverageLeaflet").then((m) => ({ default: m.OwnersCoverageLeaflet })),
+);
 
 type OwnersCoverageBandProps = {
-  editorialHeroSrc: string;
+  editorialHeroSrc?: string;
   lightMode: boolean;
   mutedText: string;
   subtleText: string;
 };
 
 export function OwnersCoverageBand({
-  editorialHeroSrc,
   lightMode,
   mutedText,
   subtleText,
@@ -31,13 +34,6 @@ export function OwnersCoverageBand({
   const imageWell = lightMode
     ? "border-black/[0.12] bg-[#e8e4dc]"
     : "border-white/14 bg-[#111a27]";
-  const imageScrim = lightMode
-    ? "bg-[linear-gradient(to_bottom,rgba(255,253,247,0.08),rgba(40,44,52,0.18))]"
-    : "bg-[linear-gradient(to_bottom,rgba(6,16,29,0.12),rgba(6,16,29,0.48))]";
-
-  const chipOuter = lightMode
-    ? "border-black/[0.18] bg-white/[0.72] text-black shadow-md"
-    : "border-white/[0.2] bg-black/[0.55] text-white shadow-lg backdrop-blur-md";
 
   const glassExtras = `${lightMode ? "ring-1 ring-black/[0.04]" : `${listingsRailChromeClass} ring-1 ring-white/[0.06]`}`;
 
@@ -69,39 +65,23 @@ export function OwnersCoverageBand({
                 breaks—all documented in-platform so expectations stay lined up with reality.
               </p>
               <p className={`mt-5 border-t pt-4 text-[12px] leading-relaxed ${footerRule} ${footerInk}`}>
-                Chips on the image are illustrative, not GIS pins—and will upgrade cleanly when live map data is ready.
+                Map shows our active management neighborhoods. Click any marker to see the area name.
               </p>
             </div>
           </div>
 
           <div className={`order-1 overflow-hidden rounded-[26px] border p-4 md:p-5 xl:order-2 ${frameOuter}`}>
             <div className={`relative isolate min-h-[min(420px,55vh)] overflow-hidden rounded-[22px] border md:rounded-[24px] xl:min-h-[min(544px,calc(85vh))] ${imageWell}`}>
-              <span className="sr-only">Philadelphia — neighborhoods we actively manage alongside owners.</span>
-              <img
-                src={editorialHeroSrc}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                role="presentation"
-                className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-[center_42%]"
-              />
-              <div className={`pointer-events-none absolute inset-0 z-[1] ${imageScrim}`} />
-              {ownersNeighborhoods.map((tile, index) => {
-                const offset =
-                  ownersCoveragePinOffsets[index % ownersCoveragePinOffsets.length] ??
-                  ownersCoveragePinOffsets[0];
-                return (
-                  <div
-                    key={`cov-${tile.key}`}
-                    className="pointer-events-none absolute z-[2] -translate-x-1/2 -translate-y-1/2"
-                    style={{ top: offset.top, left: offset.left }}
-                  >
-                    <div className={`max-w-[10rem] rounded-2xl px-2.5 py-1.5 text-center text-xs font-semibold backdrop-blur-md ${chipOuter}`}>
-                      {tile.name}
-                    </div>
+              <span className="sr-only">Interactive map of Philadelphia neighborhoods Penn Liberty manages.</span>
+              <Suspense
+                fallback={
+                  <div className="flex h-full w-full items-center justify-center">
+                    <span className={`text-sm ${subtleText}`}>Loading map…</span>
                   </div>
-                );
-              })}
+                }
+              >
+                <OwnersCoverageLeaflet lightMode={lightMode} />
+              </Suspense>
             </div>
           </div>
         </div>

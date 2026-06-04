@@ -89,10 +89,10 @@ export type OwnersPath = {
 export const ownersPaths: OwnersPath[] = [
   {
     key: "manage",
-    eyebrow: "I want help managing",
+    eyebrow: "List your property with us",
     title: "Full-Service Management",
-    body: "Leasing, tenants, rent, maintenance, vendor coordination, owner reporting. We run the day-to-day so you don't have to.",
-    cta: "Explore management",
+    body: "98% occupancy. Three generations of Philly expertise. We handle leasing, screening, rent, maintenance, and owner reporting — so your investment works without you running it.",
+    cta: "List Your Property With Us",
     featured: true,
   },
   {

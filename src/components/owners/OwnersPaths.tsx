@@ -143,11 +143,8 @@ export function OwnersPaths({
     <section>
       <SectionDivider lightMode={lightMode} label="However we can help" number="02" />
       <p className={`mt-6 max-w-2xl text-sm leading-snug md:text-[0.95rem] md:leading-relaxed ${introMuted}`}>
-        Three doors — each card jumps somewhere real on this site (Buildium rundown, Contact for selling /
-        valuations, or the owner review form).
-        <span className={`block mt-3 text-[0.8125rem] leading-snug md:text-[0.875rem] ${subtleText}`}>
-          Tilt on desktop stays decorative; taps and keyboards use the same routes.
-        </span>
+        Whether you want a management team that takes everything off your plate, you&apos;re thinking about
+        selling, or you just want to talk through your options — we&apos;ve got a clear next step for you.
       </p>
       <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {sorted.map((path) => (

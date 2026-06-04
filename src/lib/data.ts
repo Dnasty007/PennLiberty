@@ -6,7 +6,11 @@ export type Rental = {
   price: string;
   meta: string;
   area: string;
+  address?: string;
+  mlsNumber?: string;
   image: string;
+  /** 4–6 images for the card carousel and modal. First image mirrors `image`. */
+  gallery?: string[];
   /** Optional per-unit application link (e.g. Buildium listing URL). Overrides `VITE_BUILDIUM_RENTAL_APPLICATION_URL`. */
   applicationUrl?: string;
 };
@@ -62,8 +66,16 @@ export const initialRentals: Rental[] = [
     price: "$1,895/mo",
     meta: "2 bed · 1 bath · Pets case-by-case",
     area: "Fishtown — Girard corridor & transit nearby",
+    address: "Girard Ave corridor, Fishtown, Philadelphia PA",
     image:
       "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1200&q=85",
+    ],
   },
   {
     id: 2,
@@ -71,8 +83,15 @@ export const initialRentals: Rental[] = [
     price: "$1,125/mo",
     meta: "Studio · Updated kitchenette · Laundry in building",
     area: "Temple / North Philly",
+    address: "Broad St & Cecil B. Moore Ave, Philadelphia PA",
     image:
       "https://images.unsplash.com/photo-1545158539-1709fed7e2bf?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1545158539-1709fed7e2bf?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=85",
+    ],
   },
   {
     id: 3,
@@ -80,8 +99,16 @@ export const initialRentals: Rental[] = [
     price: "$1,675/mo",
     meta: "1 bed · 1 bath · Private rear patio",
     area: "South Philly — tenant-stable blocks",
+    address: "South Philadelphia, PA 19148",
     image:
       "https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1604709177225-055f99402ea3?auto=format&fit=crop&w=1200&q=85",
+    ],
   },
   {
     id: 4,
@@ -89,8 +116,15 @@ export const initialRentals: Rental[] = [
     price: "$2,250/mo",
     meta: "1 bed · 1 bath · Doorman elevator building",
     area: "Rittenhouse / Avenue of the Arts",
+    address: "Avenue of the Arts, Center City, Philadelphia PA",
     image:
       "https://images.unsplash.com/photo-1496564203457-11bb12075d90?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1496564203457-11bb12075d90?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=85",
+    ],
   },
   {
     id: 5,
@@ -98,8 +132,16 @@ export const initialRentals: Rental[] = [
     price: "$2,495/mo",
     meta: "2 bed · 2 bath · Garage parking avail.",
     area: "Northern Liberties",
+    address: "Northern Liberties, Philadelphia PA 19123",
     image:
       "https://images.unsplash.com/photo-1568526381923-caf3fd520382?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1568526381923-caf3fd520382?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1576698483491-8c43f0862543?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85",
+    ],
   },
   {
     id: 6,
@@ -107,8 +149,17 @@ export const initialRentals: Rental[] = [
     price: "$2,850/mo",
     meta: "3 bed · 2 bath · Rooftop deck",
     area: "Fairmount / Art Museum area",
+    address: "Fairmount Ave, Art Museum District, Philadelphia PA",
     image:
       "https://images.unsplash.com/photo-1559406041-c7d2bbf2fd1c?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1559406041-c7d2bbf2fd1c?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1416331108676-a22ccbe8bc2b?auto=format&fit=crop&w=1200&q=85",
+    ],
   },
 ];
 

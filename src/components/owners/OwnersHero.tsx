@@ -8,9 +8,9 @@ type OwnersHeroProps = {
 };
 
 const ownerProofPoints = [
-  { term: "Since", detail: "2009", note: "Philly leases & exits" },
-  { term: "Systems", detail: "Buildium", note: "Leasing · rent · work orders · reporting" },
-  { term: "Where", detail: "Block-level", note: "Not flyover playbook management" },
+  { term: "Occupancy", detail: "98%", note: "Low turnover, stable income for owners" },
+  { term: "Experience", detail: "Three generations", note: "Philadelphia management since 2009" },
+  { term: "Approach", detail: "Block-level", note: "Local vendors, local knowledge — not flyover management" },
 ] as const;
 
 export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: OwnersHeroProps) {
@@ -39,19 +39,18 @@ export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: Owner
           </div>
 
           <h1 id="owners-hero-title" className={`mt-7 max-w-[22ch] text-[2.125rem] font-semibold leading-[1.06] tracking-[-0.02em] sm:max-w-none sm:text-4xl md:text-[46px] md:leading-[1.03] xl:text-[52px] ${h1Strong}`}>
-            Owning property in Philadelphia is rewarding.
+            Philadelphia property owners trust us with what they can&apos;t afford to get wrong.
             <span className={`mt-3 block max-w-[20ch] text-[0.92em] font-medium md:max-w-[28ch] ${h1Sub}`}>
-              Managing it well is what protects that reward.
+              98% occupancy. Low turnover. Real maintenance.
             </span>
           </h1>
 
           <p className={`mt-6 max-w-2xl text-base leading-relaxed md:text-lg md:leading-snug ${mutedText}`}>
-            Penn Liberty has been managing and selling Philadelphia properties since 2009. Day to day we run
-            leasing, accounting, maintenance, and owner reporting through{" "}
-            <strong className={`font-semibold ${strongInk}`}>Buildium property management software</strong>
-            —so approvals, disbursements, and work orders aren&apos;t improvised in side threads. Whether
-            you&apos;re a first-time landlord or running a portfolio, we&apos;ll walk you through what disciplined
-            management protects — and why it matters more than most owners expect.
+            Three generations of hands-on Philadelphia management since 2009. We hold our properties at 98%
+            occupancy because we screen carefully, maintain aggressively, and treat every unit like it&apos;s ours.
+            Low turnover means your income is predictable. Real local vendors mean repairs happen — not promises.{" "}
+            <strong className={`font-semibold ${strongInk}`}>If you own property in Philadelphia and want a
+            management team that actually shows up, this is it.</strong>
           </p>
         </header>
 
