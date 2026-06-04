@@ -286,9 +286,17 @@ export default function App() {
   const pageOrder = navItems.map((item) => item.key);
   const currentPageIndex = pageOrder.indexOf(activePage);
 
-  // Block horizontal pan at the native level so the page never slides sideways.
-  // Must use a real addEventListener with passive:false — React synthetic events
-  // can't call preventDefault on touchmove on iOS.
+  // ⚠️ LOAD-BEARING — DO NOT "SIMPLIFY" THIS INTO CSS. ⚠️
+  // This is what makes mobile swipe-between-pages work WITHOUT the page sliding
+  // sideways, while keeping normal vertical scroll. It went through several
+  // broken attempts; here is what does NOT work on iOS Safari and why:
+  //   • `touch-action: pan-y` on a div  → iOS ignores it for document panning.
+  //   • `touch-action: pan-y` on <html> → iOS fires touchcancel instead of
+  //                                        touchend, so page-swipe stops firing.
+  //   • `overflow-x: hidden` on <body>  → iOS treats body as a scroll container
+  //                                        and KILLS vertical scrolling.
+  // The only reliable fix: a non-passive touchmove listener that preventDefault()s
+  // ONLY on horizontal drags. Vertical scroll and touchend (page-swipe) stay intact.
   useEffect(() => {
     let startX = 0;
     let startY = 0;

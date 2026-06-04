@@ -11,6 +11,10 @@
   box-sizing: border-box;
 }
 
+/* ⚠️ Mobile swipe/scroll is handled by a touchmove listener in App.tsx.
+   DO NOT add `touch-action` here or `overflow-x: hidden` to `body` — both
+   break iOS (see the load-bearing comment in App.tsx). overflow-x on <html>
+   is safe and just prevents a sideways scrollbar. */
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
