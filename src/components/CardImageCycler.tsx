@@ -13,6 +13,30 @@ type CardImageCyclerProps = {
 
 const FADE_MS = 1000;
 
+// #region agent log
+function dbg(
+  location: string,
+  message: string,
+  data: Record<string, unknown>,
+  hypothesisId: string,
+) {
+  if (!import.meta.env.DEV) return;
+  const host = typeof window !== "undefined" ? window.location.hostname : "127.0.0.1";
+  fetch(`http://${host}:7457/ingest/ed9b07e2-465a-482e-b5a8-7dd1854cf52a`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "0b913a" },
+    body: JSON.stringify({
+      sessionId: "0b913a",
+      location,
+      message,
+      data,
+      hypothesisId,
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+}
+// #endregion
+
 function preload(src: string) {
   const img = new Image();
   img.src = src;
@@ -33,11 +57,12 @@ export function CardImageCycler({
   const [currentIdx, setCurrentIdx] = useState(0);
   const [nextIdx, setNextIdx] = useState(1);
   const [fadeInNext, setFadeInNext] = useState(false);
-  const [instantReset, setInstantReset] = useState(false);
+  const [skipTransition, setSkipTransition] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const cycleTimerRef = useRef<number | null>(null);
   const fadeTimerRef = useRef<number | null>(null);
+  const cycleCountRef = useRef(0);
 
   const total = images.length;
   const hasMultiple = total > 1;
@@ -60,12 +85,27 @@ export function CardImageCycler({
     if (!el || !hasMultiple) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { root: null, rootMargin: "80px", threshold: 0.15 },
+      ([entry]) => {
+        // #region agent log
+        dbg(
+          "CardImageCycler:intersection",
+          "visibility",
+          {
+            alt: alt.slice(0, 30),
+            isIntersecting: entry.isIntersecting,
+            ratio: entry.intersectionRatio,
+            cycles: cycleCountRef.current,
+          },
+          "H2",
+        );
+        // #endregion
+        setIsVisible(entry.isIntersecting);
+      },
+      { root: null, rootMargin: "80px", threshold: 0.1 },
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasMultiple]);
+  }, [hasMultiple, alt]);
 
   const clearCycleTimer = useCallback(() => {
     if (cycleTimerRef.current) {
@@ -81,30 +121,80 @@ export function CardImageCycler({
       clearTimeout(fadeTimerRef.current);
     }
 
+    // #region agent log
+    dbg(
+      "CardImageCycler:beginFade",
+      "fade start",
+      { alt: alt.slice(0, 30), currentIdx, nextIdx, cycles: cycleCountRef.current },
+      "H3",
+    );
+    // #endregion
+
     setFadeInNext(true);
 
     fadeTimerRef.current = window.setTimeout(() => {
       const newCurrent = nextIdx;
       const newNext = (nextIdx + 1) % total;
+      cycleCountRef.current += 1;
 
-      setInstantReset(true);
+      // #region agent log
+      dbg(
+        "CardImageCycler:fadeComplete",
+        "fade done",
+        {
+          alt: alt.slice(0, 30),
+          newCurrent,
+          newNext,
+          cycles: cycleCountRef.current,
+        },
+        "H3",
+      );
+      // #endregion
+
+      // Snap top layer without transition; use setTimeout (not rAF) — rAF is throttled on mobile Safari
+      setSkipTransition(true);
       setFadeInNext(false);
       setCurrentIdx(newCurrent);
       setNextIdx(newNext);
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setInstantReset(false));
-      });
+      window.setTimeout(() => setSkipTransition(false), 50);
     }, FADE_MS);
-  }, [hasMultiple, nextIdx, total]);
+  }, [hasMultiple, nextIdx, total, alt, currentIdx]);
 
-  // Schedule next cycle — only clear the wait timer here, never the fade-completion timer
+  // Schedule next cycle — never block on skipTransition (was instantReset; rAF stuck on mobile)
   useEffect(() => {
     clearCycleTimer();
 
-    if (!hasMultiple || !isVisible || isHovered || fadeInNext || instantReset) {
+    const blocked = !hasMultiple || !isVisible || isHovered || fadeInNext;
+    if (blocked) {
+      // #region agent log
+      dbg(
+        "CardImageCycler:schedule",
+        "blocked",
+        {
+          alt: alt.slice(0, 30),
+          hasMultiple,
+          isVisible,
+          isHovered,
+          fadeInNext,
+          skipTransition,
+          currentIdx,
+          cycles: cycleCountRef.current,
+        },
+        blocked && !isVisible ? "H2" : fadeInNext ? "H3" : "H4",
+      );
+      // #endregion
       return;
     }
+
+    // #region agent log
+    dbg(
+      "CardImageCycler:schedule",
+      "scheduled",
+      { alt: alt.slice(0, 30), interval, currentIdx, cycles: cycleCountRef.current },
+      "H4",
+    );
+    // #endregion
 
     cycleTimerRef.current = window.setTimeout(() => {
       beginFade();
@@ -116,11 +206,11 @@ export function CardImageCycler({
     isVisible,
     isHovered,
     fadeInNext,
-    instantReset,
     currentIdx,
     interval,
     beginFade,
     clearCycleTimer,
+    alt,
   ]);
 
   // Clear fade timer on unmount only
@@ -135,9 +225,14 @@ export function CardImageCycler({
   const supportsHover =
     typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  const fadeClass = instantReset
+  const fadeClass = skipTransition
     ? ""
     : "transition-opacity duration-1000 ease-in-out";
+
+  const showDebug =
+    import.meta.env.DEV &&
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("pl_cycler_debug");
 
   return (
     <div
@@ -186,6 +281,12 @@ export function CardImageCycler({
           <span>{currentIdx + 1}</span>
           <span className="mx-0.5 text-[9px] opacity-50">/</span>
           <span>{total}</span>
+        </div>
+      )}
+
+      {showDebug && (
+        <div className="absolute left-1 top-1 z-20 max-w-[90%] rounded bg-red-600/90 px-1 py-0.5 text-[8px] text-white">
+          c:{cycleCountRef.current} v:{isVisible ? 1 : 0} f:{fadeInNext ? 1 : 0}
         </div>
       )}
 
