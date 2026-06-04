@@ -5,7 +5,11 @@ import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import type { PageKey } from "@/lib/data";
 import { rentalMapPinOffsets, rentalPinOffsetsBySrc, type Rental } from "@/lib/data";
-import { rentalsHeroFramingBySrc, rentalsHeroCollageOverlays } from "@/lib/siteImagery";
+import {
+  rentalsHeroBlankBaseSrc,
+  rentalsHeroCollageOverlays,
+  rentalsHeroFramingBySrc,
+} from "@/lib/siteImagery";
 
 const PENN_PHONE_TEL = "+12159227900";
 const PENN_EMAIL = "info@pennlibertyre.com";
@@ -25,6 +29,21 @@ type RentalsSectionProps = {
 function configuredBuildiumApplicationUrl(): string | undefined {
   const raw = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim();
   return raw || undefined;
+}
+
+function collageOverlayBoxStyle(blendMode: string): React.CSSProperties {
+  return {
+    mixBlendMode:
+      blendMode !== "normal" ? (blendMode as React.CSSProperties["mixBlendMode"]) : undefined,
+  };
+}
+
+/** Opacity on <img> — matches dev editor manifest (0.65 on dark rentals-1 panels). */
+function collageOverlayImgStyle(opacity: number, scale?: number): React.CSSProperties {
+  return {
+    opacity,
+    transform: scale ? `scale(${scale})` : undefined,
+  };
 }
 
 function openRentalApplication(rental: Rental) {
@@ -123,7 +142,7 @@ export function RentalsSection({
     opacity: number; // 0-1
     blendMode: string;
   };
-  const COLLAGE_KEY = "pl-collage-v3";
+  const COLLAGE_KEY = "pl-collage-v4";
   const [collageMode, setCollageMode] = useState(false);
   const [allOverlays, setAllOverlays] = useState<(CollageOverlay & { heroSrc: string })[]>(() => {
     if (!import.meta.env.DEV) return [];
@@ -137,6 +156,14 @@ export function RentalsSection({
 
   // Filter overlays for current hero image
   const overlays = allOverlays.filter((o) => o.heroSrc === rentalsHeroSrc);
+  const lockedCollage = rentalsHeroCollageOverlays[rentalsHeroSrc] ?? [];
+  const hasLockedCollage = lockedCollage.length > 0;
+
+  /* Permanent collage is in source — drop stale dev-only layers (caused duplicate Eagles). */
+  useEffect(() => {
+    if (!import.meta.env.DEV || !hasLockedCollage || overlays.length === 0) return;
+    setAllOverlays((all) => all.filter((o) => o.heroSrc !== rentalsHeroSrc));
+  }, [rentalsHeroSrc, hasLockedCollage, overlays.length]);
 
   // Save to localStorage whenever allOverlays changes
   useEffect(() => {
@@ -409,12 +436,17 @@ export function RentalsSection({
           <div
             aria-hidden
             className="rentals-hero-bg pointer-events-none absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url("${rentalsHeroSrc}")`,
-              backgroundSize: rentalsHeroFramingBySrc[rentalsHeroSrc]?.backgroundSize ?? "cover",
-              backgroundPosition: rentalsHeroFramingBySrc[rentalsHeroSrc]?.backgroundPosition ?? "50% 80%",
-              backgroundRepeat: "no-repeat",
-            }}
+            style={
+              rentalsHeroBlankBaseSrc.has(rentalsHeroSrc)
+                ? undefined
+                : {
+                    backgroundImage: `url("${rentalsHeroSrc}")`,
+                    backgroundSize: rentalsHeroFramingBySrc[rentalsHeroSrc]?.backgroundSize ?? "cover",
+                    backgroundPosition:
+                      rentalsHeroFramingBySrc[rentalsHeroSrc]?.backgroundPosition ?? "50% 80%",
+                    backgroundRepeat: "no-repeat",
+                  }
+            }
           />
 
           {/* Dev collage overlays */}
@@ -431,45 +463,42 @@ export function RentalsSection({
           {(rentalsHeroCollageOverlays[rentalsHeroSrc] ?? []).map((overlay, idx) => (
             <div
               key={`perm-${idx}`}
-              className="pointer-events-none absolute"
+              className="rentals-collage-overlay pointer-events-none absolute"
               style={{
                 top: `${overlay.top}%`,
                 left: `${overlay.left}%`,
                 width: `${overlay.width}%`,
                 height: `${overlay.height}%`,
                 zIndex: 5 + overlay.zIndex,
-                mixBlendMode: overlay.blendMode as React.CSSProperties["mixBlendMode"],
+                ...collageOverlayBoxStyle(overlay.blendMode),
               }}
             >
               <img
                 src={overlay.src}
                 alt=""
                 className="h-full w-full rounded-lg object-cover shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
-                style={{
-                  opacity: overlay.opacity,
-                  transform: overlay.scale ? `scale(${overlay.scale})` : undefined,
-                }}
+                style={collageOverlayImgStyle(overlay.opacity, overlay.scale)}
                 draggable={false}
               />
             </div>
           ))}
 
-          {import.meta.env.DEV && overlays.length > 0 && (
+          {import.meta.env.DEV && !hasLockedCollage && overlays.length > 0 && (
             <div className="pointer-events-none absolute left-4 bottom-4 z-50 rounded bg-black/70 px-2 py-1 text-[10px] text-white">
               {overlays.length} dev overlay(s)
             </div>
           )}
-          {import.meta.env.DEV && overlays.map((overlay) => (
+          {import.meta.env.DEV && !hasLockedCollage && overlays.map((overlay) => (
             <div
               key={overlay.id}
-              className={`absolute cursor-move ${collageMode ? "" : "pointer-events-none"}`}
+              className={`rentals-collage-overlay absolute cursor-move ${collageMode ? "" : "pointer-events-none"}`}
               style={{
                 top: `${overlay.top}%`,
                 left: `${overlay.left}%`,
                 width: `${overlay.width}%`,
                 height: `${overlay.height}%`,
                 zIndex: 10 + overlay.zIndex,
-                mixBlendMode: overlay.blendMode as React.CSSProperties["mixBlendMode"],
+                ...collageOverlayBoxStyle(overlay.blendMode),
                 backgroundColor: collageMode ? "rgba(214,176,106,0.3)" : undefined,
                 border: collageMode ? "2px dashed #d6b06a" : undefined,
               }}
@@ -479,7 +508,7 @@ export function RentalsSection({
                 src={overlay.src}
                 alt=""
                 className="h-full w-full rounded-lg object-cover shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
-                style={{ opacity: overlay.opacity }}
+                style={collageOverlayImgStyle(overlay.opacity)}
                 draggable={false}
                 onError={(e) => { console.error("Image failed to load:", overlay.id); (e.target as HTMLImageElement).style.display = "none"; }}
               />
@@ -555,14 +584,16 @@ export function RentalsSection({
                   {import.meta.env.DEV && pinMode && (
                     <div className="pointer-events-none absolute -inset-1 rounded-2xl ring-2 ring-[#d6b06a] ring-offset-1 ring-offset-black/40" />
                   )}
-                  <button
-                    type="button"
-                    onClick={() => !pinMode && onOpenRentalDetails?.(rental.id)}
-                    className="max-w-[11rem] rounded-2xl border border-[#d6b06a]/25 bg-black/58 px-3 py-2 text-center text-xs font-medium text-white shadow-[0_12px_34px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-[#d6b06a]/60 hover:bg-black/75 hover:scale-105 hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] sm:max-w-[12rem]"
-                  >
-                    <span className="line-clamp-2 leading-snug">{rental.title}</span>
-                    <span className="mt-1 block font-semibold tracking-tight text-[#f4dfb4]">{rental.price}</span>
-                  </button>
+                  <div className="rental-pin-bob">
+                    <button
+                      type="button"
+                      onClick={() => !pinMode && onOpenRentalDetails?.(rental.id)}
+                      className="rental-pin-chip max-w-[11rem] rounded-2xl border border-[#d6b06a]/25 bg-black/58 px-3 py-2 text-center text-xs font-medium text-white shadow-[0_12px_34px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-[#d6b06a]/60 hover:bg-black/75 hover:scale-105 hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] sm:max-w-[12rem]"
+                    >
+                      <span className="line-clamp-2 leading-snug">{rental.title}</span>
+                      <span className="mt-1 block font-semibold tracking-tight text-[#f4dfb4]">{rental.price}</span>
+                    </button>
+                  </div>
                 </div>
               );
             })

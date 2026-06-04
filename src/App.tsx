@@ -33,6 +33,7 @@ import {
   ownersPageBackdropDarkPool,
   rentalsHeroPool,
   rentalsHeroDarkPool,
+  siteBackdropFramingBySrc,
   siteBackdropImageClass,
   usePoolIndexCycler,
 } from "@/lib/siteImagery";
@@ -206,12 +207,16 @@ export default function App() {
   const lightMode = theme.lightMode;
 
   /** Same day/night pick on every page (Home used a separate path before — broke Light on sub-pages). */
-  const siteBackdropImage =
+  const siteBackdropSrc =
     displayMode === "light"
-      ? backdropCssUrl(dayBackdropPick)
+      ? dayBackdropPick
       : displayMode === "dark"
-        ? backdropCssUrl(nightBackdropPick)
+        ? nightBackdropPick
         : undefined;
+  const siteBackdropImage = siteBackdropSrc ? backdropCssUrl(siteBackdropSrc) : undefined;
+  const siteBackdropFrame = siteBackdropSrc
+    ? siteBackdropFramingBySrc[siteBackdropSrc]
+    : undefined;
 
   /* Scroll-reveal disabled — background stays fixed. */
 
@@ -462,7 +467,15 @@ export default function App() {
       {theme.showBackdrop && siteBackdropImage ? (
         <div
           className={siteBackdropImageClass}
-          style={{ backgroundImage: siteBackdropImage }}
+          style={{
+            backgroundImage: siteBackdropImage,
+            ...(siteBackdropFrame?.backgroundSize && {
+              backgroundSize: siteBackdropFrame.backgroundSize,
+            }),
+            ...(siteBackdropFrame?.backgroundPosition && {
+              backgroundPosition: siteBackdropFrame.backgroundPosition,
+            }),
+          }}
           role="presentation"
           aria-hidden
         />

@@ -187,10 +187,10 @@ function devImageSavePlugin() {
                             base64 = body.dataUrl.replace(/^data:image\/\w+;base64,/, "");
                             buffer = Buffer.from(base64, "base64");
                             safe = body.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-                            dest = path.resolve(__dirname, "public", "backdrops", safe);
+                            dest = path.resolve(__dirname, "public", "backgrounds", safe);
                             fs.mkdirSync(path.dirname(dest), { recursive: true });
                             fs.writeFileSync(dest, buffer);
-                            publicPath = "/backdrops/".concat(safe);
+                            publicPath = "/backgrounds/".concat(safe);
                             console.log("[dev-image-save] Saved \u2192 ".concat(dest));
                             res.statusCode = 200;
                             res.setHeader("Content-Type", "application/json");

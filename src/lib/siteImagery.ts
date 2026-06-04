@@ -1,18 +1,28 @@
 import { useCallback, useRef, useState } from "react";
 
-/** Local Philadelphia backdrops under `public/backdrops/` (served at `/backdrops/...`). */
-
+/**
+ * Site-wide sky behind every page (Light / Dark toggle).
+ * `public/backgrounds/day/` — 3 photos · `public/backgrounds/night/` — 3 photos
+ */
 export const dayBackdropPool = [
-  "/backdrops/philly-day-1.jpg",
-  "/backdrops/philly-day-2.jpg",
-  "/backdrops/philly-day-3.jpg",
+  "/backgrounds/day/day-1.jpg",
+  "/backgrounds/day/day-2.jpg",
+  "/backgrounds/day/day-3.jpg",
 ] as const;
 
 export const nightBackdropPool = [
-  "/backdrops/philly-night-1.jpg",
-  "/backdrops/philly-night-2.jpg",
-  "/backdrops/philly-night-3.jpg",
+  "/backgrounds/night/night-1.jpg",
+  "/backgrounds/night/night-2.jpg",
+  "/backgrounds/night/night-3.jpg",
 ] as const;
+
+/** Per-file crop for the site-wide `.site-backdrop` (defaults in `index.css`). */
+export const siteBackdropFramingBySrc: Record<
+  string,
+  { backgroundSize?: string; backgroundPosition?: string }
+> = {
+  "/backgrounds/day/day-3.jpg": { backgroundSize: "100%", backgroundPosition: "100% 25%" },
+};
 
 /** For Owners page — local photography under `public/owners/`. */
 export const ownersPageBackdropPool = [
@@ -68,8 +78,15 @@ export const rentalsHeroPool = [
   "/rentals-hero/rentals-3.jpg",
 ] as const;
 
-/** Rentals hero DARK MODE — under `public/rentals-hero/dark/` (one background + overlays in `overlays/`). */
-export const rentalsHeroDarkPool = ["/rentals-hero/dark/rentals-1.jpg"] as const;
+/** Rentals hero DARK MODE — backgrounds in `public/rentals-hero/dark/`, collages in `dark/overlays/`. */
+export const rentalsHeroDarkPool = [
+  "/rentals-hero/dark/rentals-1.jpg",
+  "/rentals-hero/dark/rentals-2.jpg",
+  "/rentals-hero/dark/rentals-3.jpg",
+] as const;
+
+/** Blank hero base — collage overlays only (Light rentals-1). Dark rentals-1 keeps ferris wheel bg. */
+export const rentalsHeroBlankBaseSrc = new Set<string>(["/rentals-hero/rentals-1.jpg"]);
 
 /**
  * Per-image framing for the Rentals hero background.
@@ -83,7 +100,9 @@ export const rentalsHeroFramingBySrc: Record<string, { backgroundSize?: string; 
   "/rentals-hero/rentals-2.jpg": { backgroundSize: "101%", backgroundPosition: "100% 75%" },
   "/rentals-hero/rentals-3.jpg": { backgroundSize: "cover", backgroundPosition: "50% 80%" },
   // Dark mode
-  "/rentals-hero/dark/rentals-1.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
+  "/rentals-hero/dark/rentals-1.jpg": { backgroundSize: "100%", backgroundPosition: "50% 50%" },
+  "/rentals-hero/dark/rentals-2.jpg": { backgroundSize: "100%", backgroundPosition: "100% 56%" },
+  "/rentals-hero/dark/rentals-3.jpg": { backgroundSize: "100%", backgroundPosition: "100% 67%" },
 };
 
 /**
@@ -102,9 +121,33 @@ export type RentalsCollageOverlay = {
   scale?: number;
 };
 
+const rentals1TwoPanelCollage = (overlayDir: "/rentals-hero/overlays" | "/rentals-hero/dark/overlays") =>
+  [
+    {
+      src: `${overlayDir}/overlay-1.jpg`,
+      top: 0,
+      left: 0,
+      width: 62.34019287769368,
+      height: 100,
+      opacity: 1,
+      blendMode: "normal",
+      zIndex: 0,
+    },
+    {
+      src: `${overlayDir}/overlay-2.jpg`,
+      top: 0,
+      left: 61.68472097049463,
+      width: 38.77573073063044,
+      height: 100,
+      opacity: 1,
+      blendMode: "normal",
+      zIndex: 1,
+    },
+  ] as const satisfies readonly RentalsCollageOverlay[];
+
 export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]> = {
-  // Light mode
-  "/rentals-hero/rentals-1.jpg": [],
+  // Light mode — rentals-1: Eagles (left) + Phillies (right)
+  "/rentals-hero/rentals-1.jpg": [...rentals1TwoPanelCollage("/rentals-hero/overlays")],
   "/rentals-hero/rentals-2.jpg": [
     {
       src: "/rentals-hero/overlays/overlay-2.jp.jpg",
@@ -130,7 +173,7 @@ export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]>
       zIndex: 0,
     },
   ],
-  // Dark mode — files live in public/rentals-hero/dark/overlays/
+  // Dark mode — rentals-1: 3 street panels @ 0.65 (not Eagles/Phillies)
   "/rentals-hero/dark/rentals-1.jpg": [
     {
       src: "/rentals-hero/dark/overlays/overlay-1.jpg",
@@ -138,7 +181,7 @@ export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]>
       left: 70.31610994305308,
       width: 30,
       height: 100,
-      opacity: 0.5,
+      opacity: 0.65,
       blendMode: "normal",
       zIndex: 0,
     },
@@ -148,7 +191,7 @@ export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]>
       left: 30.079479213147952,
       width: 40.32333758120799,
       height: 100,
-      opacity: 0.5,
+      opacity: 0.65,
       blendMode: "normal",
       zIndex: 1,
     },
@@ -158,22 +201,25 @@ export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]>
       left: 0,
       width: 30,
       height: 100,
-      opacity: 0.5,
+      opacity: 0.65,
       blendMode: "normal",
       zIndex: 2,
     },
   ],
+  "/rentals-hero/dark/rentals-2.jpg": [],
+  "/rentals-hero/dark/rentals-3.jpg": [],
 };
 
 /**
  * Wide distant skyline for the listings map teaser — bundled under `/public` so it always
  * resolves (no remote outages / PATH-length issues during local dev).
  */
-export const listingsMapTeaserDefaultSrc = "/backdrops/philly-day-6.jpg" as const;
+/** Listings page map hero only — not the site-wide sky (see `public/listings/`). */
+export const listingsMapTeaserDefaultSrc = "/listings/teaser-1.jpg" as const;
 
 export const listingsMapTeaserPool = [
   listingsMapTeaserDefaultSrc,
-  "/backdrops/philly-listings-teaser.jpg",
+  "/listings/teaser-2.jpg",
 ] as const;
 
 /** @deprecated Use listingsMapTeaserPool */

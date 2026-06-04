@@ -38,20 +38,18 @@ input {
 /* Full-viewport Philly backdrops (Light / Dark) — applied in App.tsx */
 /* backdrop div is position:fixed so it only ever covers viewport, never the full page height */
 .site-backdrop {
-  background-size: 134%;
-  --bd-y: 25%; /* starting vertical frame (top of page); scroll reveals downward from here */
-  background-position: 47% var(--bd-y);
+  background-size: 100%;
+  background-position: 100% 43%;
   background-repeat: no-repeat;
   background-attachment: scroll;
-  will-change: background-position;
   backface-visibility: hidden;
 }
 
-/* Tall/narrow viewports: keep cover, nudge focal point down slightly for portrait screens */
+/* Tall/narrow viewports — same frame as desktop (locked via dev editor) */
 @media (max-aspect-ratio: 4/5) {
   .site-backdrop {
-    background-size: cover;
-    background-position: center 25%;
+    background-size: 100%;
+    background-position: 100% 43%;
   }
 }
 
@@ -84,14 +82,29 @@ input {
 .coverage-chip:nth-child(4) { animation-delay: 2.1s; }
 .coverage-chip:nth-child(5) { animation-delay: 2.8s; }
 
-.rental-pin {
+/* Float on inner bob so centering translate on .rental-pin is not overwritten */
+.rental-pin .rental-pin-bob {
   animation: chip-float 4.2s ease-in-out infinite;
 }
-.rental-pin:nth-child(1) { animation-delay: 0s; }
-.rental-pin:nth-child(2) { animation-delay: 0.9s; }
-.rental-pin:nth-child(3) { animation-delay: 1.8s; }
-.rental-pin:nth-child(4) { animation-delay: 2.7s; }
-.rental-pin:nth-child(5) { animation-delay: 3.6s; }
-.rental-pin:nth-child(6) { animation-delay: 1.3s; }
-.rental-pin:nth-child(7) { animation-delay: 2.2s; }
+.rental-pin:nth-child(1) .rental-pin-bob { animation-delay: 0s; }
+.rental-pin:nth-child(2) .rental-pin-bob { animation-delay: 0.9s; }
+.rental-pin:nth-child(3) .rental-pin-bob { animation-delay: 1.8s; }
+.rental-pin:nth-child(4) .rental-pin-bob { animation-delay: 2.7s; }
+.rental-pin:nth-child(5) .rental-pin-bob { animation-delay: 3.6s; }
+.rental-pin:nth-child(6) .rental-pin-bob { animation-delay: 1.3s; }
+.rental-pin:nth-child(7) .rental-pin-bob { animation-delay: 2.2s; }
+
+/* Collage overlay compositing — opacity is on each img (see RentalsSection). */
+.rentals-collage-overlay {
+  isolation: isolate;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .rental-pin-chip {
+    background-color: rgba(0, 0, 0, 0.88) !important;
+  }
+}
 

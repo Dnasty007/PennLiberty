@@ -70,12 +70,12 @@ function devImageSavePlugin(): Plugin {
 
           // Sanitise filename — only allow safe chars
           const safe = body.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-          const dest = path.resolve(__dirname, "public", "backdrops", safe);
+          const dest = path.resolve(__dirname, "public", "backgrounds", safe);
 
           fs.mkdirSync(path.dirname(dest), { recursive: true });
           fs.writeFileSync(dest, buffer);
 
-          const publicPath = `/backdrops/${safe}`;
+          const publicPath = `/backgrounds/${safe}`;
           console.log(`[dev-image-save] Saved → ${dest}`);
 
           res.statusCode = 200;

@@ -74,8 +74,8 @@ export const rentalMapPinOffsets = [
 export const rentalPinOffsetsBySrc: Record<string, { top: string; left: string }[]> = {
   // Light mode
   "/rentals-hero/rentals-1.jpg": [
-    { top: "33.4%", left: "86.5%" },
-    { top: "8.4%", left: "72.3%" },
+    { top: "35.7%", left: "89.0%" },
+    { top: "14.6%", left: "62.2%" },
   ],
   "/rentals-hero/rentals-2.jpg": [
     { top: "86.1%", left: "59.2%" },
@@ -89,6 +89,14 @@ export const rentalPinOffsetsBySrc: Record<string, { top: string; left: string }
   "/rentals-hero/dark/rentals-1.jpg": [
     { top: "84.8%", left: "23.4%" },
     { top: "25.8%", left: "66.1%" },
+  ],
+  "/rentals-hero/dark/rentals-2.jpg": [
+    { top: "74.2%", left: "43.9%" },
+    { top: "12.7%", left: "71.3%" },
+  ],
+  "/rentals-hero/dark/rentals-3.jpg": [
+    { top: "12.9%", left: "76.9%" },
+    { top: "39.2%", left: "15.5%" },
   ],
 };
 
