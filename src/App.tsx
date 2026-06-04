@@ -286,6 +286,47 @@ export default function App() {
   const pageOrder = navItems.map((item) => item.key);
   const currentPageIndex = pageOrder.indexOf(activePage);
 
+  // Block horizontal pan at the native level so the page never slides sideways.
+  // Must use a real addEventListener with passive:false — React synthetic events
+  // can't call preventDefault on touchmove on iOS.
+  useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+    let directionLocked: "horizontal" | "vertical" | null = null;
+
+    const onStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      directionLocked = null;
+    };
+
+    const onMove = (e: TouchEvent) => {
+      // Let Leaflet maps handle their own touch.
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".leaflet-container")) return;
+
+      const dx = Math.abs(e.touches[0].clientX - startX);
+      const dy = Math.abs(e.touches[0].clientY - startY);
+
+      // Lock direction once we know which way the finger is going.
+      if (!directionLocked && (dx > 4 || dy > 4)) {
+        directionLocked = dx > dy ? "horizontal" : "vertical";
+      }
+
+      if (directionLocked === "horizontal") {
+        e.preventDefault(); // stops the page from sliding sideways
+      }
+    };
+
+    document.addEventListener("touchstart", onStart, { passive: true });
+    document.addEventListener("touchmove", onMove, { passive: false });
+
+    return () => {
+      document.removeEventListener("touchstart", onStart);
+      document.removeEventListener("touchmove", onMove);
+    };
+  }, []);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     // Don't hijack gestures that start inside the map — Leaflet pans it horizontally itself.
     const target = e.target as HTMLElement | null;

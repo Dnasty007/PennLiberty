@@ -14,9 +14,6 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  /* pan-y on html tells iOS Safari: horizontal drags are never document scrolls.
-     Putting this on a child div is unreliable on iOS — it must be on html/body. */
-  touch-action: pan-y;
 }
 
 body {
