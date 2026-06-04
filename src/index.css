@@ -13,10 +13,17 @@
 
 html {
   scroll-behavior: smooth;
+  /* Lock horizontal scrolling so a sideways swipe can't pan the whole document. */
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  /* Belt-and-suspenders against horizontal swipe panning / iOS rubber-band overscroll. */
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  width: 100%;
+  position: relative;
 }
 
 button,
