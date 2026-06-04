@@ -304,15 +304,35 @@ type Selected = {
   savedPath: string | null;
 };
 
+export type DevImageryCycleProps = {
+  onNextBackdrop: () => void;
+  onNextPageHero: () => void;
+  canCycleBackdrop: boolean;
+  canCyclePageHero: boolean;
+  backdropPreview: string;
+  pageHeroPreview: string;
+};
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Component
 ═══════════════════════════════════════════════════════════════════════════ */
-export function DevImageEditor() {
+export function DevImageEditor({ imagery }: { imagery?: DevImageryCycleProps }) {
   if (!import.meta.env.DEV) return null;
 
   /* eslint-disable react-hooks/rules-of-hooks */
   const [editMode, setEditMode]   = useState(false);
   const [imageMode, setImageMode] = useState(false);
+  const [pinMode, setPinMode]     = useState(false);
+  const [collageMode, setCollageMode] = useState(false);
+  const [pinData, setPinData] = useState<{ positions: Array<{ top: string; left: string }>; src: string } | null>(null);
+  const [pinCopied, setPinCopied] = useState(false);
+  const [rentalPinData, setRentalPinData] = useState<{ positions: Array<{ top: string; left: string }>; heroSrc: string } | null>(null);
+  const [rentalPinCopied, setRentalPinCopied] = useState(false);
+  type CollageOverlay = { id: string; src: string; top: number; left: number; width: number; height: number; zIndex: number; opacity: number; blendMode: string };
+  const [collageOverlays, setCollageOverlays] = useState<CollageOverlay[]>([]);
+  const [collageHeroSrc, setCollageHeroSrc] = useState<string>("");
+  const [collageCopied, setCollageCopied] = useState(false);
+  const [selectedCollageId, setSelectedCollageId] = useState<string | null>(null);
   const [selected, setSelected]   = useState<Selected | null>(null);
   const [saving, setSaving]       = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
@@ -336,6 +356,44 @@ export function DevImageEditor() {
 
   editModeRef.current  = editMode;
   imageModeRef.current = imageMode;
+
+  /* broadcast pin mode to OwnersCoverageBand */
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("pl-pin-mode", { detail: pinMode }));
+  }, [pinMode]);
+
+  /* broadcast collage mode */
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("pl-collage-mode", { detail: collageMode }));
+  }, [collageMode]);
+
+  /* receive collage overlays from RentalsSection */
+  useEffect(() => {
+    const onOverlays = (e: Event) => {
+      const data = (e as CustomEvent).detail as { overlays: CollageOverlay[]; heroSrc: string };
+      setCollageOverlays(data.overlays);
+      setCollageHeroSrc(data.heroSrc);
+    };
+    window.addEventListener("pl-collage-overlays", onOverlays);
+    return () => window.removeEventListener("pl-collage-overlays", onOverlays);
+  }, []);
+
+  /* receive live pin positions from OwnersCoverageBand */
+  useEffect(() => {
+    const onPos = (e: Event) => setPinData((e as CustomEvent).detail);
+    window.addEventListener("pl-pin-positions", onPos);
+    return () => window.removeEventListener("pl-pin-positions", onPos);
+  }, []);
+
+  /* receive live pin positions from RentalsSection */
+  useEffect(() => {
+    const onPos = (e: Event) => {
+      const data = (e as CustomEvent).detail as { positions: Array<{ top: string; left: string }>; heroSrc: string };
+      setRentalPinData(data);
+    };
+    window.addEventListener("pl-rental-pin-positions", onPos);
+    return () => window.removeEventListener("pl-rental-pin-positions", onPos);
+  }, []);
 
   /* overlays */
   useEffect(() => {
@@ -537,11 +595,11 @@ export function DevImageEditor() {
     };
   }, [selectEl, ring]);
 
-  /* Image Mode: force all images clickable (overrides pointer-events:none) */
+  /* Image Mode: force all images + background-image divs clickable (overrides pointer-events:none) */
   useEffect(() => {
     if (!imageMode) return;
     const style = document.createElement("style");
-    style.textContent = "img{pointer-events:auto!important;}";
+    style.textContent = "img, [style*='background-image'], .rentals-hero-bg, .owners-card-backdrop, .site-backdrop{pointer-events:auto!important;}";
     document.head.appendChild(style);
     return () => style.remove();
   }, [imageMode]);
@@ -758,7 +816,7 @@ export function DevImageEditor() {
         {/* Mode toggles */}
         <div className="px-4 py-3 space-y-2">
           {/* Edit Mode */}
-          <button onClick={() => { setEditMode((m) => { const n = !m; if (n) setImageMode(false); return n; }); }}
+          <button onClick={() => { setEditMode((m) => { const n = !m; if (n) { setImageMode(false); setPinMode(false); setCollageMode(false); } return n; }); }}
             className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition ${editMode ? "border-[#d6b06a]/50 bg-[#d6b06a]/15" : "border-white/10 bg-white/[0.03]"}`}>
             <span className={`text-[11px] font-bold ${editMode ? "text-[#d6b06a]" : "text-white/55"}`}>Edit Mode</span>
             <span className={`relative h-4 w-7 rounded-full transition ${editMode ? "bg-[#d6b06a]" : "bg-white/15"}`}>
@@ -767,7 +825,7 @@ export function DevImageEditor() {
           </button>
 
           {/* Image Mode */}
-          <button onClick={() => { setImageMode((m) => { const n = !m; if (n) setEditMode(false); return n; }); }}
+          <button onClick={() => { setImageMode((m) => { const n = !m; if (n) { setEditMode(false); setPinMode(false); setCollageMode(false); } return n; }); }}
             className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition ${imageMode ? "border-[#5ec8ff]/50 bg-[#5ec8ff]/12" : "border-white/10 bg-white/[0.03]"}`}>
             <span className={`text-[11px] font-bold ${imageMode ? "text-[#5ec8ff]" : "text-white/55"}`}>🖼 Image Mode</span>
             <span className={`relative h-4 w-7 rounded-full transition ${imageMode ? "bg-[#5ec8ff]" : "bg-white/15"}`}>
@@ -775,10 +833,230 @@ export function DevImageEditor() {
             </span>
           </button>
 
+          {/* Pin Mode */}
+          <button onClick={() => { setPinMode((m) => { const n = !m; if (n) { setEditMode(false); setImageMode(false); setCollageMode(false); } return n; }); }}
+            className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition ${pinMode ? "border-[#d6b06a]/50 bg-[#d6b06a]/12" : "border-white/10 bg-white/[0.03]"}`}>
+            <span className={`text-[11px] font-bold ${pinMode ? "text-[#d6b06a]" : "text-white/55"}`}>📍 Pin Mode</span>
+            <span className={`relative h-4 w-7 rounded-full transition ${pinMode ? "bg-[#d6b06a]" : "bg-white/15"}`}>
+              <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${pinMode ? "left-3.5" : "left-0.5"}`} />
+            </span>
+          </button>
+
+          {/* Collage Mode */}
+          <button onClick={() => { setCollageMode((m) => { const n = !m; if (n) { setEditMode(false); setImageMode(false); setPinMode(false); } return n; }); }}
+            className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition ${collageMode ? "border-[#5ec8ff]/50 bg-[#5ec8ff]/12" : "border-white/10 bg-white/[0.03]"}`}>
+            <span className={`text-[11px] font-bold ${collageMode ? "text-[#5ec8ff]" : "text-white/55"}`}>🖼️ Collage Mode</span>
+            <span className={`relative h-4 w-7 rounded-full transition ${collageMode ? "bg-[#5ec8ff]" : "bg-white/15"}`}>
+              <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${collageMode ? "left-3.5" : "left-0.5"}`} />
+            </span>
+          </button>
+
           <p className="mt-1 text-[8px] text-white/30 leading-relaxed">
-            {imageMode ? "Click any image (even backdrops) to edit." : editMode ? "Click any element to edit it." : "Pick a mode, then click."}
+            {collageMode ? "Add photos, drag to position, resize, layer." : pinMode ? "Drag pins on Owners map or Rentals hero to reposition." : imageMode ? "Click any image (even backdrops) to edit." : editMode ? "Click any element to edit it." : "Pick a mode, then click."}
           </p>
+
+          {/* Collage controls */}
+          {collageMode && (
+            <div className="mt-2 space-y-2">
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent("pl-collage-add"))}
+                className="w-full rounded-lg border border-[#5ec8ff]/40 bg-[#5ec8ff]/15 py-2 text-[10px] font-bold text-[#5ec8ff] transition hover:bg-[#5ec8ff]/25"
+              >
+                + Add Photo
+              </button>
+
+              {collageOverlays.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-white/35">Layers for {collageHeroSrc.split("/").pop()}</p>
+                  {[...collageOverlays].sort((a, b) => b.zIndex - a.zIndex).map((o) => (
+                    <div
+                      key={o.id}
+                      className={`rounded-lg border px-2 py-1.5 cursor-pointer transition ${selectedCollageId === o.id ? "border-[#5ec8ff]/50 bg-[#5ec8ff]/10" : "border-white/10 bg-white/[0.03]"}`}
+                      onClick={() => setSelectedCollageId(selectedCollageId === o.id ? null : o.id)}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <img src={o.src} alt="" className="h-6 w-6 rounded object-cover" />
+                        <span className="flex-1 text-[8px] text-white/40 truncate">Layer {o.zIndex + 1}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent("pl-collage-layer", { detail: { id: o.id, direction: "up" } })); }}
+                          className="text-[10px] text-white/40 hover:text-[#5ec8ff]"
+                          title="Bring forward"
+                        >↑</button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent("pl-collage-layer", { detail: { id: o.id, direction: "down" } })); }}
+                          className="text-[10px] text-white/40 hover:text-[#5ec8ff]"
+                          title="Send back"
+                        >↓</button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent("pl-collage-delete", { detail: o.id })); }}
+                          className="text-[10px] text-white/40 hover:text-red-400"
+                          title="Delete"
+                        >✕</button>
+                      </div>
+
+                      {/* Expanded controls when selected */}
+                      {selectedCollageId === o.id && (
+                        <div className="mt-2 space-y-2 border-t border-white/10 pt-2">
+                          {/* Opacity slider */}
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[9px] text-white/50">Opacity</span>
+                              <span className="text-[9px] text-[#5ec8ff]">{Math.round(o.opacity * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={1}
+                              step={0.05}
+                              value={o.opacity}
+                              onInput={(e) => window.dispatchEvent(new CustomEvent("pl-collage-opacity", { detail: { id: o.id, opacity: parseFloat((e.target as HTMLInputElement).value) } }))}
+                              onChange={(e) => window.dispatchEvent(new CustomEvent("pl-collage-opacity", { detail: { id: o.id, opacity: parseFloat(e.target.value) } }))}
+                              className="w-full cursor-pointer accent-[#5ec8ff]"
+                            />
+                          </div>
+
+                          {/* Blend mode dropdown */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-white/50">Blend</span>
+                            <select
+                              value={o.blendMode}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent("pl-collage-blend", { detail: { id: o.id, blendMode: e.target.value } })); }}
+                              className="rounded-md border border-white/10 bg-white/[0.06] px-2 py-1 text-[10px] text-white/85 outline-none"
+                            >
+                              <option value="normal" className="bg-[#0a1322]">Normal</option>
+                              <option value="multiply" className="bg-[#0a1322]">Multiply</option>
+                              <option value="screen" className="bg-[#0a1322]">Screen</option>
+                              <option value="overlay" className="bg-[#0a1322]">Overlay</option>
+                              <option value="darken" className="bg-[#0a1322]">Darken</option>
+                              <option value="lighten" className="bg-[#0a1322]">Lighten</option>
+                              <option value="color-dodge" className="bg-[#0a1322]">Color Dodge</option>
+                              <option value="color-burn" className="bg-[#0a1322]">Color Burn</option>
+                              <option value="soft-light" className="bg-[#0a1322]">Soft Light</option>
+                              <option value="hard-light" className="bg-[#0a1322]">Hard Light</option>
+                              <option value="difference" className="bg-[#0a1322]">Difference</option>
+                              <option value="exclusion" className="bg-[#0a1322]">Exclusion</option>
+                              <option value="hue" className="bg-[#0a1322]">Hue</option>
+                              <option value="saturation" className="bg-[#0a1322]">Saturation</option>
+                              <option value="color" className="bg-[#0a1322]">Color</option>
+                              <option value="luminosity" className="bg-[#0a1322]">Luminosity</option>
+                            </select>
+                          </div>
+
+                          {/* Size info */}
+                          <div className="text-[8px] text-white/30">
+                            Size: {Math.round(o.width)}% × {Math.round(o.height)}%
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      const code = `"${collageHeroSrc}": ` + JSON.stringify(collageOverlays.map(({ src, ...rest }) => ({ ...rest, src: "/* replace with saved path */" })), null, 2);
+                      navigator.clipboard.writeText(code).then(() => { setCollageCopied(true); setTimeout(() => setCollageCopied(false), 1800); });
+                    }}
+                    className={`w-full rounded-lg py-1.5 text-[9px] font-bold uppercase tracking-wider transition ${collageCopied ? "bg-green-500/20 text-green-400" : "bg-[#5ec8ff]/15 text-[#5ec8ff] hover:bg-[#5ec8ff]/25"}`}
+                  >
+                    {collageCopied ? "✓ Copied!" : "⬇ Copy Collage Layout"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Owners pin positions export */}
+          {pinMode && (
+            <div className="mt-1 space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-white/35">Owners chips</p>
+              {pinData ? (
+                <>
+                  <p className="text-[8px] text-[#d6b06a]/70 truncate font-mono">{pinData.src.split("/").pop()}</p>
+                  <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 space-y-0.5">
+                    {pinData.positions.map((p, i) => (
+                      <p key={i} className="text-[8px] text-white/40 font-mono truncate">{i + 1}: {p.top} / {p.left}</p>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const lines = pinData.positions.map((p) => `    { top: "${p.top}", left: "${p.left}" },`).join("\n");
+                      const code = `  "${pinData.src}": [\n${lines}\n  ],`;
+                      navigator.clipboard.writeText(code).then(() => { setPinCopied(true); setTimeout(() => setPinCopied(false), 1800); });
+                    }}
+                    className={`w-full rounded-lg py-1.5 text-[9px] font-bold uppercase tracking-wider transition ${pinCopied ? "bg-green-500/20 text-green-400" : "bg-[#d6b06a]/15 text-[#d6b06a] hover:bg-[#d6b06a]/25"}`}
+                  >
+                    {pinCopied ? "✓ Copied!" : "⬇ Copy owners pins"}
+                  </button>
+                </>
+              ) : (
+                <p className="text-[8px] text-white/30 leading-relaxed">Go to <span className="text-[#d6b06a]">For Owners</span> page to drag chips.</p>
+              )}
+            </div>
+          )}
+
+          {/* Rental pin positions export */}
+          {pinMode && (
+            <div className="mt-2 space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-white/35">Rentals pins</p>
+              {rentalPinData && rentalPinData.positions.length > 0 ? (
+                <>
+                  <p className="text-[8px] text-[#d6b06a]/70 truncate font-mono">{rentalPinData.heroSrc.split("/").pop()}</p>
+                  <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 space-y-0.5">
+                    {rentalPinData.positions.map((p, i) => (
+                      <p key={i} className="text-[8px] text-white/40 font-mono truncate">{i + 1}: {p.top} / {p.left}</p>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const lines = rentalPinData.positions.map((p) => `    { top: "${p.top}", left: "${p.left}" },`).join("\n");
+                      const code = `  "${rentalPinData.heroSrc}": [\n${lines}\n  ],`;
+                      navigator.clipboard.writeText(code).then(() => { setRentalPinCopied(true); setTimeout(() => setRentalPinCopied(false), 1800); });
+                    }}
+                    className={`w-full rounded-lg py-1.5 text-[9px] font-bold uppercase tracking-wider transition ${rentalPinCopied ? "bg-green-500/20 text-green-400" : "bg-[#d6b06a]/15 text-[#d6b06a] hover:bg-[#d6b06a]/25"}`}
+                  >
+                    {rentalPinCopied ? "✓ Copied!" : "⬇ Copy pins for this image"}
+                  </button>
+                </>
+              ) : (
+                <p className="text-[8px] text-white/30 leading-relaxed">Go to <span className="text-[#d6b06a]">Rentals</span> page to drag unit pins.</p>
+              )}
+            </div>
+          )}
         </div>
+
+        {imagery && (
+          <>
+            <div className="h-px bg-white/[0.06]" />
+            <div className="px-4 py-3 space-y-2">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">Image review</p>
+              <button
+                type="button"
+                disabled={!imagery.canCycleBackdrop}
+                onClick={imagery.onNextBackdrop}
+                className="w-full rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2 text-left transition hover:border-[#5ec8ff]/40 hover:bg-[#5ec8ff]/10 disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                <span className="text-[10px] font-bold text-[#5ec8ff]">▶ Next backdrop</span>
+                <span className="mt-0.5 block truncate text-[8px] text-white/35">
+                  {imagery.canCycleBackdrop ? imagery.backdropPreview : "Neutral mode — switch Light/Dark"}
+                </span>
+              </button>
+              <button
+                type="button"
+                disabled={!imagery.canCyclePageHero}
+                onClick={imagery.onNextPageHero}
+                className="w-full rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2 text-left transition hover:border-[#d6b06a]/40 hover:bg-[#d6b06a]/10 disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                <span className="text-[10px] font-bold text-[#d6b06a]">▶ Next page image</span>
+                <span className="mt-0.5 block truncate text-[8px] text-white/35">
+                  {imagery.canCyclePageHero
+                    ? imagery.pageHeroPreview
+                    : "Open Rentals, Listings, or For Owners"}
+                </span>
+              </button>
+              <p className="text-[8px] text-white/28 leading-relaxed">No refresh — cycles the photo pool for this page.</p>
+            </div>
+          </>
+        )}
 
         <div className="h-px bg-white/[0.06]" />
 

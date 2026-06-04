@@ -1,16 +1,18 @@
 # For Owners page imagery
 
-The For Owners page currently uses Unsplash-hosted placeholder photography
-sourced from `src/lib/owners.ts`. To swap in real Penn Liberty photography:
+Local assets served at `/owners/...`:
 
-1. Drop replacement files in this folder, e.g. `philly-park.jpg`,
-   `northern-liberties.jpg`, etc.
-2. Update the URLs in `src/lib/owners.ts` to point at the local files
-   (e.g. `/owners/philly-park.jpg`).
+| File | Use |
+|------|-----|
+| `owners-1.jpg` | Landscape — page shell backdrop + metro coverage panel |
+| `owners-2.jpg` | Portrait — cycle in dev; prefer landscape for coverage panel |
+| `owners-3.jpg` | Page shell + metro coverage (dev **Next page image**) |
+
+Wired in `src/lib/siteImagery.ts` and passed from `App.tsx` into `OwnersSection`.
+
+To replace a photo, swap the file in this folder (keep the same name) or update the paths in `siteImagery.ts`.
 
 Recommended sizes:
 
-- Page backdrop: at least 2000px wide, landscape, low-saturation enough
-  to read as background.
-- Neighborhood tiles: at least 1200px wide, recognizable streetscapes.
-- Polaroid: at least 900px wide, square or 4:3.
+- `owners-1.jpg`: at least 2000px wide, landscape
+- `owners-2.jpg`: at least 1400px wide; portrait or landscape both work with `object-cover`

@@ -104,15 +104,26 @@ export function Header({
             onClick={() => goToPage("home")}
             className="flex min-w-0 items-center gap-3 text-left"
           >
-            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
+            <div className="relative h-16 w-16 shrink-0">
               <img
                 src="/branding/liberty-head.png"
                 alt="Penn Liberty Liberty-head mark"
-                className="h-14 w-14 origin-right scale-[1.38] transform object-contain will-change-transform"
+                className="absolute left-1/2 top-1/2 h-14 w-14 object-contain will-change-transform"
+                style={{ transform: "translate(calc(-50% - 4px), calc(-50% - 2px)) scale(1.863)" }}
               />
             </div>
             <div>
-              <div className="text-lg font-semibold tracking-wide">PENN LIBERTY</div>
+              <div className="text-lg font-semibold tracking-wide">
+                <span className={lightMode ? "text-[#5b6573]" : "text-[#cdd5e1]"}>PEN</span>
+                <span
+                  className={`bg-gradient-to-r bg-clip-text text-transparent ${
+                    lightMode ? "from-[#5b6573] to-[#1746b8]" : "from-[#cdd5e1] to-[#3f86f7]"
+                  }`}
+                >
+                  N
+                </span>
+                <span className={lightMode ? "text-[#1746b8]" : "text-[#3f86f7]"}> LIBERTY</span>
+              </div>
               <div className={`text-xs uppercase tracking-[0.22em] ${subtleText}`}>
                 Real Estate & Property Management
               </div>

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
 /** Local Philadelphia backdrops under `public/backdrops/` (served at `/backdrops/...`). */
 
@@ -14,7 +14,37 @@ export const nightBackdropPool = [
   "/backdrops/philly-night-3.jpg",
 ] as const;
 
-export const ownersBackdropPool = dayBackdropPool;
+/** For Owners page — local photography under `public/owners/`. */
+export const ownersPageBackdropPool = [
+  "/owners/owners-1.jpg",
+  "/owners/owners-2.jpg",
+  "/owners/owners-3.jpg",
+] as const;
+
+/** For Owners page DARK MODE — under `public/owners/dark/`. */
+export const ownersPageBackdropDarkPool = [
+  "/owners/dark/owners-1.jpg",
+  "/owners/dark/owners-2.jpg",
+  "/owners/dark/owners-3.jpg",
+] as const;
+
+/** Same pool as shell backdrop (dev tool can cycle without refresh). */
+export const ownersCoverageEditorialPool = ownersPageBackdropPool;
+
+/** Per-file crop/zoom for the metro coverage `<img>` (one element, three photos). */
+export const ownersCoverageFramingBySrc: Record<string, { objectPosition: string; scale?: number }> = {
+  "/owners/owners-1.jpg": { objectPosition: "50% 81%" },
+  "/owners/owners-2.jpg": { objectPosition: "50% 80%" },
+  "/owners/owners-3.jpg": { objectPosition: "50% 81%", scale: 1.06 },
+  // Dark mode
+  "/owners/dark/owners-1.jpg": { objectPosition: "50% 50%" },
+  "/owners/dark/owners-2.jpg": { objectPosition: "50% 50%" },
+  "/owners/dark/owners-3.jpg": { objectPosition: "50% 50%" },
+};
+
+/** @deprecated Prefer `ownersPageBackdropPool` on the For Owners page. */
+export const ownersBackdropPool = ownersPageBackdropPool;
+
 export const homeBackdropPool = dayBackdropPool;
 
 /**
@@ -28,10 +58,92 @@ export const siteBackdropImageClass =
 export const ownersCardBackdropImageClass = "owners-card-backdrop absolute inset-0";
 
 /**
- * Philly skyline teaser — bundled under `/public` so hero always resolves (Rentals relied on
- * remote URLs that often 404 or block, yielding an empty-looking black hero).
+ * Rentals section hero — local photography under `public/rentals-hero/`.
+ * Add any number of images here; the dev tool lets you cycle through them
+ * without a page refresh (Next page image button).
  */
-export const rentalsHeroPool = ["/backdrops/grok-076dd323-5369-436e-b9a0-38d68ec62a9a.jpg"] as const;
+export const rentalsHeroPool = [
+  "/rentals-hero/rentals-1.jpg",
+  "/rentals-hero/rentals-2.jpg",
+  "/rentals-hero/rentals-3.jpg",
+] as const;
+
+/** Rentals hero DARK MODE — under `public/rentals-hero/dark/`. */
+export const rentalsHeroDarkPool = [
+  "/rentals-hero/dark/rentals-1.jpg",
+  "/rentals-hero/dark/rentals-2.jpg",
+  "/rentals-hero/dark/rentals-3.jpg",
+  "/rentals-hero/dark/rentals-4.jpg",
+] as const;
+
+/**
+ * Per-image framing for the Rentals hero background.
+ * backgroundSize: "cover" fills the panel (default), use "80%" etc. to zoom out and show more.
+ * backgroundPosition: "X% Y%" controls which part of the image is centered.
+ * Use Image Mode in the dev editor (drag to pan, zoom slider) then lock values in here.
+ */
+export const rentalsHeroFramingBySrc: Record<string, { backgroundSize?: string; backgroundPosition?: string }> = {
+  // Light mode
+  "/rentals-hero/rentals-1.jpg": { backgroundSize: "101%", backgroundPosition: "100% 22%" },
+  "/rentals-hero/rentals-2.jpg": { backgroundSize: "101%", backgroundPosition: "100% 75%" },
+  "/rentals-hero/rentals-3.jpg": { backgroundSize: "cover", backgroundPosition: "50% 80%" },
+  // Dark mode
+  "/rentals-hero/dark/rentals-1.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
+  "/rentals-hero/dark/rentals-2.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
+  "/rentals-hero/dark/rentals-3.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
+  "/rentals-hero/dark/rentals-4.jpg": { backgroundSize: "cover", backgroundPosition: "50% 50%" },
+};
+
+/**
+ * Permanent collage overlays for each rentals hero image.
+ * Created via Collage Mode in dev, then locked in here.
+ */
+export type RentalsCollageOverlay = {
+  src: string;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  opacity: number;
+  blendMode: string;
+  zIndex: number;
+  scale?: number;
+};
+
+export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]> = {
+  // Light mode
+  "/rentals-hero/rentals-1.jpg": [],
+  "/rentals-hero/rentals-2.jpg": [
+    {
+      src: "/rentals-hero/overlays/overlay-2.jp.jpg",
+      top: 24.8,
+      left: 69.6,
+      width: 30.6,
+      height: 76.3,
+      opacity: 0.75,
+      blendMode: "normal",
+      zIndex: 0,
+      scale: 1.04,
+    },
+  ],
+  "/rentals-hero/rentals-3.jpg": [
+    {
+      src: "/rentals-hero/overlays/overlay-3.jpg",
+      top: 0,
+      left: 80.9,
+      width: 19.8,
+      height: 100,
+      opacity: 0.85,
+      blendMode: "normal",
+      zIndex: 0,
+    },
+  ],
+  // Dark mode (add overlays later)
+  "/rentals-hero/dark/rentals-1.jpg": [],
+  "/rentals-hero/dark/rentals-2.jpg": [],
+  "/rentals-hero/dark/rentals-3.jpg": [],
+  "/rentals-hero/dark/rentals-4.jpg": [],
+};
 
 /**
  * Wide distant skyline for the listings map teaser — bundled under `/public` so it always
@@ -39,8 +151,10 @@ export const rentalsHeroPool = ["/backdrops/grok-076dd323-5369-436e-b9a0-38d68ec
  */
 export const listingsMapTeaserDefaultSrc = "/backdrops/philly-day-6.jpg" as const;
 
-/** Single stable pick; kept as a tuple so `pickFromPool` + `useStablePoolIndex` stay unchanged at call sites. */
-export const listingsMapTeaserPool = [listingsMapTeaserDefaultSrc] as const;
+export const listingsMapTeaserPool = [
+  listingsMapTeaserDefaultSrc,
+  "/backdrops/philly-listings-teaser.jpg",
+] as const;
 
 /** @deprecated Use listingsMapTeaserPool */
 export const listingsHeroPool = listingsMapTeaserPool;
@@ -57,4 +171,26 @@ export function useStablePoolIndex(poolLength: number): number {
     ref.current = Math.floor(Math.random() * poolLength);
   }
   return ref.current;
+}
+
+/** Dev: cycle pool index without reload. Prod: stable random only. */
+export function usePoolIndexCycler(poolLength: number) {
+  const stableIdx = useStablePoolIndex(poolLength);
+  const [devIdx, setDevIdx] = useState<number | null>(null);
+
+  const idx = import.meta.env.DEV && devIdx !== null ? devIdx : stableIdx;
+
+  const cycle = useCallback(() => {
+    if (poolLength <= 1) return;
+    setDevIdx((prev) => {
+      const base = prev ?? stableIdx;
+      return (base + 1) % poolLength;
+    });
+  }, [poolLength, stableIdx]);
+
+  return {
+    idx,
+    cycle,
+    canCycle: import.meta.env.DEV && poolLength > 1,
+  };
 }

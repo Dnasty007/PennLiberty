@@ -59,16 +59,50 @@ const diamond3fPhotos = [
 const diamond2fGallery = rentalGallery("1704-w-diamond-st-2f", diamond2fPhotos);
 const diamond3fGallery = rentalGallery("1704-w-diamond-st-3f", diamond3fPhotos);
 
-/** Pin positions (% of hero) aligned to `initialRentals` length at build time — adjust if you reorder. */
+/** Default pin positions — fallback if image not in `rentalPinOffsetsBySrc`. */
 export const rentalMapPinOffsets = [
-  { top: "18%", left: "54%", nudge: "-196px -47px" },
-  { top: "24%", left: "69%", nudge: "-77px 19px" },
+  { top: "83.6%", left: "56.7%" },
+  { top: "20.9%", left: "64.2%" },
   { top: "19%", left: "50%" },
   { top: "44%", left: "61%" },
   { top: "36%", left: "73%" },
   { top: "27%", left: "58%" },
   { top: "38%", left: "48%" },
 ] as const;
+
+/** Per-image pin positions for the Rentals hero. */
+export const rentalPinOffsetsBySrc: Record<string, { top: string; left: string }[]> = {
+  // Light mode
+  "/rentals-hero/rentals-1.jpg": [
+    { top: "33.4%", left: "86.5%" },
+    { top: "8.4%", left: "72.3%" },
+  ],
+  "/rentals-hero/rentals-2.jpg": [
+    { top: "86.1%", left: "59.2%" },
+    { top: "20.9%", left: "64.2%" },
+  ],
+  "/rentals-hero/rentals-3.jpg": [
+    { top: "87.4%", left: "48.2%" },
+    { top: "16.3%", left: "68.4%" },
+  ],
+  // Dark mode (adjust positions once images are placed)
+  "/rentals-hero/dark/rentals-1.jpg": [
+    { top: "50%", left: "50%" },
+    { top: "30%", left: "70%" },
+  ],
+  "/rentals-hero/dark/rentals-2.jpg": [
+    { top: "50%", left: "50%" },
+    { top: "30%", left: "70%" },
+  ],
+  "/rentals-hero/dark/rentals-3.jpg": [
+    { top: "50%", left: "50%" },
+    { top: "30%", left: "70%" },
+  ],
+  "/rentals-hero/dark/rentals-4.jpg": [
+    { top: "50%", left: "50%" },
+    { top: "30%", left: "70%" },
+  ],
+};
 
 export type SaleListing = PropertyDetail & {
   id: number;

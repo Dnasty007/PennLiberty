@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
-import { ownersCoveragePinOffsets, ownersNeighborhoods } from "@/lib/owners";
+import { ownersCoveragePinOffsets, ownersPinOffsetsBySrc, ownersNeighborhoods } from "@/lib/owners";
+import { ownersCoverageFramingBySrc } from "@/lib/siteImagery";
 
 type OwnersCoverageBandProps = {
   editorialHeroSrc: string;
@@ -14,6 +16,74 @@ export function OwnersCoverageBand({
   mutedText,
   subtleText,
 }: OwnersCoverageBandProps) {
+  const [pinMode, setPinMode] = useState(false);
+  const basePins = (ownersPinOffsetsBySrc[editorialHeroSrc] ?? ownersCoveragePinOffsets).map(
+    (p) => ({ top: p.top, left: p.left }),
+  );
+  const [pinPositions, setPinPositions] = useState(basePins);
+
+  /* reset pin positions when the image changes */
+  const prevSrcRef = useRef(editorialHeroSrc);
+  useEffect(() => {
+    if (prevSrcRef.current === editorialHeroSrc) return;
+    prevSrcRef.current = editorialHeroSrc;
+    const next = (ownersPinOffsetsBySrc[editorialHeroSrc] ?? ownersCoveragePinOffsets).map(
+      (p) => ({ top: p.top, left: p.left }),
+    );
+    setPinPositions(next);
+  }, [editorialHeroSrc]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef<{
+    idx: number; startX: number; startY: number; startLeft: number; startTop: number;
+  } | null>(null);
+
+  /* listen for pin-mode toggle from DevImageEditor */
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const onToggle = (e: Event) => setPinMode((e as CustomEvent<boolean>).detail);
+    window.addEventListener("pl-pin-mode", onToggle);
+    return () => window.removeEventListener("pl-pin-mode", onToggle);
+  }, []);
+
+  /* broadcast positions + current src back to DevImageEditor whenever they change */
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    // broadcast immediately when pin mode turns on, and on every position/image change
+    window.dispatchEvent(new CustomEvent("pl-pin-positions", { detail: { positions: pinPositions, src: editorialHeroSrc } }));
+  }, [pinPositions, editorialHeroSrc]);
+
+  /* also broadcast on pin mode toggle so the panel updates right away */
+  useEffect(() => {
+    if (!import.meta.env.DEV || !pinMode) return;
+    window.dispatchEvent(new CustomEvent("pl-pin-positions", { detail: { positions: pinPositions, src: editorialHeroSrc } }));
+  }, [pinMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onChipMouseDown = (idx: number, e: React.MouseEvent) => {
+    if (!pinMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const cur = pinPositions[idx] ?? { top: "50%", left: "50%" };
+    draggingRef.current = {
+      idx,
+      startX: e.clientX,
+      startY: e.clientY,
+      startLeft: parseFloat(cur.left),
+      startTop: parseFloat(cur.top),
+    };
+    const onMove = (me: MouseEvent) => {
+      const d = draggingRef.current;
+      if (!d) return;
+      const nl = Math.max(0, Math.min(100, d.startLeft + ((me.clientX - d.startX) / rect.width) * 100));
+      const nt = Math.max(0, Math.min(100, d.startTop + ((me.clientY - d.startY) / rect.height) * 100));
+      setPinPositions((prev) => prev.map((p, i) => i === d.idx ? { top: `${nt.toFixed(1)}%`, left: `${nl.toFixed(1)}%` } : p));
+    };
+    const onUp = () => { draggingRef.current = null; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
   const eyebrow = lightMode ? "text-[#926d28]" : "text-[#ceb47d]/95";
   const heading = lightMode ? "text-black" : "text-white";
   const insetBox = lightMode
@@ -36,10 +106,15 @@ export function OwnersCoverageBand({
     : "bg-[linear-gradient(to_bottom,rgba(6,16,29,0.12),rgba(6,16,29,0.48))]";
 
   const chipOuter = lightMode
-    ? "border-black/[0.18] bg-white/[0.72] text-black shadow-md"
-    : "border-white/[0.2] bg-black/[0.55] text-white shadow-lg backdrop-blur-md";
+    ? "border-[#d6b06a]/40 bg-white/[0.82] text-black shadow-[0_4px_18px_rgba(0,0,0,0.18),0_0_0_1px_rgba(214,176,106,0.25)]"
+    : "border-[#d6b06a]/30 bg-black/[0.62] text-white shadow-[0_4px_22px_rgba(0,0,0,0.5),0_0_0_1px_rgba(214,176,106,0.18)] backdrop-blur-md";
 
   const glassExtras = `${lightMode ? "ring-1 ring-black/[0.04]" : `${listingsRailChromeClass} ring-1 ring-white/[0.06]`}`;
+
+  const framing =
+    editorialHeroSrc in ownersCoverageFramingBySrc
+      ? ownersCoverageFramingBySrc[editorialHeroSrc as keyof typeof ownersCoverageFramingBySrc]
+      : { objectPosition: "center 42%" as const };
 
   return (
     <section aria-labelledby="owners-coverage-heading">
@@ -75,7 +150,10 @@ export function OwnersCoverageBand({
           </div>
 
           <div className={`order-1 overflow-hidden rounded-[26px] border p-4 md:p-5 xl:order-2 ${frameOuter}`}>
-            <div className={`relative isolate min-h-[min(420px,55vh)] overflow-hidden rounded-[22px] border md:rounded-[24px] xl:min-h-[min(544px,calc(85vh))] ${imageWell}`}>
+            <div
+              ref={containerRef}
+              className={`relative isolate min-h-[min(420px,55vh)] overflow-hidden rounded-[22px] border md:rounded-[24px] xl:min-h-[min(544px,calc(85vh))] ${imageWell}`}
+            >
               <span className="sr-only">Philadelphia neighborhoods we actively manage alongside owners.</span>
               <img
                 src={editorialHeroSrc}
@@ -83,25 +161,35 @@ export function OwnersCoverageBand({
                 loading="lazy"
                 decoding="async"
                 role="presentation"
-                className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-[center_42%]"
+                className="pointer-events-none absolute inset-0 z-0 size-full transform object-cover"
+                style={{
+                  objectPosition: framing.objectPosition,
+                  transform: framing.scale ? `scale(${framing.scale})` : undefined,
+                }}
               />
               <div className={`pointer-events-none absolute inset-0 z-[1] ${imageScrim}`} />
               {ownersNeighborhoods.map((tile, index) => {
-                const offset =
+                const offset = pinPositions[index] ??
                   ownersCoveragePinOffsets[index % ownersCoveragePinOffsets.length] ??
                   ownersCoveragePinOffsets[0];
                 return (
                   <div
                     key={`cov-${tile.key}`}
-                    className="pointer-events-none absolute z-[2] -translate-x-1/2 -translate-y-1/2"
+                    className={`coverage-chip absolute z-[2] -translate-x-1/2 -translate-y-1/2 ${pinMode ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"}`}
                     style={{ top: offset.top, left: offset.left }}
+                    onMouseDown={pinMode ? (e) => onChipMouseDown(index, e) : undefined}
                   >
-                    <div className={`max-w-[10rem] rounded-2xl px-2.5 py-1.5 text-center text-xs font-semibold backdrop-blur-md ${chipOuter}`}>
+                    <div className={`max-w-[10rem] rounded-2xl border px-3 py-1.5 text-center text-[11px] font-semibold tracking-wide backdrop-blur-md ${chipOuter} ${pinMode ? "ring-2 ring-[#d6b06a]/60 select-none" : ""}`}>
                       {tile.name}
                     </div>
                   </div>
                 );
               })}
+              {pinMode && (
+                <div className="pointer-events-none absolute bottom-2 left-1/2 z-[3] -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-[9px] font-bold text-[#d6b06a] backdrop-blur-sm">
+                  PIN MODE — drag chips to reposition
+                </div>
+              )}
             </div>
           </div>
         </div>
