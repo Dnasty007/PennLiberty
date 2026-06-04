@@ -67,19 +67,19 @@ export function CardImageCycler({
     return () => observer.disconnect();
   }, [hasMultiple]);
 
-  const clearTimers = useCallback(() => {
+  const clearCycleTimer = useCallback(() => {
     if (cycleTimerRef.current) {
       clearTimeout(cycleTimerRef.current);
       cycleTimerRef.current = null;
-    }
-    if (fadeTimerRef.current) {
-      clearTimeout(fadeTimerRef.current);
-      fadeTimerRef.current = null;
     }
   }, []);
 
   const beginFade = useCallback(() => {
     if (!hasMultiple) return;
+
+    if (fadeTimerRef.current) {
+      clearTimeout(fadeTimerRef.current);
+    }
 
     setFadeInNext(true);
 
@@ -98,9 +98,9 @@ export function CardImageCycler({
     }, FADE_MS);
   }, [hasMultiple, nextIdx, total]);
 
-  // Schedule next cycle after each slide (or when card scrolls into view)
+  // Schedule next cycle — only clear the wait timer here, never the fade-completion timer
   useEffect(() => {
-    clearTimers();
+    clearCycleTimer();
 
     if (!hasMultiple || !isVisible || isHovered || fadeInNext || instantReset) {
       return;
@@ -110,7 +110,7 @@ export function CardImageCycler({
       beginFade();
     }, interval);
 
-    return clearTimers;
+    return clearCycleTimer;
   }, [
     hasMultiple,
     isVisible,
@@ -120,8 +120,17 @@ export function CardImageCycler({
     currentIdx,
     interval,
     beginFade,
-    clearTimers,
+    clearCycleTimer,
   ]);
+
+  // Clear fade timer on unmount only
+  useEffect(() => {
+    return () => {
+      if (fadeTimerRef.current) {
+        clearTimeout(fadeTimerRef.current);
+      }
+    };
+  }, []);
 
   const supportsHover =
     typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
