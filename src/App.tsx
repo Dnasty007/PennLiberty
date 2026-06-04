@@ -192,6 +192,12 @@ export default function App() {
   const currentPageIndex = pageOrder.indexOf(activePage);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Don't hijack gestures that start inside the map — Leaflet pans it horizontally itself.
+    const target = e.target as HTMLElement | null;
+    if (target?.closest(".leaflet-container")) {
+      swipeTouchStart.current = null;
+      return;
+    }
     swipeTouchStart.current = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
@@ -285,7 +291,11 @@ export default function App() {
     : "border-white/10 bg-white/[0.04] text-white placeholder:text-white/40";
 
   return (
-    <div className={rootClasses} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <div
+      className={`${rootClasses} touch-pan-y`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="relative min-h-screen overflow-x-hidden">
         {theme.showBackdrop && siteBackdropImage ? (
           <div
