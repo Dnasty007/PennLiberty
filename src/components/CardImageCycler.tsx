@@ -136,7 +136,7 @@ export function CardImageCycler({
   return (
     <div
       ref={rootRef}
-      className="relative h-full w-full overflow-hidden"
+      className="absolute inset-0 overflow-hidden"
       onMouseEnter={() => supportsHover && setIsHovered(true)}
       onMouseLeave={() => supportsHover && setIsHovered(false)}
     >
