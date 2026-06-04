@@ -218,7 +218,7 @@ export function ListingsMap({
                             : "border border-white/[0.09] bg-white/[0.025] shadow-[0_14px_48px_rgba(0,0,0,0.28)] hover:border-[#d6b06a]/22 hover:bg-white/[0.055] hover:shadow-[0_22px_60px_rgba(0,0,0,0.38)] focus-visible:border-[#d6b06a]/40 focus-visible:ring-2 focus-visible:ring-[#d6b06a]/30"
                       } ring-offset-transparent ${reduceMotion ? "" : "motion-safe:hover:-translate-y-[2px]"}`}
                     >
-                      <div className="relative isolate aspect-[4/3] shrink-0 overflow-hidden bg-[#0a121c]">
+                      <div className="relative isolate w-full shrink-0 overflow-hidden bg-[#0a121c]" style={{ height: 0, paddingBottom: "75%" }}>
                         <CardImageCycler
                           images={listing.gallery?.length ? listing.gallery : [listing.image]}
                           alt={listing.title}
