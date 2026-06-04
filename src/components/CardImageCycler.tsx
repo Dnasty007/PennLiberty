@@ -13,30 +13,6 @@ type CardImageCyclerProps = {
 
 const FADE_MS = 1000;
 
-// #region agent log
-function dbg(
-  location: string,
-  message: string,
-  data: Record<string, unknown>,
-  hypothesisId: string,
-) {
-  if (!import.meta.env.DEV) return;
-  const host = typeof window !== "undefined" ? window.location.hostname : "127.0.0.1";
-  fetch(`http://${host}:7457/ingest/ed9b07e2-465a-482e-b5a8-7dd1854cf52a`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "0b913a" },
-    body: JSON.stringify({
-      sessionId: "0b913a",
-      location,
-      message,
-      data,
-      hypothesisId,
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-}
-// #endregion
-
 function preload(src: string) {
   const img = new Image();
   img.src = src;
@@ -68,24 +44,6 @@ export function CardImageCycler({
   const safeCurrent = images[currentIdx] ?? images[0];
   const safeNext = images[nextIdx] ?? images[0];
 
-  // #region agent log
-  useEffect(() => {
-    dbg(
-      "CardImageCycler.tsx:mount",
-      "cycler mounted",
-      {
-        alt: alt.slice(0, 40),
-        total,
-        hasMultiple,
-        innerWidth: window.innerWidth,
-        ua: navigator.userAgent.slice(0, 80),
-        hoverFine: window.matchMedia("(hover: hover) and (pointer: fine)").matches,
-      },
-      "H3",
-    );
-  }, []);
-  // #endregion
-
   // Preload current, next, and the one after
   useEffect(() => {
     if (!safeCurrent) return;
@@ -102,21 +60,7 @@ export function CardImageCycler({
     if (!el || !hasMultiple) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        // #region agent log
-        dbg(
-          "CardImageCycler.tsx:intersection",
-          "visibility changed",
-          {
-            alt: alt.slice(0, 40),
-            isIntersecting: entry.isIntersecting,
-            ratio: entry.intersectionRatio,
-          },
-          "H1",
-        );
-        // #endregion
-        setIsVisible(entry.isIntersecting);
-      },
+      ([entry]) => setIsVisible(entry.isIntersecting),
       { root: null, rootMargin: "80px", threshold: 0.15 },
     );
     observer.observe(el);
@@ -137,29 +81,11 @@ export function CardImageCycler({
   const beginFade = useCallback(() => {
     if (!hasMultiple) return;
 
-    // #region agent log
-    dbg(
-      "CardImageCycler.tsx:beginFade",
-      "fade started",
-      { alt: alt.slice(0, 40), currentIdx, nextIdx, total },
-      "H4",
-    );
-    // #endregion
-
     setFadeInNext(true);
 
     fadeTimerRef.current = window.setTimeout(() => {
       const newCurrent = nextIdx;
       const newNext = (nextIdx + 1) % total;
-
-      // #region agent log
-      dbg(
-        "CardImageCycler.tsx:fadeComplete",
-        "fade completed",
-        { alt: alt.slice(0, 40), newCurrent, newNext, total },
-        "H5",
-      );
-      // #endregion
 
       setInstantReset(true);
       setFadeInNext(false);
@@ -170,40 +96,15 @@ export function CardImageCycler({
         requestAnimationFrame(() => setInstantReset(false));
       });
     }, FADE_MS);
-  }, [hasMultiple, nextIdx, total, alt, currentIdx]);
+  }, [hasMultiple, nextIdx, total]);
 
   // Schedule next cycle after each slide (or when card scrolls into view)
   useEffect(() => {
     clearTimers();
 
     if (!hasMultiple || !isVisible || isHovered || fadeInNext || instantReset) {
-      // #region agent log
-      dbg(
-        "CardImageCycler.tsx:schedule",
-        "cycle blocked",
-        {
-          alt: alt.slice(0, 40),
-          hasMultiple,
-          isVisible,
-          isHovered,
-          fadeInNext,
-          instantReset,
-          currentIdx,
-        },
-        "H2",
-      );
-      // #endregion
       return;
     }
-
-    // #region agent log
-    dbg(
-      "CardImageCycler.tsx:schedule",
-      "cycle scheduled",
-      { alt: alt.slice(0, 40), interval, currentIdx, isVisible },
-      "H4",
-    );
-    // #endregion
 
     cycleTimerRef.current = window.setTimeout(() => {
       beginFade();
