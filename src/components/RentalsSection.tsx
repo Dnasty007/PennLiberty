@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ClipboardList, KeyRound, Mail, MapPin } from "lucide-react";
+import { CardImageCycler } from "@/components/CardImageCycler";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import type { PageKey } from "@/lib/data";
@@ -591,11 +592,12 @@ export function RentalsSection({
                   onClick={() => onOpenRentalDetails?.(rental.id)}
                 >
                   <div className="relative isolate aspect-[16/11] shrink-0 overflow-hidden bg-[#0f1824]">
-                    <img
-                      src={rental.image}
+                    <CardImageCycler
+                      images={rental.gallery?.length ? rental.gallery : [rental.image]}
                       alt={rental.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-[transform] duration-500 motion-safe:group-hover:scale-[1.04]"
+                      interval={3500}
+                      imgClassName="transition-[transform] duration-500 motion-safe:group-hover:scale-[1.04]"
+                      lightMode={lightMode}
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050a11]/88 via-[#050a11]/25 to-transparent" />
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 px-3.5 pb-3.5 pt-10">

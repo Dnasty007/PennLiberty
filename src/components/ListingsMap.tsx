@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { MapPin, MapPinned, Search } from "lucide-react";
+import { CardImageCycler } from "@/components/CardImageCycler";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { ListingDetailsOverlay } from "@/components/ListingDetailsOverlay";
 import { ScheduleTourModal } from "@/components/ScheduleTourModal";
@@ -218,11 +219,12 @@ export function ListingsMap({
                       } ring-offset-transparent ${reduceMotion ? "" : "motion-safe:hover:-translate-y-[2px]"}`}
                     >
                       <div className="relative isolate aspect-[4/3] shrink-0 overflow-hidden bg-[#0a121c]">
-                        <img
-                          src={listing.image}
+                        <CardImageCycler
+                          images={listing.gallery?.length ? listing.gallery : [listing.image]}
                           alt={listing.title}
-                          loading="lazy"
-                          className={`h-full w-full object-cover transition-[transform] duration-500 ease-out will-change-transform ${reduceMotion ? "" : "motion-safe:group-hover:scale-[1.045]"} ${isSelected ? "brightness-[1.04] saturate-[1.05]" : "saturate-[0.94] motion-safe:group-hover:saturate-100"}`}
+                          interval={3500}
+                          imgClassName={`transition-[transform] duration-500 ease-out will-change-transform ${reduceMotion ? "" : "motion-safe:group-hover:scale-[1.045]"} ${isSelected ? "brightness-[1.04] saturate-[1.05]" : "saturate-[0.94] motion-safe:group-hover:saturate-100"}`}
+                          lightMode={lightMode}
                         />
                         <div className="pointer-events-none absolute inset-0 rounded-t-[inherit] ring-1 ring-inset ring-white/10" aria-hidden />
 
