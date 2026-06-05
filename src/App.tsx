@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
 import { Header } from "@/components/Header";
 import { DevImageEditor } from "@/components/DevImageEditor";
 import { Hero } from "@/components/Hero";
 import { ListingDetailsOverlay } from "@/components/ListingDetailsOverlay";
 import { ListingsMap } from "@/components/ListingsMap";
 import { OwnersSection } from "@/components/owners/OwnersSection";
-import { AIAssistant } from "@/components/AIAssistant";
 import { ContactSection } from "@/components/ContactSection";
+import { RentalApplicationModal } from "@/components/RentalApplicationModal";
 import { RentalsSection } from "@/components/RentalsSection";
 import { TeamSection } from "@/components/TeamSection";
 import {
@@ -35,6 +36,10 @@ import {
   siteBackdropImageClass,
   usePoolIndexCycler,
 } from "@/lib/siteImagery";
+
+const EMAILJS_SERVICE_ID = "Owner_Email_Website";
+const EMAILJS_TEMPLATE_ID = "template_mol56qf";
+const EMAILJS_PUBLIC_KEY = "ykKMeoPCgTNLT5di1";
 
 function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
   if (type === "none") {
@@ -85,6 +90,12 @@ export default function App() {
   const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(0);
   const [showRentalDetails, setShowRentalDetails] = useState(false);
   const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
+  const [showRentalApplication, setShowRentalApplication] = useState(false);
+  const [rentalApplicationId, setRentalApplicationId] = useState<number | null>(null);
+  const [rentalApplicationStatus, setRentalApplicationStatus] = useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
+  const [rentalApplicationOpenedExternal, setRentalApplicationOpenedExternal] = useState(false);
   const [rentalGalleryImageIndex, setRentalGalleryImageIndex] = useState(0);
   const [tourForm, setTourForm] = useState({
     name: "",
@@ -227,6 +238,8 @@ export default function App() {
   });
 
   const selectedRental = rentals.find((r) => r.id === selectedRentalId) ?? null;
+  const rentalApplicationTarget =
+    rentals.find((r) => r.id === rentalApplicationId) ?? null;
   const selectedRentalImages = selectedRental
     ? selectedRental.gallery.length ? selectedRental.gallery : [selectedRental.image]
     : [];
@@ -247,32 +260,66 @@ export default function App() {
       (prev) => (prev - 1 + selectedRentalImages.length) % selectedRentalImages.length,
     );
 
-  const submitRentalApplication = () => {
-    if (!selectedRental) return;
-    const listingUrl = selectedRental.applicationUrl?.trim();
-    const globalUrl = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim() || undefined;
-    const url = listingUrl || globalUrl;
-    if (url && /^https?:\/\//i.test(url)) {
-      window.open(url, "_blank", "noopener,noreferrer");
-    } else {
-      const subject = encodeURIComponent(`Rental inquiry: ${selectedRental.title}`);
-      const body = encodeURIComponent(
-        [
-          "Hi Penn Liberty,",
-          "",
-          `I'm interested in this rental: ${selectedRental.title}`,
-          selectedRental.address,
-          `Advertised rent: ${selectedRental.price}`,
-          selectedRental.meta,
-          "",
-          "My move-in timeline:",
-          "",
-          "Questions:",
-        ].join("\n"),
+  const openRentalApplication = (id: number) => {
+    setRentalApplicationId(id);
+    setRentalApplicationStatus("idle");
+    setRentalApplicationOpenedExternal(false);
+    setShowRentalApplication(true);
+  };
+
+  const closeRentalApplication = () => {
+    setShowRentalApplication(false);
+    setRentalApplicationStatus("idle");
+    setRentalApplicationOpenedExternal(false);
+  };
+
+  const submitRentalApplication = async (contact: {
+    name: string;
+    email: string;
+    phone: string;
+  }) => {
+    const rental = rentals.find((r) => r.id === rentalApplicationId);
+    if (!rental) return;
+
+    setRentalApplicationStatus("sending");
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          title: "Rental Application Request",
+          name: contact.name,
+          email: contact.email,
+          phone: contact.phone,
+          address: rental.address,
+          message: [
+            rental.title,
+            rental.price,
+            rental.meta,
+            rental.area,
+          ].join(" · "),
+          time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+        },
+        EMAILJS_PUBLIC_KEY,
       );
-      window.location.href = `mailto:info@pennlibertyre.com?subject=${subject}&body=${body}`;
+
+      const listingUrl = rental.applicationUrl?.trim();
+      const globalUrl = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim() || undefined;
+      const url = listingUrl || globalUrl;
+
+      const hasBuildiumUrl = Boolean(url && /^https?:\/\//i.test(url));
+
+      if (hasBuildiumUrl) {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      setRentalApplicationOpenedExternal(hasBuildiumUrl);
+      setRentalApplicationStatus("success");
+      closeRentalDetails();
+    } catch {
+      setRentalApplicationStatus("error");
     }
-    closeRentalDetails();
   };
 
   const goToPage = (page: PageKey) => {
@@ -292,9 +339,13 @@ export default function App() {
 
   useEffect(() => {
     swipeBlockedRef.current = Boolean(
-      showListingDetails || showScheduleTour || showRentalDetails || mobileOpen,
+      showListingDetails ||
+        showScheduleTour ||
+        showRentalDetails ||
+        showRentalApplication ||
+        mobileOpen,
     );
-  }, [showListingDetails, showScheduleTour, showRentalDetails, mobileOpen]);
+  }, [showListingDetails, showScheduleTour, showRentalDetails, showRentalApplication, mobileOpen]);
 
   // ⚠️ LOAD-BEARING — DO NOT "SIMPLIFY" THIS INTO CSS. ⚠️
   // Non-passive touchmove + preventDefault on horizontal drags stops iOS sideways pan
@@ -524,6 +575,7 @@ export default function App() {
                 goToPage={goToPage}
                 lightMode={lightMode}
                 mutedText={mutedText}
+                onOpenRentalApplication={openRentalApplication}
                 onOpenRentalDetails={openRentalDetails}
                 outlineButtonClasses={outlineButtonClasses}
                 rentals={rentals}
@@ -534,7 +586,6 @@ export default function App() {
 
             {activePage === "property-management" && (
               <OwnersSection
-                assistantTrigger={<AIAssistant lightMode={lightMode} />}
                 backdropSrc={ownersSectionBackdrop}
                 editorialHeroSrc={ownersEditorialHeroPick}
                 goToPage={goToPage}
@@ -610,6 +661,16 @@ export default function App() {
         }}
       />
 
+      <RentalApplicationModal
+        key={rentalApplicationTarget?.id ?? "closed"}
+        lightMode={lightMode}
+        rental={showRentalApplication ? rentalApplicationTarget : null}
+        status={rentalApplicationStatus}
+        openedExternalApplication={rentalApplicationOpenedExternal}
+        onClose={closeRentalApplication}
+        onSubmit={submitRentalApplication}
+      />
+
       {showRentalDetails && selectedRental && (
         <ListingDetailsOverlay
           currentImageIndex={rentalGalleryImageIndex}
@@ -620,7 +681,7 @@ export default function App() {
           onImageChange={setRentalGalleryImageIndex}
           onNextImage={nextRentalImage}
           onPrevImage={prevRentalImage}
-          onScheduleTour={submitRentalApplication}
+          onScheduleTour={() => openRentalApplication(selectedRental.id)}
           primaryActionLabel="Submit Application"
           backLabel="Back to Rentals"
         />
@@ -629,17 +690,8 @@ export default function App() {
       <footer
         className={`relative z-10 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] ${footerClasses}`}
       >
-        <div className="mx-auto flex max-w-7xl flex-col items-start gap-4 py-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto max-w-7xl py-2">
           <span className="text-sm">&copy;2008 Penn Liberty</span>
-          <img
-            src="/branding/matthew-419-logo.png"
-            alt="Matthew 4:19"
-            className={`h-16 w-auto sm:h-20 md:ml-auto ${
-              lightMode
-                ? "opacity-80 mix-blend-multiply"
-                : "invert grayscale opacity-75"
-            }`}
-          />
         </div>
       </footer>
     </div>

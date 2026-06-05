@@ -19,17 +19,13 @@ type RentalsSectionProps = {
   goToPage?: (page: PageKey) => void;
   lightMode: boolean;
   mutedText: string;
+  onOpenRentalApplication?: (id: number) => void;
   onOpenRentalDetails?: (id: number) => void;
   outlineButtonClasses?: string;
   rentalsHeroSrc: string;
   rentals: Rental[];
   subtleText: string;
 };
-
-function configuredBuildiumApplicationUrl(): string | undefined {
-  const raw = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim();
-  return raw || undefined;
-}
 
 function collageOverlayBoxStyle(blendMode: string): React.CSSProperties {
   return {
@@ -46,43 +42,11 @@ function collageOverlayImgStyle(opacity: number, scale?: number): React.CSSPrope
   };
 }
 
-function openRentalApplication(rental: Rental) {
-  const listingUrl = rental.applicationUrl?.trim();
-  const globalUrl = configuredBuildiumApplicationUrl();
-  const url = listingUrl || globalUrl;
-
-  if (url && /^https?:\/\//i.test(url)) {
-    window.open(url, "_blank", "noopener,noreferrer");
-    return;
-  }
-
-  openRentalInquiry(rental);
-}
-
-function openRentalInquiry(rental: Rental) {
-  const subject = encodeURIComponent(`Rental inquiry: ${rental.title}`);
-  const body = encodeURIComponent(
-    [
-      "Hi Penn Liberty,",
-      "",
-      `I'm interested in this rental: ${rental.title}`,
-      rental.address,
-      `Advertised rent: ${rental.price}`,
-      rental.meta,
-      "",
-      "My move-in timeline:",
-      "",
-      "Questions:",
-    ].join("\n"),
-  );
-
-  window.location.href = `mailto:${PENN_EMAIL}?subject=${subject}&body=${body}`;
-}
-
 export function RentalsSection({
   goToPage,
   lightMode,
   mutedText,
+  onOpenRentalApplication,
   onOpenRentalDetails,
   outlineButtonClasses,
   rentalsHeroSrc,
@@ -656,7 +620,7 @@ export function RentalsSection({
                     <Button
                       type="button"
                       className="mt-5 w-full rounded-full bg-[#d6b06a] py-5 text-sm font-semibold text-[#08111f] shadow-[0_12px_28px_rgba(214,176,106,0.3)] hover:bg-[#e4be78]"
-                      onClick={(e) => { e.stopPropagation(); openRentalApplication(rental); }}
+                      onClick={(e) => { e.stopPropagation(); onOpenRentalApplication?.(rental.id); }}
                     >
                       <span className="inline-flex items-center justify-center gap-2">
                         <ClipboardList className="h-4 w-4 shrink-0" aria-hidden />

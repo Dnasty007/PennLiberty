@@ -17,3 +17,7 @@ Thumbs.db
 
 # Brainstorm session artifacts
 .superpowers/
+
+# Local deploy bundles
+deploy-godaddy.zip
+.swipe-debug/

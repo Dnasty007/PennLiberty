@@ -1,4 +1,4 @@
-import { Building2, LandPlot, ShieldCheck, Users } from "lucide-react";
+import { Building2, LandPlot, Mail, Phone, ShieldCheck, Users } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import type { PageKey, TeamPerson } from "@/lib/data";
@@ -14,6 +14,13 @@ type TeamSectionProps = {
   outlineButtonClasses: string;
   subtleText: string;
 };
+
+function telHref(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return digits;
+}
 
 function monogramForPerson(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -139,6 +146,32 @@ function TeamPortraitCard({
           <p className={`mt-2 text-[13px] italic leading-relaxed md:text-[0.9375rem] text-[#d6b06a]`}>
             {person.tagline}
           </p>
+        )}
+        {(person.phone || (person.emails && person.emails.length > 0)) && (
+          <ul className={`mt-4 space-y-2 border-t pt-4 text-[13px] md:text-[0.875rem] ${lightMode ? "border-black/[0.08]" : "border-white/[0.08]"}`}>
+            {person.phone && (
+              <li>
+                <a
+                  href={`tel:${telHref(person.phone)}`}
+                  className={`inline-flex items-center gap-2 font-medium transition hover:text-[#d6b06a] ${lightMode ? "text-black/78" : "text-white/78"}`}
+                >
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-[#d6b06a]" aria-hidden />
+                  {person.phone}
+                </a>
+              </li>
+            )}
+            {person.emails?.map((email) => (
+              <li key={email}>
+                <a
+                  href={`mailto:${email}`}
+                  className={`inline-flex items-center gap-2 font-medium break-all transition hover:text-[#d6b06a] ${lightMode ? "text-black/78" : "text-white/78"}`}
+                >
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-[#d6b06a]" aria-hidden />
+                  {email}
+                </a>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </article>

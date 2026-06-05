@@ -11,7 +11,7 @@ const EMAILJS_PUBLIC_KEY  = "ykKMeoPCgTNLT5di1";
 
 const PENN_PHONE_DISPLAY = "215-922-7900";
 const PENN_PHONE_TEL = "+12159227900";
-const PENN_EMAIL = "info@pennlibertyre.com";
+const PENN_EMAIL = "Pennlibertyre@gmail.com";
 
 const PENN_CONTACT_SUBJECT_DEFAULT = "Penn Liberty: website inquiry";
 

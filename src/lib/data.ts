@@ -390,6 +390,9 @@ export type TeamPerson = {
   readonly tagline?: string;
   /** Relative URL under `/public`, e.g. `/team/donna.jpg`. When omitted, Liberty mark shows behind initials */
   readonly photo?: string;
+  /** Display format, e.g. `215-833-2827` — rendered as a `tel:` link when set */
+  readonly phone?: string;
+  readonly emails?: readonly string[];
 };
 
 /** Founders & principals — surfaced first on About */
@@ -417,26 +420,36 @@ export const teamStaff: readonly TeamPerson[] = [
     name: "Donna Wunderle",
     role: "Office Secretary",
     bio: "First voice many hear at Penn Liberty. She keeps schedules coordinated, filings and paperwork orderly.",
+    phone: "215-870-9016",
+    emails: ["Pennlibertyre@gmail.com", "Pennlibertyrentals@gmail.com"],
   },
   {
     name: "David Froelich",
     role: "Head Property Manager / Agent",
     bio: "Leads resident service and the Company Books while remaining active in brokerage.",
+    phone: "267-231-5148",
+    emails: ["Davepennliberty@gmail.com"],
   },
   {
     name: "Brandon Lohr",
     role: "Agent",
     bio: "A licensee supporting buyers and sellers throughout Philadelphia.",
+    phone: "215-251-8184",
+    emails: ["bml1024@gmail.com"],
   },
   {
     name: "Juanita Sharperson",
     role: "Agent",
     bio: "Represents landlords and investors with clear communication, from showings through lease signatures and resale opportunities.",
+    phone: "215-435-2825",
+    emails: ["jsharperson68@gmail.com"],
   },
   {
     name: "Fatima Aguilar",
     role: "Agent",
     bio: "Licensed agent throughout the Philadelphia area.",
+    phone: "215-833-2827",
+    emails: ["Faguilar215@comcast.net"],
   },
 ] as const;
 
