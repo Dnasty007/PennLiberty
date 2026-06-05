@@ -588,7 +588,6 @@ export default function App() {
               <OwnersSection
                 backdropSrc={ownersSectionBackdrop}
                 editorialHeroSrc={ownersEditorialHeroPick}
-                goToPage={goToPage}
                 lightMode={lightMode}
                 mutedText={mutedText}
                 subtleText={subtleText}

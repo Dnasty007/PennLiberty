@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { OwnersHero } from "@/components/owners/OwnersHero";
 import { OwnersWhyManagement } from "@/components/owners/OwnersWhyManagement";
@@ -6,14 +5,12 @@ import { OwnersPaths } from "@/components/owners/OwnersPaths";
 import { OwnersCTA } from "@/components/owners/OwnersCTA";
 import { OwnersCoverageBand } from "@/components/owners/OwnersCoverageBand";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
-import type { PageKey } from "@/lib/data";
+import { OwnersTalkToTeam } from "@/components/owners/OwnersTalkToTeam";
 import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
 
 type OwnersSectionProps = {
   backdropSrc?: string;
   editorialHeroSrc: string;
-  assistantTrigger?: ReactNode;
-  goToPage?: (page: PageKey) => void;
   lightMode: boolean;
   mutedText: string;
   subtleText: string;
@@ -22,8 +19,6 @@ type OwnersSectionProps = {
 export function OwnersSection({
   backdropSrc,
   editorialHeroSrc,
-  assistantTrigger,
-  goToPage,
   lightMode,
   mutedText,
   subtleText,
@@ -78,7 +73,7 @@ export function OwnersSection({
       />
 
       <div className="relative z-[2] px-5 pb-14 pt-12 sm:px-8 md:px-10 md:pb-16 md:pt-14">
-        <OwnersHero lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} trailing={assistantTrigger} />
+        <OwnersHero lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
       </div>
 
       <div className={`relative z-[2] border-t ${bodyTrayRule} ${bodyTrayBg} backdrop-blur-md`}>
@@ -92,6 +87,7 @@ export function OwnersSection({
             onPresetPropertyReviewInterest={presetInterestForCards}
           />
           <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersTalkToTeam lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersCTA
             lightMode={lightMode}
             mutedText={mutedText}
