@@ -1,0 +1,20 @@
+Penn Liberty — Rental QR code URLs
+==================================
+
+ALL RENTALS (browse every unit):
+https://pennlibertyre.com/rentals
+
+INDIVIDUAL UNITS (one QR per rental):
+https://pennlibertyre.com/rentals/1704-w-diamond-st-2f  — 1704 W Diamond St, Unit 2F
+https://pennlibertyre.com/rentals/1704-w-diamond-st-3f  — 1704 W Diamond St, Unit 3F
+https://pennlibertyre.com/rentals/2542-cecil-b-moore-ave-2  — 2542 Cecil B. Moore Ave
+https://pennlibertyre.com/rentals/1540-n-15th-st-3f-rear  — 1540 N 15th St, 3rd Floor Rear
+https://pennlibertyre.com/rentals/1711-n-gratz-st-2f  — 1711 N Gratz St, Unit 2F
+https://pennlibertyre.com/rentals/2633-kensington-ave-3  — 2633 Kensington Ave, Unit 3
+https://pennlibertyre.com/rentals/2633-kensington-ave-1c  — 2633 Kensington Ave, Unit 1C — Storefront
+https://pennlibertyre.com/rentals/5316-glenloch-st-3f  — 5316 Glenloch St
+https://pennlibertyre.com/rentals/811-n-15th-st  — 811 N 15th St
+
+Printable QR images: qr-codes/ folder (run npm run qr:generate to refresh)
+
+Do NOT use only https://pennlibertyre.com — that goes to the home page.

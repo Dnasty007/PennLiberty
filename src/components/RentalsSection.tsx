@@ -42,6 +42,31 @@ function collageOverlayImgStyle(opacity: number, scale?: number): React.CSSPrope
   };
 }
 
+type PinOffset = { top: string; left: string };
+
+function pinTemplateForHero(heroSrc: string): readonly PinOffset[] {
+  return rentalPinOffsetsBySrc[heroSrc] ?? rentalMapPinOffsets;
+}
+
+/** One pin per rental — cycles template coords when inventory outgrows locked pairs. */
+function defaultPinsForRentalCount(heroSrc: string, rentalCount: number): PinOffset[] {
+  const template = pinTemplateForHero(heroSrc);
+  return Array.from({ length: rentalCount }, (_, i) => ({
+    top: template[i % template.length]!.top,
+    left: template[i % template.length]!.left,
+  }));
+}
+
+function normalizePinList(
+  stored: PinOffset[] | undefined,
+  heroSrc: string,
+  rentalCount: number,
+): PinOffset[] {
+  const defaults = defaultPinsForRentalCount(heroSrc, rentalCount);
+  if (!stored?.length) return defaults;
+  return Array.from({ length: rentalCount }, (_, i) => stored[i] ?? defaults[i]!);
+}
+
 export function RentalsSection({
   goToPage,
   lightMode,
@@ -68,9 +93,11 @@ export function RentalsSection({
     }
   });
 
-  // Get pin positions for current hero image
-  const getDefaultPins = () => (rentalPinOffsetsBySrc[rentalsHeroSrc] ?? rentalMapPinOffsets).map((p) => ({ top: p.top, left: p.left }));
-  const pinPositions = allPinPositions[rentalsHeroSrc] ?? getDefaultPins();
+  const pinPositions = normalizePinList(
+    allPinPositions[rentalsHeroSrc],
+    rentalsHeroSrc,
+    rentals.length,
+  );
 
   // Save pin positions to localStorage
   useEffect(() => {
@@ -82,14 +109,21 @@ export function RentalsSection({
     }
   }, [allPinPositions]);
 
-  const updatePinPositions = useCallback((updater: { top: string; left: string }[] | ((prev: { top: string; left: string }[]) => { top: string; left: string }[])) => {
-    const currentHero = rentalsHeroSrc;
-    setAllPinPositions((all) => {
-      const current = all[currentHero] ?? getDefaultPins();
-      const next = typeof updater === "function" ? updater(current) : updater;
-      return { ...all, [currentHero]: next };
-    });
-  }, [rentalsHeroSrc]);
+  const updatePinPositions = useCallback(
+    (updater: PinOffset[] | ((prev: PinOffset[]) => PinOffset[])) => {
+      const currentHero = rentalsHeroSrc;
+      const rentalCount = rentals.length;
+      setAllPinPositions((all) => {
+        const current = normalizePinList(all[currentHero], currentHero, rentalCount);
+        const next = typeof updater === "function" ? updater(current) : updater;
+        return {
+          ...all,
+          [currentHero]: normalizePinList(next, currentHero, rentalCount),
+        };
+      });
+    },
+    [rentalsHeroSrc, rentals.length],
+  );
 
   const heroRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef<{ idx: number; startX: number; startY: number; startLeft: number; startTop: number } | null>(null);
@@ -533,10 +567,10 @@ export function RentalsSection({
             </div>
           ) : (
             rentals.map((rental, index) => {
-              const sourcePins = rentalPinOffsetsBySrc[rentalsHeroSrc] ?? rentalMapPinOffsets;
-              const livePos = (import.meta.env.DEV && pinMode)
+              const sourcePins = pinTemplateForHero(rentalsHeroSrc);
+              const livePos = import.meta.env.DEV && pinMode
                 ? (pinPositions[index] ?? { top: "50%", left: "50%" })
-                : (sourcePins[index % sourcePins.length] ?? sourcePins[0]);
+                : (sourcePins[index] ?? sourcePins[index % sourcePins.length] ?? sourcePins[0]!);
 
               return (
                 <div

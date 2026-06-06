@@ -50,6 +50,11 @@ function TeamPortraitCard({
   tier: Tier;
 }) {
   const monogram = monogramForPerson(person.name);
+  const taglineLines = person.taglines?.length
+    ? person.taglines
+    : person.tagline
+      ? [person.tagline]
+      : [];
 
   const isPrincipal = tier === "principal";
   const photo = person.photo?.trim();
@@ -141,12 +146,16 @@ function TeamPortraitCard({
         >
           {person.role}
         </p>
-        <p className={`text-[13px] leading-relaxed md:text-[0.9375rem] ${mutedText} ${isPrincipal ? "mt-3 min-h-[5.75rem]" : "mt-2.5"}`}>{person.bio}</p>
-        {person.tagline && (
-          <p className={`mt-2 text-[13px] italic leading-relaxed md:text-[0.9375rem] text-[#d6b06a]`}>
-            {person.tagline}
-          </p>
-        )}
+        <div
+          className={`flex flex-col ${isPrincipal ? "mt-3 min-h-[5.75rem]" : "mt-2.5"} ${taglineLines.length > 0 ? "gap-1" : ""}`}
+        >
+          <p className={`text-[13px] leading-relaxed md:text-[0.9375rem] ${mutedText}`}>{person.bio}</p>
+          {taglineLines.map((line) => (
+            <p key={line} className="text-[13px] italic leading-snug md:text-[0.9375rem] text-[#d6b06a]">
+              {line}
+            </p>
+          ))}
+        </div>
         {(person.phone || (person.emails && person.emails.length > 0)) && (
           <ul className={`mt-4 space-y-2 border-t pt-4 text-[13px] md:text-[0.875rem] ${lightMode ? "border-black/[0.08]" : "border-white/[0.08]"}`}>
             {person.phone && (

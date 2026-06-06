@@ -193,6 +193,11 @@ export function propertyOverview(listing: {
     return `${listing.units} Units • ${listing.sqft.toLocaleString()} sqft`;
   }
 
+  if (listing.beds === 0 && listing.baths === 0) {
+    const sqftPart = listing.sqft ? ` • ${listing.sqft.toLocaleString()} sqft` : "";
+    return `Contact for unit details${sqftPart}`;
+  }
+
   const sqftPart = listing.sqft ? ` • ${listing.sqft.toLocaleString()} sqft` : "";
   return `${listing.beds} Beds • ${listing.baths} Baths${sqftPart}`;
 }

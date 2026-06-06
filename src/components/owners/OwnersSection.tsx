@@ -5,7 +5,6 @@ import { OwnersPaths } from "@/components/owners/OwnersPaths";
 import { OwnersCTA } from "@/components/owners/OwnersCTA";
 import { OwnersCoverageBand } from "@/components/owners/OwnersCoverageBand";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
-import { OwnersTalkToTeam } from "@/components/owners/OwnersTalkToTeam";
 import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
 
 type OwnersSectionProps = {
@@ -87,7 +86,6 @@ export function OwnersSection({
             onPresetPropertyReviewInterest={presetInterestForCards}
           />
           <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
-          <OwnersTalkToTeam lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersCTA
             lightMode={lightMode}
             mutedText={mutedText}

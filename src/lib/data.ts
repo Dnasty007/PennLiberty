@@ -61,6 +61,57 @@ const diamond3fPhotos = [
 const diamond2fGallery = rentalGallery("1704-w-diamond-st-2f", diamond2fPhotos);
 const diamond3fGallery = rentalGallery("1704-w-diamond-st-3f", diamond3fPhotos);
 
+/** Placeholder until photos land in folder — swap to rentalGallery(..., ["cover.jpg", ...]). */
+const cecilMoore2Gallery = ["/branding/liberty-head-grey.png"];
+const n15th3fRearGallery = ["/branding/liberty-head-grey.png"];
+const gratz2fGallery = ["/branding/liberty-head-grey.png"];
+const kensington3Gallery = ["/branding/liberty-head-grey.png"];
+const kensington1cPhotos = [
+  "cover-1.png",
+  "cover-2.png",
+  "IMG_5797.jpg",
+  "IMG_7380.jpg",
+  "IMG_7381.jpg",
+  "IMG_7382.jpg",
+] as const;
+const kensington1cGallery = rentalGallery("2633-kensington-ave-1c", kensington1cPhotos);
+const glenloch3fPhotos = [
+  "cover-1.jpg",
+  "20240911_134958.jpg",
+  "20240911_135008.jpg",
+  "20240911_135011.jpg",
+  "20240911_135016.jpg",
+  "20240911_135050.jpg",
+] as const;
+const glenloch3fGallery = rentalGallery("5316-glenloch-st-3f", glenloch3fPhotos);
+const n811_15thStPhotos = [
+  "IMG_0062.JPEG",
+  "IMG_0063.JPEG",
+  "IMG_0064.JPEG",
+  "IMG_0065.JPEG",
+  "IMG_0067.JPEG",
+  "IMG_0069.JPEG",
+  "IMG_0070.JPEG",
+  "IMG_0071.JPEG",
+  "IMG_0072.JPEG",
+  "IMG_0073.JPEG",
+  "IMG_0074.JPEG",
+  "IMG_0075.JPEG",
+  "IMG_0076.JPEG",
+  "IMG_0077.JPEG",
+  "IMG_0078.JPEG",
+  "IMG_0079.JPEG",
+  "IMG_0080.JPEG",
+  "IMG_0083.JPEG",
+  "IMG_0084.JPEG",
+  "IMG_9605.jpg",
+  "IMG_9612.JPEG",
+  "IMG_9613.JPEG",
+  "IMG_9614.JPEG",
+  "IMG_9615.JPEG",
+] as const;
+const n811_15thStGallery = rentalGallery("811-n-15th-st", n811_15thStPhotos);
+
 /** Default pin positions — fallback if image not in `rentalPinOffsetsBySrc`. */
 export const rentalMapPinOffsets = [
   { top: "83.6%", left: "56.7%" },
@@ -76,29 +127,83 @@ export const rentalMapPinOffsets = [
 export const rentalPinOffsetsBySrc: Record<string, { top: string; left: string }[]> = {
   // Light mode
   "/rentals-hero/rentals-1.jpg": [
-    { top: "35.7%", left: "89.0%" },
-    { top: "14.6%", left: "62.2%" },
+    { top: "31.3%", left: "89.9%" },
+    { top: "72.9%", left: "61.9%" },
+    { top: "29.7%", left: "13.6%" },
+    { top: "8.4%", left: "36.1%" },
+    { top: "90.1%", left: "95.7%" },
+    { top: "90.0%", left: "11.4%" },
+    { top: "8.2%", left: "72.5%" },
+    { top: "26.7%", left: "56.1%" },
+    { top: "90.6%", left: "50.8%" },
+    { top: "29.7%", left: "13.6%" },
+    { top: "34.9%", left: "33.5%" },
   ],
   "/rentals-hero/rentals-2.jpg": [
-    { top: "86.1%", left: "59.2%" },
-    { top: "20.9%", left: "64.2%" },
+    { top: "40.5%", left: "49.0%" },
+    { top: "24.6%", left: "70.9%" },
+    { top: "15.1%", left: "39.9%" },
+    { top: "85.8%", left: "67.5%" },
+    { top: "89.9%", left: "16.1%" },
+    { top: "24.4%", left: "93.0%" },
+    { top: "35.7%", left: "10.5%" },
+    { top: "69.9%", left: "32.7%" },
+    { top: "29.0%", left: "26.8%" },
+    { top: "45.0%", left: "80.1%" },
+    { top: "11.3%", left: "54.1%" },
   ],
   "/rentals-hero/rentals-3.jpg": [
-    { top: "87.4%", left: "48.2%" },
+    { top: "86.0%", left: "56.3%" },
     { top: "16.3%", left: "68.4%" },
+    { top: "10.9%", left: "49.5%" },
+    { top: "89.0%", left: "82.5%" },
+    { top: "87.4%", left: "17.7%" },
+    { top: "14.6%", left: "90.4%" },
+    { top: "39.4%", left: "14.1%" },
+    { top: "40.8%", left: "69.7%" },
+    { top: "58.1%", left: "34.4%" },
+    { top: "60.0%", left: "58.2%" },
+    { top: "16.1%", left: "27.3%" },
   ],
   // Dark mode
   "/rentals-hero/dark/rentals-1.jpg": [
     { top: "84.8%", left: "23.4%" },
     { top: "25.8%", left: "66.1%" },
+    { top: "52.1%", left: "73.3%" },
+    { top: "89.6%", left: "70.8%" },
+    { top: "70.2%", left: "9.1%" },
+    { top: "9.8%", left: "76.0%" },
+    { top: "9.8%", left: "49.5%" },
+    { top: "92.7%", left: "40.3%" },
+    { top: "33.7%", left: "32.0%" },
+    { top: "52.1%", left: "73.3%" },
+    { top: "51.9%", left: "90.4%" },
   ],
   "/rentals-hero/dark/rentals-2.jpg": [
-    { top: "74.2%", left: "43.9%" },
+    { top: "23.8%", left: "10.3%" },
     { top: "12.7%", left: "71.3%" },
+    { top: "49.2%", left: "75.9%" },
+    { top: "43.9%", left: "32.3%" },
+    { top: "91.9%", left: "84.2%" },
+    { top: "78.6%", left: "49.2%" },
+    { top: "90.2%", left: "11.2%" },
+    { top: "70.1%", left: "7.0%" },
+    { top: "30.6%", left: "76.9%" },
+    { top: "49.2%", left: "75.9%" },
+    { top: "22.6%", left: "38.6%" },
   ],
   "/rentals-hero/dark/rentals-3.jpg": [
-    { top: "12.9%", left: "76.9%" },
+    { top: "10.0%", left: "71.5%" },
     { top: "39.2%", left: "15.5%" },
+    { top: "11.4%", left: "23.7%" },
+    { top: "74.0%", left: "33.5%" },
+    { top: "91.0%", left: "76.9%" },
+    { top: "90.7%", left: "17.7%" },
+    { top: "34.6%", left: "80.4%" },
+    { top: "34.8%", left: "64.5%" },
+    { top: "60.7%", left: "84.5%" },
+    { top: "11.4%", left: "23.7%" },
+    { top: "56.9%", left: "32.2%" },
   ],
 };
 
@@ -155,23 +260,230 @@ export const initialRentals: Rental[] = [
     id: 2,
     slug: "1704-w-diamond-st-3f",
     title: "1704 W Diamond St, Unit 3F",
-    price: "Contact for rent",
+    price: "$1,200/mo",
     address: "1704 W Diamond St #3, Philadelphia, PA 19121",
     beds: 2,
     baths: 1,
-    meta: "2 bed · 1 bath · Temple University area",
+    meta: "2 bed · 1 bath · $1,200/mo · Temple University area",
     area: "Temple University",
     image: diamond3fGallery[0],
     gallery: diamond3fGallery,
     propertyType: "Residential Lease",
     status: "Available",
     brokerage: "Penn Liberty Real Estate",
+    applicationFee: "$50",
     description:
-      "Third-floor apartment in the same classic Temple University area rowhome as our 2F listing. Contact Penn Liberty for current rent, move-in date, and application details.",
+      "Third-floor two-bedroom, one-bath apartment in the same classic Temple University area rowhome as our 2F listing — $1,200 per month. Contact Penn Liberty for move-in date and application details.",
     highlights: [
+      "2 bedrooms · 1 bath · 3rd floor",
       "Third-floor unit in 3-unit building (1915 masonry row)",
       "Temple University neighborhood",
-      "Contact office for current rent and availability",
+      "$1,200/mo · $50 application fee",
+    ],
+  },
+  {
+    id: 3,
+    slug: "2542-cecil-b-moore-ave-2",
+    title: "2542 Cecil B. Moore Ave",
+    price: "$1,950/mo",
+    address: "2542 Cecil B. Moore Ave, Philadelphia, PA 19121",
+    beds: 4,
+    baths: 3,
+    sqft: 1472,
+    meta: "4 bed · 3 bath · Available 04/20/26",
+    area: "Brewerytown",
+    image: cecilMoore2Gallery[0],
+    gallery: cecilMoore2Gallery,
+    propertyType: "Residential Lease",
+    status: "Active",
+    mlsNumber: "PAPH2609626",
+    brokerage: "Penn Liberty Real Estate",
+    dateAvailable: "04/20/26",
+    securityDeposit: "$2,300",
+    description:
+      "Four bedrooms and three full baths with in-unit washer and dryer. All-new hardwood floors, fresh paint, and a modern kitchen with upgraded cabinets and appliances. Oversized rear deck with skyline views. Bi-level interior row/townhouse (1915) in Brewerytown with central A/C, full basement, and on-street parking.",
+    highlights: [
+      "4 bedrooms · 3 full baths · ~1,472 sq ft",
+      "Washer & dryer · new hardwood floors · freshly painted",
+      "Modern kitchen — upgraded cabinets & appliances",
+      "Oversized rear deck with skyline view",
+      "Central A/C · natural gas · on-street parking",
+      "12–24 month lease · $2,300 security deposit",
+      "Brewerytown · near Girard Ave corridor",
+    ],
+  },
+  {
+    id: 4,
+    slug: "1540-n-15th-st-3f-rear",
+    title: "1540 N 15th St, 3rd Floor Rear",
+    price: "$950/mo",
+    address: "1540 N 15th St, 3rd Floor Rear, Philadelphia, PA 19121",
+    beds: 1,
+    baths: 1,
+    sqft: 450,
+    meta: "1 bed · 1 bath · ~450 sq ft · Temple area",
+    area: "Temple University",
+    image: n15th3fRearGallery[0],
+    gallery: n15th3fRearGallery,
+    propertyType: "Residential Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    dateAvailable: "11/05/25",
+    securityDeposit: "$1,900",
+    applicationFee: "$50",
+    description:
+      "Third-floor rear one-bedroom, one-bath apartment blocks from Temple University. Steps from the Broad Street Line, campus buildings, and neighborhood restaurants. Large kitchen opens to a cozy living room with hardwood floors. Gas stove, full-size refrigerator, and generous cabinet and counter space. Corner building with abundant windows; bedroom at the rear with closet space and room to furnish comfortably.",
+    highlights: [
+      "1 bedroom · 1 bath · ~450 sq ft",
+      "Third floor rear · hardwood floors",
+      "Gas stove · full-size refrigerator",
+      "Corner building · bright, windowed rooms",
+      "Blocks from Temple U · near Broad St. Line",
+      "$1,900 security deposit · $50 application fee",
+    ],
+  },
+  {
+    id: 5,
+    slug: "1711-n-gratz-st-2f",
+    title: "1711 N Gratz St, Unit 2F",
+    price: "$1,100/mo",
+    address: "1711 N Gratz St, Unit 2F, Philadelphia, PA 19121",
+    beds: 2,
+    baths: 1,
+    meta: "2 bed · 1 bath · Temple University area",
+    area: "Temple University",
+    image: gratz2fGallery[0],
+    gallery: gratz2fGallery,
+    propertyType: "Residential Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    securityDeposit: "$2,100",
+    applicationFee: "$50",
+    description:
+      "Second-floor two-bedroom, one-bath apartment just off Temple University's main campus. Enter into a kitchen with a full-size refrigerator, electric stove, range hood, and eat-in dining space. Central air, gas heat, and in-unit laundry.",
+    highlights: [
+      "2 bedrooms · 1 bath · 2nd floor",
+      "Eat-in kitchen · full-size refrigerator",
+      "Electric stove · range hood",
+      "Central A/C · gas heat",
+      "In-unit laundry",
+      "Steps from Temple University main campus",
+      "$2,100 security deposit · $50 application fee",
+    ],
+  },
+  {
+    id: 6,
+    slug: "2633-kensington-ave-3",
+    title: "2633 Kensington Ave, Unit 3",
+    price: "$2,500/mo",
+    address: "2633 Kensington Ave, Unit 3, Philadelphia, PA 19125",
+    beds: 3,
+    baths: 2,
+    meta: "3 bed · 2 bath · Available 05/29/26",
+    area: "Kensington",
+    image: kensington3Gallery[0],
+    gallery: kensington3Gallery,
+    propertyType: "Residential Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    dateAvailable: "05/29/26",
+    securityDeposit: "$2,500",
+    applicationFee: "$50",
+    description:
+      "Three-bedroom, two-bath apartment at 2633 Kensington Avenue in the 19125 corridor. Contact Penn Liberty for a showing, full amenity list, and application details.",
+    highlights: [
+      "3 bedrooms · 2 baths",
+      "Kensington · Philadelphia 19125",
+      "Available 05/29/26",
+      "$2,500 security deposit · $50 application fee",
+      "Contact Penn Liberty to schedule a tour",
+    ],
+  },
+  {
+    id: 7,
+    slug: "2633-kensington-ave-1c",
+    title: "2633 Kensington Ave, Unit 1C — Storefront",
+    price: "$1,150/mo",
+    address: "2633 Kensington Ave, Unit 1C, Philadelphia, PA 19125",
+    beds: 0,
+    baths: 0,
+    meta: "$1,150/mo · Storefront · Kensington",
+    area: "Kensington",
+    image: kensington1cGallery[0],
+    gallery: kensington1cGallery,
+    propertyType: "Commercial Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    dateAvailable: "05/29/26",
+    securityDeposit: "$1,150",
+    applicationFee: "$50",
+    description:
+      "Storefront retail space at Unit 1C, 2633 Kensington Avenue in the 19125 corridor — $1,150 per month. Contact Penn Liberty for square footage, permitted uses, showing times, and application details.",
+    highlights: [
+      "Storefront · Unit 1C",
+      "$1,150/mo",
+      "Kensington · Philadelphia 19125",
+      "Available 05/29/26",
+      "$1,150 security deposit · $50 application fee",
+      "Same building as our Unit 3 listing — contact office to tour",
+    ],
+  },
+  {
+    id: 8,
+    slug: "5316-glenloch-st-3f",
+    title: "5316 Glenloch St",
+    price: "$1,350/mo",
+    address: "5316 Glenloch St, Philadelphia, PA 19124",
+    beds: 2,
+    baths: 1,
+    sqft: 660,
+    meta: "2 bed · 1 bath · ~660 sq ft · Available 06/01/26",
+    area: "Frankford",
+    image: glenloch3fGallery[0],
+    gallery: glenloch3fGallery,
+    propertyType: "Residential Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    dateAvailable: "06/01/26",
+    securityDeposit: "$1,350",
+    applicationFee: "$50",
+    description:
+      "Very nice two-bedroom ranch-style home at 5316 Glenloch Street. Ultra-modern kitchen and bathroom recently replaced. Hardwood floors throughout. Front and rear fenced yards. Granite counters with open bar area. Central air. Stackable washer and dryer included. Move-in ready — first month, last month, and security ($3,150 total). Proof of income required; no evictions.",
+    highlights: [
+      "2 bedrooms · 1 bath · ~660 sq ft",
+      "Ranch-style home · hardwood floors throughout",
+      "Ultra-modern kitchen & bath · granite counters · open bar",
+      "Central A/C · stackable washer & dryer included",
+      "Front & rear fenced yards · eat-in kitchen",
+      "Frankford · Philadelphia 19124",
+      "Available 06/01/26",
+      "$1,350 security deposit · $50 application fee",
+      "Move-in: 1st, last & security ($3,150 total)",
+    ],
+  },
+  {
+    id: 11,
+    slug: "811-n-15th-st",
+    title: "811 N 15th St",
+    price: "$3,500/mo",
+    address: "811 N 15th St, Philadelphia, PA 19130",
+    beds: 0,
+    baths: 0,
+    meta: "$3,500/mo · Fairmount · Philadelphia 19130",
+    area: "Fairmount",
+    image: n811_15thStGallery[0],
+    gallery: n811_15thStGallery,
+    propertyType: "Residential Lease",
+    status: "Available",
+    brokerage: "Penn Liberty Real Estate",
+    applicationFee: "$50",
+    description:
+      "Rental at 811 N 15th Street in the Fairmount neighborhood — $3,500 per month. Contact Penn Liberty for move-in date, bedroom and bath details, and application information.",
+    highlights: [
+      "$3,500/mo",
+      "Fairmount · Philadelphia 19130",
+      "Contact office for availability and showing times",
+      "$50 application fee",
     ],
   },
 ];
@@ -388,8 +700,9 @@ export type TeamPerson = {
   readonly name: string;
   readonly role: string;
   readonly bio: string;
-  /** Optional italic line rendered below the bio */
+  /** Optional italic line(s) rendered below the bio */
   readonly tagline?: string;
+  readonly taglines?: readonly string[];
   /** Relative URL under `/public`, e.g. `/team/donna.jpg`. When omitted, Liberty mark shows behind initials */
   readonly photo?: string;
   /** Display format, e.g. `215-833-2827` — rendered as a `tel:` link when set */
@@ -403,11 +716,13 @@ export const teamPrincipals: readonly TeamPerson[] = [
     name: "Ray Caceres",
     role: "Broker / Founder / U.S. Marine",
     bio: "Leads brokerage direction, deal strategy, and the firm's Foundation to the Company and his Clients.",
+    taglines: ["License RM421140", "Penn Liberty License RB066799"],
   },
   {
     name: "Ramon Caceres",
     role: "Co-Founder",
     bio: "Founding anchor of Penn Liberty, the father side of our family-founded firm, and a steady presence in our office.",
+    tagline: "License RS152630A",
   },
   {
     name: "Ramon L. Caceres",
@@ -429,6 +744,7 @@ export const teamStaff: readonly TeamPerson[] = [
     name: "David Froelich",
     role: "Head Property Manager / Agent",
     bio: "Leads resident service and the Company Books while remaining active in brokerage.",
+    tagline: "License RS337196",
     phone: "267-231-5148",
     emails: ["Davepennliberty@gmail.com"],
   },
@@ -436,6 +752,7 @@ export const teamStaff: readonly TeamPerson[] = [
     name: "Brandon Lohr",
     role: "Agent",
     bio: "A licensee supporting buyers and sellers throughout Philadelphia.",
+    tagline: "License RS379544",
     phone: "215-251-8184",
     emails: ["bml1024@gmail.com"],
   },
@@ -443,6 +760,7 @@ export const teamStaff: readonly TeamPerson[] = [
     name: "Juanita Sharperson",
     role: "Agent",
     bio: "Represents landlords and investors with clear communication, from showings through lease signatures and resale opportunities.",
+    tagline: "License RS314983",
     phone: "215-435-2825",
     emails: ["jsharperson68@gmail.com"],
   },
@@ -450,8 +768,17 @@ export const teamStaff: readonly TeamPerson[] = [
     name: "Fatima Aguilar",
     role: "Agent",
     bio: "Licensed agent throughout the Philadelphia area.",
+    tagline: "License RS314983",
     phone: "215-833-2827",
     emails: ["Faguilar215@comcast.net"],
+  },
+  {
+    name: "Richard Machado",
+    role: "Agent",
+    bio: "Licensed agent supporting buyers, sellers, and landlords throughout the Philadelphia area.",
+    tagline: "License RS282437",
+    phone: "215-275-9204",
+    emails: ["richardpennliberty@gmail.com"],
   },
 ] as const;
 
@@ -470,6 +797,25 @@ export const navItems = [
 /** Buildium Resident portal — tenants, owners, and vendors with Penn Liberty sign in here */
 export const manageBuildingResidentLoginUrl =
   "https://signin.managebuilding.com/Resident/portal/global-login";
+
+/** Buildium online rental application — opened when renters click Submit your application */
+export const buildiumRentalApplicationUrl =
+  "https://pennlibertyrentals.managebuilding.com/Resident/rental-application/new";
+
+/** Resolve application URL: per-unit override → env → site default */
+export function resolveRentalApplicationUrl(rental?: Pick<Rental, "applicationUrl"> | null): string {
+  const perUnit = rental?.applicationUrl?.trim();
+  if (perUnit && /^https?:\/\//i.test(perUnit)) {
+    return perUnit;
+  }
+
+  const fromEnv = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim();
+  if (fromEnv && /^https?:\/\//i.test(fromEnv)) {
+    return fromEnv;
+  }
+
+  return buildiumRentalApplicationUrl;
+}
 
 export const serviceCards: { title: string; desc: string; page: PageKey; icon: LucideIcon }[] = [
   {

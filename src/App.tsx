@@ -15,6 +15,7 @@ import {
   initialRentals,
   initialSaleListings,
   navItems,
+  resolveRentalApplicationUrl,
   type PageKey,
   type Rental,
   type SaleListing,
@@ -37,6 +38,11 @@ import {
   siteBackdropImageClass,
   usePoolIndexCycler,
 } from "@/lib/siteImagery";
+import {
+  readBrowserRoute,
+  syncBrowserUrl,
+  type AppRoute,
+} from "@/lib/routing";
 
 const EMAILJS_SERVICE_ID = "Owner_Email_Website";
 const EMAILJS_TEMPLATE_ID = "template_mol56qf";
@@ -77,7 +83,7 @@ export default function App() {
   const [saleListings, setSaleListings] = useState<SaleListing[]>([...initialSaleListings]);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("neutral");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activePage, setActivePage] = useState<PageKey>("home");
+  const [activePage, setActivePage] = useState<PageKey>(() => readBrowserRoute().page);
   const [selectedListingId, setSelectedListingId] = useState<number>(initialSaleListings[0].id);
   const [listingSearch, setListingSearch] = useState("");
   const [weather, setWeather] = useState<WeatherState>({
@@ -245,13 +251,59 @@ export default function App() {
     ? selectedRental.gallery.length ? selectedRental.gallery : [selectedRental.image]
     : [];
 
+  const applyRoute = useCallback(
+    (
+      route: AppRoute,
+      options: { replace?: boolean; syncHistory?: boolean } = {},
+    ) => {
+      const { replace = false, syncHistory = true } = options;
+
+      setActivePage(route.page);
+      setMobileOpen(false);
+
+      if (route.rentalSlug) {
+        const rental = rentals.find((r) => r.slug === route.rentalSlug);
+        if (rental) {
+          setSelectedRentalId(rental.id);
+          setRentalGalleryImageIndex(0);
+          setShowRentalDetails(true);
+        } else {
+          setSelectedRentalId(null);
+          setShowRentalDetails(false);
+        }
+        setShowListingDetails(false);
+      } else if (route.listingSlug) {
+        const listing = saleListings.find((l) => l.slug === route.listingSlug);
+        if (listing) {
+          setSelectedListingId(listing.id);
+          setSelectedGalleryImageIndex(0);
+          setShowListingDetails(true);
+        } else {
+          setShowListingDetails(false);
+        }
+        setShowRentalDetails(false);
+        setSelectedRentalId(null);
+      } else {
+        setShowRentalDetails(false);
+        setShowListingDetails(false);
+      }
+
+      if (syncHistory) {
+        syncBrowserUrl(route, replace);
+      }
+    },
+    [rentals, saleListings],
+  );
+
   const openRentalDetails = (id: number) => {
-    setSelectedRentalId(id);
-    setRentalGalleryImageIndex(0);
-    setShowRentalDetails(true);
+    const rental = rentals.find((r) => r.id === id);
+    if (!rental) return;
+    applyRoute({ page: "rentals", rentalSlug: rental.slug });
   };
 
-  const closeRentalDetails = () => setShowRentalDetails(false);
+  const closeRentalDetails = () => {
+    applyRoute({ page: "rentals" }, { replace: true });
+  };
 
   const nextRentalImage = () =>
     setRentalGalleryImageIndex((prev) => (prev + 1) % selectedRentalImages.length);
@@ -262,10 +314,11 @@ export default function App() {
     );
 
   const openRentalApplication = (id: number) => {
-    setRentalApplicationId(id);
-    setRentalApplicationStatus("idle");
-    setRentalApplicationOpenedExternal(false);
-    setShowRentalApplication(true);
+    const rental = rentals.find((r) => r.id === id);
+    if (!rental) return;
+
+    const url = resolveRentalApplicationUrl(rental);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const closeRentalApplication = () => {
@@ -324,9 +377,22 @@ export default function App() {
   };
 
   const goToPage = (page: PageKey) => {
-    setActivePage(page);
-    setMobileOpen(false);
+    applyRoute({ page });
   };
+
+  useEffect(() => {
+    applyRoute(readBrowserRoute(), { replace: true, syncHistory: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on load for QR / shared links
+  }, []);
+
+  useEffect(() => {
+    const onPopState = () => {
+      applyRoute(readBrowserRoute(), { syncHistory: false });
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [applyRoute]);
 
   const pageOrder = useMemo(() => navItems.map((item) => item.key), []);
   const currentPageIndex = pageOrder.indexOf(activePage);
@@ -440,12 +506,19 @@ export default function App() {
     : [selectedListing.image];
 
   const openListingDetails = () => {
+    const listing = saleListings.find((l) => l.id === selectedListingId);
+    if (listing?.slug) {
+      applyRoute({ page: "listings", listingSlug: listing.slug });
+      return;
+    }
+
     setSelectedGalleryImageIndex(0);
     setShowListingDetails(true);
+    syncBrowserUrl({ page: "listings" });
   };
 
   const closeListingDetails = () => {
-    setShowListingDetails(false);
+    applyRoute({ page: "listings" }, { replace: true });
   };
 
   const openScheduleTour = () => {

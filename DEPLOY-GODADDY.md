@@ -42,9 +42,29 @@ If the site is hosted on Vercel/Netlify but the **domain** is on GoDaddy:
 2. Point **A** record `@` to your host’s IP, or **CNAME** `www` to your host (e.g. `cname.vercel-dns.com`)
 3. Remove conflicting old A/CNAME records.
 
+## Rental QR codes
+
+Generate print-ready QR images for **every rental** plus **all rentals**:
+
+```bash
+npm run qr:generate
+```
+
+Output lands in `qr-codes/` — open `qr-codes/index.html` to preview or print. URL list is in `rental-qr-urls.txt`.
+
+| QR | URL | Opens |
+|---|---|---|
+| **All Rentals** | `https://pennlibertyre.com/rentals` | Full rentals browse page |
+| **Each unit** | `https://pennlibertyre.com/rentals/{slug}` | That unit’s detail view |
+
+**Wrong (always lands on home):** `https://pennlibertyre.com`
+
+After deploying, scan-test one “all rentals” QR and one unit QR before printing signs.
+
 ## After go-live checklist
 
 - [ ] Home, Rentals, About, Contact load
+- [ ] QR code for a rental opens that unit’s detail view
 - [ ] Light/Dark backdrop images show
 - [ ] Contact form / rental application emails (EmailJS)
 - [ ] Mobile layout and swipe between pages
