@@ -13,6 +13,16 @@ export type Rental = {
   gallery?: string[];
   /** Optional per-unit application link (e.g. Buildium listing URL). Overrides `VITE_BUILDIUM_RENTAL_APPLICATION_URL`. */
   applicationUrl?: string;
+  beds?: number;
+  baths?: number;
+  status?: string;
+  dateAvailable?: string;
+  securityDeposit?: string;
+  applicationFee?: string;
+  description?: string;
+  highlights?: string[];
+  /** Optional 15-second video tour URL (MP4). When present, shows "Watch 15s Video Tour" button on mobile detail sheet. */
+  videoUrl?: string;
 };
 
 /** Same bundled skyline as Rentals hero (`siteImagery.rentalsHeroPool`) — for future map wiring. */

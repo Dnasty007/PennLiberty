@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Mail, MapPin } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
-import { RentalDetailsModal } from "@/components/RentalDetailsModal";
+import { RentalDetailSheet } from "@/components/RentalDetailSheet";
 import type { PageKey } from "@/lib/data";
 import { rentalMapPinOffsets, type Rental } from "@/lib/data";
 
@@ -424,18 +424,15 @@ export function RentalsSection({
       </GlassCard>
 
       {selectedRental && (
-        <RentalDetailsModal
+        <RentalDetailSheet
           rental={selectedRental}
           lightMode={lightMode}
+          mutedText={mutedText}
+          onApply={(rental) => {
+            openRentalApplication(rental);
+            setSelectedRental(null);
+          }}
           onClose={() => setSelectedRental(null)}
-          onApply={() => {
-            openRentalApplication(selectedRental);
-            setSelectedRental(null);
-          }}
-          onScheduleShowing={() => {
-            openShowingRequest(selectedRental);
-            setSelectedRental(null);
-          }}
         />
       )}
     </section>
