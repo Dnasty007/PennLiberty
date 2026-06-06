@@ -372,6 +372,18 @@ export function RentalDetailSheet({
   const outlineBtn = lightMode
     ? "border-black/12 bg-black/[0.04] text-black/80"
     : "border-white/[0.12] bg-white/[0.04] text-white/85";
+  // Primary browse action — solid neutral fill, the stronger of the two media buttons
+  const photosBtn = lightMode
+    ? "border-black/[0.10] bg-black/[0.07] text-black/85"
+    : "border-white/[0.14] bg-white/[0.10] text-white";
+  // Secondary/optional — quiet outline; gold lives only in the play icon
+  const videoBtn = lightMode
+    ? "border-black/[0.10] bg-transparent text-black/65"
+    : "border-white/[0.12] bg-transparent text-white/72";
+  // Neutral status pill — calm dot instead of a full gold fill
+  const statusPill = lightMode
+    ? "border-black/[0.09] bg-black/[0.04] text-black/70"
+    : "border-white/[0.10] bg-white/[0.05] text-white/72";
   const highlightCard = lightMode
     ? "border-black/[0.07] bg-black/[0.025] text-black/72"
     : "border-white/[0.08] bg-white/[0.035] text-white/65";
@@ -399,7 +411,7 @@ export function RentalDetailSheet({
         {/* ── Hero image ── */}
         <div
           className="absolute inset-x-0 top-0 select-none bg-[#0a121c]"
-          style={{ height: "54%" }}
+          style={{ height: "44%" }}
           onTouchStart={(e) => { heroTouchStartX.current = e.touches[0].clientX; }}
           onTouchEnd={(e) => {
             if (heroTouchStartX.current === null) return;
@@ -414,8 +426,8 @@ export function RentalDetailSheet({
             className="h-full w-full object-cover"
             draggable={false}
           />
-          {/* Bottom-up gradient that blends into the card */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/28" />
+          {/* Subtle vignette — keeps the photo clean while making controls legible */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/20" />
 
           {/* Close */}
           <button
@@ -428,7 +440,7 @@ export function RentalDetailSheet({
 
           {/* Counter */}
           {total > 1 && (
-            <div className="absolute bottom-8 left-4 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-sm font-medium text-white backdrop-blur-md">
+            <div className="absolute bottom-5 left-4 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
               {currentIdx + 1} / {total}
             </div>
           )}
@@ -443,8 +455,8 @@ export function RentalDetailSheet({
         </div>
 
         {/* ── Content card ── */}
-        <div className="absolute inset-x-0 bottom-0 flex flex-col" style={{ top: "calc(54% - 28px)" }}>
-          <div className={`relative flex h-full flex-col overflow-hidden rounded-t-[32px] border-l border-r border-t backdrop-blur-[20px] ${cardBg}`}>
+        <div className="absolute inset-x-0 bottom-0 flex flex-col" style={{ top: "calc(44% - 12px)" }}>
+          <div className={`relative flex h-full flex-col overflow-hidden rounded-t-[28px] border-l border-r border-t backdrop-blur-[20px] ${cardBg}`}>
 
             {/* Drag handle */}
             <div className="flex shrink-0 justify-center pt-3">
@@ -452,79 +464,97 @@ export function RentalDetailSheet({
             </div>
 
             {/* Fixed header */}
-            <div className="shrink-0 px-5 pt-4">
-              <div className="text-[1.9rem] font-semibold tabular-nums tracking-tight text-[#d6b06a]">
+            <div className="shrink-0 px-6 pt-4">
+              <div className="text-[2rem] font-semibold leading-none tabular-nums tracking-tight text-[#d6b06a]">
                 {rental.price}
               </div>
-              <h2 className={`mt-0.5 text-[1.05rem] font-semibold leading-snug tracking-tight ${titleColor}`}>
+              <h2 className={`mt-2.5 text-[1.1rem] font-semibold leading-snug tracking-tight ${titleColor}`}>
                 {rental.title}
               </h2>
-              <p className={`mt-1 text-sm leading-relaxed ${mutedText}`}>{rental.address}</p>
+              {rental.address && (
+                <p className={`mt-1.5 text-sm leading-relaxed ${mutedText}`}>{rental.address}</p>
+              )}
 
               {/* Spec pills */}
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className={`rounded-full border px-3 py-1 text-xs font-medium ${pillBg}`}>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {rental.beds != null && rental.baths != null && (
+                  <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${pillBg}`}>
+                    {rental.beds} Bed · {rental.baths} Bath
+                  </span>
+                )}
+                <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${pillBg}`}>
                   {rental.area}
                 </span>
-                <span className={`rounded-full border px-3 py-1 text-xs font-medium ${pillBg}`}>
-                  {rental.beds} Bed · {rental.baths} Bath
-                </span>
                 {rental.status && (
-                  <span className="rounded-full border border-[#d6b06a]/32 bg-[#d6b06a]/10 px-3 py-1 text-xs font-medium text-[#d6b06a]">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${statusPill}`}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#d6b06a]" aria-hidden />
                     {rental.status}
                   </span>
                 )}
                 {rental.dateAvailable && (
-                  <span className={`rounded-full border px-3 py-1 text-xs font-medium ${pillBg}`}>
+                  <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${pillBg}`}>
                     Available {rental.dateAvailable}
                   </span>
                 )}
               </div>
 
-              {/* Action buttons */}
-              <div className="mt-4 flex flex-col gap-2.5">
+              {/* Key features — surfaced above the fold so the best details aren't buried */}
+              {!!rental.highlights?.length && (
+                <p className={`mt-3.5 text-[0.8rem] leading-relaxed ${mutedText}`}>
+                  {rental.highlights.slice(0, 3).map((h, i) => (
+                    <span key={h}>
+                      {i > 0 && <span className="px-1.5 opacity-40" aria-hidden>·</span>}
+                      {h}
+                    </span>
+                  ))}
+                </p>
+              )}
+
+              {/* Media buttons — Photos is the primary browse action; video is optional */}
+              <div className="mt-5 flex gap-2.5">
+                <button
+                  onClick={() => setShowGallery(true)}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-full border py-3.5 text-[14px] font-semibold transition active:opacity-75 ${photosBtn}`}
+                >
+                  <Images className="h-4 w-4" />
+                  {rental.videoUrl ? `${total} Photos` : `View All ${total} Photos`}
+                </button>
                 {rental.videoUrl && (
                   <button
                     onClick={() => setShowVideo(true)}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-[#d6b06a] py-3.5 text-[15px] font-semibold text-[#08111f] shadow-[0_10px_28px_rgba(214,176,106,0.30)] transition active:brightness-95"
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-full border py-3.5 text-[14px] font-semibold transition active:opacity-75 ${videoBtn}`}
                   >
-                    <Play className="h-4 w-4 fill-current" />
-                    Watch 15s Video Tour
+                    <Play className="h-3.5 w-3.5 fill-[#d6b06a] text-[#d6b06a]" />
+                    15s Tour
                   </button>
                 )}
-                <button
-                  onClick={() => setShowGallery(true)}
-                  className={`flex w-full items-center justify-center gap-2 rounded-full border py-3.5 text-[15px] font-semibold transition active:opacity-75 ${outlineBtn}`}
-                >
-                  <Images className="h-4 w-4" />
-                  View All {total} Photos
-                </button>
               </div>
 
-              <div className={`mt-4 h-px ${dividerColor}`} />
+              <div className={`mt-5 h-px ${dividerColor}`} />
             </div>
 
             {/* Scrollable details */}
-            <div className="flex-1 overflow-y-auto px-5 pb-28 pt-4">
+            <div className="flex-1 overflow-y-auto px-6 pb-32 pt-5">
               {rental.description && (
                 <div>
-                  <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${mutedText} opacity-60`}>
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${mutedText} opacity-55`}>
                     About this rental
                   </p>
-                  <p className={`mt-2 text-[0.94rem] leading-relaxed ${mutedText}`}>
+                  <p className={`mt-2.5 text-[0.95rem] leading-[1.7] ${mutedText}`}>
                     {rental.description}
                   </p>
                 </div>
               )}
 
-              {!!rental.highlights?.length && (
-                <div className="mt-5">
-                  <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${mutedText} opacity-60`}>
-                    Highlights
+              {/* Remaining features beyond the 3 surfaced above the fold */}
+              {(rental.highlights?.length ?? 0) > 3 && (
+                <div className="mt-7">
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${mutedText} opacity-55`}>
+                    More features
                   </p>
-                  <div className="mt-3 space-y-2">
-                    {rental.highlights.map((h) => (
-                      <div key={h} className={`rounded-[16px] border px-4 py-3 text-sm leading-snug ${highlightCard}`}>
+                  <div className="mt-3 space-y-2.5">
+                    {rental.highlights!.slice(3).map((h) => (
+                      <div key={h} className={`rounded-[16px] border px-4 py-3.5 text-sm leading-snug ${highlightCard}`}>
                         {h}
                       </div>
                     ))}
@@ -533,19 +563,19 @@ export function RentalDetailSheet({
               )}
 
               {(rental.securityDeposit || rental.applicationFee) && (
-                <div className="mt-5">
-                  <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${mutedText} opacity-60`}>
+                <div className="mt-7">
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${mutedText} opacity-55`}>
                     Fees
                   </p>
                   <div className="mt-3 flex flex-wrap gap-3">
                     {rental.securityDeposit && (
-                      <div className={`rounded-[14px] border px-4 py-2.5 text-sm ${highlightCard}`}>
+                      <div className={`rounded-[14px] border px-4 py-3 text-sm ${highlightCard}`}>
                         <span className={`block text-[10px] font-semibold uppercase tracking-[0.18em] ${mutedText} opacity-50`}>Security Deposit</span>
                         <span className="mt-1 block font-medium">{rental.securityDeposit}</span>
                       </div>
                     )}
                     {rental.applicationFee && (
-                      <div className={`rounded-[14px] border px-4 py-2.5 text-sm ${highlightCard}`}>
+                      <div className={`rounded-[14px] border px-4 py-3 text-sm ${highlightCard}`}>
                         <span className={`block text-[10px] font-semibold uppercase tracking-[0.18em] ${mutedText} opacity-50`}>Application Fee</span>
                         <span className="mt-1 block font-medium">{rental.applicationFee}</span>
                       </div>
@@ -559,11 +589,11 @@ export function RentalDetailSheet({
             <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-[120px] ${ctaBg}`} />
 
             {/* Sticky bottom CTA */}
-            <div className="absolute inset-x-0 bottom-0 shrink-0 px-5 pb-8 pt-3">
+            <div className="absolute inset-x-0 bottom-0 shrink-0 px-6 pb-8 pt-3">
               <div className="flex gap-3">
                 <button
                   onClick={() => onApply(rental)}
-                  className="flex-1 rounded-full bg-[#d6b06a] py-4 text-[15px] font-semibold text-[#08111f] shadow-[0_12px_28px_rgba(214,176,106,0.32)] transition active:brightness-95"
+                  className="flex-1 rounded-full bg-[#d6b06a] py-4 text-[15px] font-semibold text-[#08111f] shadow-[0_12px_28px_rgba(214,176,106,0.28)] transition active:brightness-95"
                 >
                   Apply Now
                 </button>
