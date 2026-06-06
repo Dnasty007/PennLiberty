@@ -429,10 +429,14 @@ export function RentalDetailSheet({
           {/* Subtle vignette — keeps the photo clean while making controls legible */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/20" />
 
-          {/* Close */}
+          {/* Close — above photo tap zones so it does not trigger next/prev */}
           <button
-            onClick={onClose}
-            className="absolute right-4 top-14 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/22 bg-black/42 text-white backdrop-blur-md transition active:bg-black/65"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="absolute right-4 top-14 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/22 bg-black/42 text-white backdrop-blur-md transition active:bg-black/65"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -445,11 +449,21 @@ export function RentalDetailSheet({
             </div>
           )}
 
-          {/* Invisible left / right tap zones */}
+          {/* Invisible left / right tap zones — start below header so close stays clickable */}
           {total > 1 && (
             <>
-              <button onClick={prevPhoto} className="absolute bottom-0 left-0 top-0 w-1/3" aria-label="Previous photo" />
-              <button onClick={nextPhoto} className="absolute bottom-0 right-0 top-0 w-1/3" aria-label="Next photo" />
+              <button
+                type="button"
+                onClick={prevPhoto}
+                className="absolute bottom-0 left-0 top-16 z-[1] w-1/3"
+                aria-label="Previous photo"
+              />
+              <button
+                type="button"
+                onClick={nextPhoto}
+                className="absolute bottom-0 right-0 top-16 z-[1] w-1/3"
+                aria-label="Next photo"
+              />
             </>
           )}
         </div>

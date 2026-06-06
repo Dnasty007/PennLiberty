@@ -104,6 +104,15 @@ input {
 .rental-pin:nth-child(6) .rental-pin-bob { animation-delay: 1.3s; }
 .rental-pin:nth-child(7) .rental-pin-bob { animation-delay: 2.2s; }
 
+/* Desktop physics pins — motion comes from the simulation, not CSS bob */
+.rental-pin--physics {
+  pointer-events: none;
+}
+.rental-pin--physics .rental-pin-chip {
+  pointer-events: auto;
+}
+
+/* Space Invaders launcher — 2-frame pixel-invader bob (desktop only) */
 /* Collage overlay compositing — opacity is on each img (see RentalsSection). */
 .rentals-collage-overlay {
   isolation: isolate;

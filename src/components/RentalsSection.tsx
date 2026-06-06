@@ -2,9 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, ClipboardList, KeyRound, Mail, MapPin, Play } from "lucide-react";
 import { CardImageCycler } from "@/components/CardImageCycler";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
+import {
+  RentalsHeroPhysics,
+  type RentalsHeroPhysicsHandle,
+} from "@/components/RentalsHeroPhysics";
+import { RentalsHeroInvadersGame } from "@/components/RentalsHeroInvadersGame";
+import { RentalsInvadersLauncher } from "@/components/RentalsInvadersLauncher";
 import { Button } from "@/components/ui/button";
+import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
+import { useRentalsInvadersMode } from "@/hooks/useRentalsInvadersMode";
 import type { PageKey } from "@/lib/data";
 import { rentalMapPinOffsets, rentalPinOffsetsBySrc, type Rental } from "@/lib/data";
+import { staticHeroPinPercents } from "@/lib/rentalHeroPhysics";
 import {
   rentalsHeroBlankBaseSrc,
   rentalsHeroCollageOverlays,
@@ -79,8 +88,15 @@ export function RentalsSection({
   subtleText,
 }: RentalsSectionProps) {
   const hasRentals = rentals.length > 0;
+  const { usePhysicsPins, useStaticDesktopPins } = useRentalsHeroPhysicsMode();
+  const reducedMotionDesktopLayout = staticHeroPinPercents(rentals.length);
 
-  /* ── Dev pin mode ─────────────────────────────────────────────────────── */
+  /* ── Space Invaders Easter egg (desktop physics hero only) ──────────── */
+  const { active: invadersActive, start: startInvaders, exit: exitInvaders } =
+    useRentalsInvadersMode();
+  const physicsRef = useRef<RentalsHeroPhysicsHandle>(null);
+
+  /* ── Dev pin mode (mobile hero only — desktop uses physics pins) ───── */
   const [pinMode, setPinMode] = useState(false);
   const PIN_POSITIONS_KEY = "pl-rental-pins-v2";
   type PinStore = Record<string, { top: string; left: string }[]>;
@@ -353,7 +369,7 @@ export function RentalsSection({
   }, [pinMode, rentalsHeroSrc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onPinMouseDown = (idx: number, e: React.MouseEvent) => {
-    if (!pinMode) return;
+    if (!pinMode || usePhysicsPins || useStaticDesktopPins) return;
     e.preventDefault();
     e.stopPropagation();
     const container = heroRef.current;
@@ -427,7 +443,11 @@ export function RentalsSection({
         lightMode={lightMode}
         className={`overflow-hidden p-4 md:p-5 lg:p-6 ${lightMode ? "ring-1 ring-black/[0.04]" : `${listingsRailChromeClass} ring-1 ring-white/[0.06]`}`}
       >
-        <div ref={heroRef} className="relative isolate min-h-[420px] overflow-hidden rounded-[26px] border border-[#d6b06a]/18 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] sm:min-h-[480px] md:min-h-[520px]">
+        <div
+          ref={heroRef}
+          data-pl-no-page-swipe={invadersActive ? "" : undefined}
+          className="relative isolate min-h-[420px] overflow-hidden rounded-[26px] border border-[#d6b06a]/18 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] sm:min-h-[480px] md:min-h-[520px]"
+        >
           <span className="sr-only">
             Philadelphia skyline used as an editorial leasing backdrop; overlays mark featured units.
           </span>
@@ -566,36 +586,72 @@ export function RentalsSection({
               </div>
             </div>
           ) : (
-            rentals.map((rental, index) => {
-              const sourcePins = pinTemplateForHero(rentalsHeroSrc);
-              const livePos = import.meta.env.DEV && pinMode
-                ? (pinPositions[index] ?? { top: "50%", left: "50%" })
-                : (sourcePins[index] ?? sourcePins[index % sourcePins.length] ?? sourcePins[0]!);
+            <>
+              {usePhysicsPins ? (
+                <RentalsHeroPhysics
+                  ref={physicsRef}
+                  rentals={rentals}
+                  onOpenRentalDetails={onOpenRentalDetails}
+                  mode={invadersActive ? "game" : "browse"}
+                />
+              ) : null}
 
-              return (
-                <div
-                  key={rental.id}
-                  className={`rental-pin absolute z-[20] -translate-x-1/2 -translate-y-1/2 ${import.meta.env.DEV && pinMode ? "cursor-grab active:cursor-grabbing" : ""}`}
-                  style={{ top: livePos.top, left: livePos.left }}
-                  onMouseDown={import.meta.env.DEV ? (e) => onPinMouseDown(index, e) : undefined}
-                >
-                  {import.meta.env.DEV && pinMode && (
-                    <div className="pointer-events-none absolute -inset-1 rounded-2xl ring-2 ring-[#d6b06a] ring-offset-1 ring-offset-black/40" />
-                  )}
-                  <div className="rental-pin-bob">
-                    <button
-                      type="button"
-                      onClick={() => !pinMode && onOpenRentalDetails?.(rental.id)}
-                      className="rental-pin-chip max-w-[11rem] rounded-2xl border border-[#d6b06a]/25 bg-black/58 px-3 py-2 text-center text-xs font-medium text-white shadow-[0_12px_34px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-[#d6b06a]/60 hover:bg-black/75 hover:scale-105 hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] sm:max-w-[12rem]"
-                    >
-                      <span className="line-clamp-2 leading-snug">{rental.title}</span>
-                      <span className="mt-1 block font-semibold tracking-tight text-[#f4dfb4]">{rental.price}</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })
+              {!usePhysicsPins
+                ? rentals.map((rental, index) => {
+                    const sourcePins = pinTemplateForHero(rentalsHeroSrc);
+                    const livePos = useStaticDesktopPins
+                      ? (reducedMotionDesktopLayout[index] ?? { top: "50%", left: "50%" })
+                      : import.meta.env.DEV && pinMode
+                        ? (pinPositions[index] ?? { top: "50%", left: "50%" })
+                        : (sourcePins[index] ??
+                          sourcePins[index % sourcePins.length] ??
+                          sourcePins[0]!);
+                    const pinVisibility = useStaticDesktopPins ? "hidden md:block" : "md:hidden";
+
+                    return (
+                      <div
+                        key={rental.id}
+                        className={`rental-pin absolute z-[20] -translate-x-1/2 -translate-y-1/2 ${pinVisibility} ${import.meta.env.DEV && pinMode && !useStaticDesktopPins ? "cursor-grab active:cursor-grabbing" : ""}`}
+                        style={{ top: livePos.top, left: livePos.left }}
+                        onMouseDown={
+                          import.meta.env.DEV && !useStaticDesktopPins
+                            ? (e) => onPinMouseDown(index, e)
+                            : undefined
+                        }
+                      >
+                        {import.meta.env.DEV && pinMode && !useStaticDesktopPins ? (
+                          <div className="pointer-events-none absolute -inset-1 rounded-2xl ring-2 ring-[#d6b06a] ring-offset-1 ring-offset-black/40" />
+                        ) : null}
+                        <div className="rental-pin-bob">
+                          <button
+                            type="button"
+                            onClick={() => !pinMode && onOpenRentalDetails?.(rental.id)}
+                            className="rental-pin-chip max-w-[11rem] rounded-2xl border border-[#d6b06a]/25 bg-black/58 px-3 py-2 text-center text-xs font-medium text-white shadow-[0_12px_34px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-[#d6b06a]/60 hover:bg-black/75 hover:scale-105 hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] sm:max-w-[12rem]"
+                          >
+                            <span className="line-clamp-2 leading-snug">{rental.title}</span>
+                            <span className="mt-1 block font-semibold tracking-tight text-[#f4dfb4]">
+                              {rental.price}
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                : null}
+            </>
           )}
+
+          {usePhysicsPins && hasRentals && !invadersActive ? (
+            <RentalsInvadersLauncher onStart={startInvaders} />
+          ) : null}
+
+          {usePhysicsPins && hasRentals && invadersActive ? (
+            <RentalsHeroInvadersGame
+              heroRef={heroRef}
+              getPinBodies={() => physicsRef.current?.getBodies() ?? []}
+              onExit={exitInvaders}
+            />
+          ) : null}
         </div>
 
       </GlassCard>
