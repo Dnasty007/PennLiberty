@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { DevImageEditor } from "@/components/DevImageEditor";
 import { Hero } from "@/components/Hero";
 import { ListingDetailsOverlay } from "@/components/ListingDetailsOverlay";
+import { RentalDetailSheet } from "@/components/RentalDetailSheet";
 import { ListingsMap } from "@/components/ListingsMap";
 import { OwnersSection } from "@/components/owners/OwnersSection";
 import { ContactSection } from "@/components/ContactSection";
@@ -671,18 +672,12 @@ export default function App() {
       />
 
       {showRentalDetails && selectedRental && (
-        <ListingDetailsOverlay
-          currentImageIndex={rentalGalleryImageIndex}
+        <RentalDetailSheet
+          rental={selectedRental}
           lightMode={lightMode}
-          listing={selectedRental}
           mutedText={mutedText}
+          onApply={(rental) => openRentalApplication(rental.id)}
           onClose={closeRentalDetails}
-          onImageChange={setRentalGalleryImageIndex}
-          onNextImage={nextRentalImage}
-          onPrevImage={prevRentalImage}
-          onScheduleTour={() => openRentalApplication(selectedRental.id)}
-          primaryActionLabel="Submit Application"
-          backLabel="Back to Rentals"
         />
       )}
 

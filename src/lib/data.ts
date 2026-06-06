@@ -30,6 +30,8 @@ export type Rental = PropertyDetail & {
   dateAvailable?: string;
   securityDeposit?: string;
   applicationFee?: string;
+  /** Optional 15-second video tour URL (MP4). When present, shows "Watch 15s Video Tour" button on mobile detail sheet. */
+  videoUrl?: string;
 };
 
 function rentalAsset(slug: string, filename: string): string {
