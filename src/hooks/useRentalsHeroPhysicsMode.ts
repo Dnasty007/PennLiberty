@@ -8,7 +8,9 @@ const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
  * Mobile keeps legacy static pins; reduced-motion desktop uses a static grid.
  */
 export function useRentalsHeroPhysicsMode() {
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(DESKTOP_QUERY).matches,
+  );
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {

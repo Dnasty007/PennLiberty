@@ -1,0 +1,26 @@
+{
+  "slug": "123-example-st-2f",
+  "title": "123 Example St, Unit 2F",
+  "price": "$1,200/mo",
+  "address": "123 Example St, Philadelphia, PA 19121",
+  "beds": 2,
+  "baths": 1,
+  "meta": "2 bed · 1 bath · Available 07/01/26",
+  "area": "Neighborhood Name",
+  "image": "/Rentals/123-example-st-2f/cover.jpg",
+  "gallery": [
+    "/Rentals/123-example-st-2f/cover.jpg"
+  ],
+  "propertyType": "Residential Lease",
+  "status": "Available",
+  "brokerage": "Penn Liberty Real Estate",
+  "dateAvailable": "07/01/26",
+  "securityDeposit": "$1,200",
+  "applicationFee": "$50",
+  "description": "Short paragraph about the unit.",
+  "highlights": [
+    "2 bedrooms · 1 bath",
+    "Neighborhood · Philadelphia",
+    "$50 application fee"
+  ]
+}

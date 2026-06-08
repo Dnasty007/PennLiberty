@@ -2,6 +2,12 @@
 
 This site is a **static React app**. After `npm run build`, upload everything inside the `dist/` folder to GoDaddy.
 
+## Updating rentals (usually no full zip)
+
+Rental listings load from **`rentals.json`** at runtime. For add/remove/price/status changes, upload only that file (~few KB). See **[UPDATE-RENTALS.md](./UPDATE-RENTALS.md)**.
+
+Use a **full zip** when you change site code, design, or many static assets.
+
 ## Before you upload
 
 1. **Production build** (run in project folder):

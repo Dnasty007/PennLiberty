@@ -12,7 +12,6 @@ import { RentalApplicationModal } from "@/components/RentalApplicationModal";
 import { RentalsSection } from "@/components/RentalsSection";
 import { TeamSection } from "@/components/TeamSection";
 import {
-  initialRentals,
   initialSaleListings,
   navItems,
   resolveRentalApplicationUrl,
@@ -20,6 +19,7 @@ import {
   type Rental,
   type SaleListing,
 } from "@/lib/data";
+import { fetchRentalsCatalog } from "@/lib/rentalsCatalog";
 import {
   DisplayMode,
   PHILLY_COORDS,
@@ -79,7 +79,8 @@ function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
 }
 
 export default function App() {
-  const [rentals, setRentals] = useState<Rental[]>([...initialRentals]);
+  const [rentals, setRentals] = useState<Rental[]>([]);
+  const [rentalsReady, setRentalsReady] = useState(false);
   const [saleListings, setSaleListings] = useState<SaleListing[]>([...initialSaleListings]);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("neutral");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -104,11 +105,42 @@ export default function App() {
   >("idle");
   const [rentalApplicationOpenedExternal, setRentalApplicationOpenedExternal] = useState(false);
   const [rentalGalleryImageIndex, setRentalGalleryImageIndex] = useState(0);
+  const [isDesktopRentalView, setIsDesktopRentalView] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches,
+  );
   const [tourForm, setTourForm] = useState({
     name: "",
     email: "",
     phone: "",
   });
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setIsDesktopRentalView(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchRentalsCatalog()
+      .then((list) => {
+        if (!cancelled) {
+          setRentals(list);
+          setRentalsReady(true);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load rentals.json:", err);
+        if (!cancelled) setRentalsReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -381,9 +413,9 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!rentalsReady) return;
     applyRoute(readBrowserRoute(), { replace: true, syncHistory: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on load for QR / shared links
-  }, []);
+  }, [rentalsReady, applyRoute]);
 
   useEffect(() => {
     const onPopState = () => {
@@ -654,6 +686,7 @@ export default function App() {
                 outlineButtonClasses={outlineButtonClasses}
                 rentals={rentals}
                 rentalsHeroSrc={rentalsHeroPick}
+                rentalsLoading={!rentalsReady}
                 subtleText={subtleText}
               />
             )}
@@ -745,13 +778,29 @@ export default function App() {
       />
 
       {showRentalDetails && selectedRental && (
-        <RentalDetailSheet
-          rental={selectedRental}
-          lightMode={lightMode}
-          mutedText={mutedText}
-          onApply={(rental) => openRentalApplication(rental.id)}
-          onClose={closeRentalDetails}
-        />
+        isDesktopRentalView ? (
+          <ListingDetailsOverlay
+            currentImageIndex={rentalGalleryImageIndex}
+            lightMode={lightMode}
+            listing={selectedRental}
+            mutedText={mutedText}
+            onClose={closeRentalDetails}
+            onImageChange={setRentalGalleryImageIndex}
+            onNextImage={nextRentalImage}
+            onPrevImage={prevRentalImage}
+            onScheduleTour={() => openRentalApplication(selectedRental.id)}
+            primaryActionLabel="Apply Now"
+            backLabel="Back to Rentals"
+          />
+        ) : (
+          <RentalDetailSheet
+            rental={selectedRental}
+            lightMode={lightMode}
+            mutedText={mutedText}
+            onApply={(rental) => openRentalApplication(rental.id)}
+            onClose={closeRentalDetails}
+          />
+        )
       )}
 
       <footer

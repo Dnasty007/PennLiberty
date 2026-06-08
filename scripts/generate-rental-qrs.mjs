@@ -8,18 +8,12 @@ const root = path.resolve(__dirname, "..");
 const outDir = path.join(root, "qr-codes");
 const SITE_ORIGIN = "https://pennlibertyre.com";
 
-/** Keep in sync with `initialRentals` in src/lib/data.ts */
-const rentals = [
-  { slug: "1704-w-diamond-st-2f", title: "1704 W Diamond St, Unit 2F" },
-  { slug: "1704-w-diamond-st-3f", title: "1704 W Diamond St, Unit 3F" },
-  { slug: "2542-cecil-b-moore-ave-2", title: "2542 Cecil B. Moore Ave" },
-  { slug: "1540-n-15th-st-3f-rear", title: "1540 N 15th St, 3rd Floor Rear" },
-  { slug: "1711-n-gratz-st-2f", title: "1711 N Gratz St, Unit 2F" },
-  { slug: "2633-kensington-ave-3", title: "2633 Kensington Ave, Unit 3" },
-  { slug: "2633-kensington-ave-1c", title: "2633 Kensington Ave, Unit 1C — Storefront" },
-  { slug: "5316-glenloch-st-3f", title: "5316 Glenloch St" },
-  { slug: "811-n-15th-st", title: "811 N 15th St" },
-];
+/** Reads live inventory from public/rentals.json */
+const rentalsPath = path.join(root, "public", "rentals.json");
+const rentals = JSON.parse(fs.readFileSync(rentalsPath, "utf8")).map((r) => ({
+  slug: r.slug,
+  title: r.title,
+}));
 
 const targets = [
   {

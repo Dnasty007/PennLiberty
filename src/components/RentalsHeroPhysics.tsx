@@ -39,6 +39,10 @@ export const RentalsHeroPhysics = forwardRef<
   const pinnedIndexRef = useRef<number | null>(null);
   const frameRef = useRef<number | null>(null);
   const resizeTimerRef = useRef<number | null>(null);
+  const heroVisibleRef = useRef(true);
+  const tabVisibleRef = useRef(
+    typeof document !== "undefined" ? document.visibilityState === "visible" : true,
+  );
   const modeRef = useRef(mode);
   modeRef.current = mode;
 
@@ -116,7 +120,25 @@ export const RentalsHeroPhysics = forwardRef<
   }, []);
 
   useEffect(() => {
+    const el = layerRef.current;
+    if (!el) return;
+
+    let loopActive = false;
+
+    const stopLoop = () => {
+      if (frameRef.current != null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+      loopActive = false;
+    };
+
     const tick = () => {
+      if (!heroVisibleRef.current || !tabVisibleRef.current) {
+        stopLoop();
+        return;
+      }
+
       const bounds = readBounds();
       const bodies = bodiesRef.current;
 
@@ -141,11 +163,38 @@ export const RentalsHeroPhysics = forwardRef<
       frameRef.current = window.requestAnimationFrame(tick);
     };
 
-    frameRef.current = window.requestAnimationFrame(tick);
+    const startLoop = () => {
+      if (loopActive || !heroVisibleRef.current || !tabVisibleRef.current) return;
+      loopActive = true;
+      frameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    const syncLoop = () => {
+      if (heroVisibleRef.current && tabVisibleRef.current) startLoop();
+      else stopLoop();
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        heroVisibleRef.current = entry?.isIntersecting ?? false;
+        syncLoop();
+      },
+      { threshold: 0, rootMargin: "40px 0px" },
+    );
+    observer.observe(el);
+
+    const onVisibility = () => {
+      tabVisibleRef.current = document.visibilityState === "visible";
+      syncLoop();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    syncLoop();
+
     return () => {
-      if (frameRef.current != null) {
-        window.cancelAnimationFrame(frameRef.current);
-      }
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+      stopLoop();
     };
   }, [readBounds, syncDomPositions]);
 

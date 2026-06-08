@@ -33,6 +33,7 @@ type RentalsSectionProps = {
   outlineButtonClasses?: string;
   rentalsHeroSrc: string;
   rentals: Rental[];
+  rentalsLoading?: boolean;
   subtleText: string;
 };
 
@@ -85,10 +86,11 @@ export function RentalsSection({
   outlineButtonClasses,
   rentalsHeroSrc,
   rentals,
+  rentalsLoading = false,
   subtleText,
 }: RentalsSectionProps) {
   const hasRentals = rentals.length > 0;
-  const { usePhysicsPins, useStaticDesktopPins } = useRentalsHeroPhysicsMode();
+  const { usePhysicsPins, useStaticDesktopPins, isMobile } = useRentalsHeroPhysicsMode();
   const reducedMotionDesktopLayout = staticHeroPinPercents(rentals.length);
 
   /* ── Space Invaders Easter egg (desktop physics hero only) ──────────── */
@@ -656,7 +658,9 @@ export function RentalsSection({
 
       </GlassCard>
 
-      {hasRentals ? (
+      {rentalsLoading ? (
+        <p className={`py-8 text-center text-sm ${mutedText}`}>Loading listings…</p>
+      ) : hasRentals ? (
         <div>
           <div className="mb-5 md:mb-6">
             <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
@@ -669,9 +673,9 @@ export function RentalsSection({
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 xl:gap-5">
             {rentals.map((rental) => (
               <li key={rental.id} className="min-w-0">
-                {/* ── Mobile-native card (phones only) ── */}
+                {isMobile ? (
                 <article
-                  className={`flex flex-col overflow-hidden rounded-[26px] border md:hidden ${
+                  className={`flex flex-col overflow-hidden rounded-[26px] border ${
                     onOpenRentalDetails ? "cursor-pointer transition-transform active:scale-[0.99]" : ""
                   } ${
                     lightMode
@@ -742,10 +746,9 @@ export function RentalsSection({
                     </div>
                   </div>
                 </article>
-
-                {/* ── Desktop / tablet card (unchanged from before) ── */}
+                ) : (
                 <article
-                  className={`group hidden h-full flex-col overflow-hidden rounded-[22px] border transition-colors duration-300 md:flex md:rounded-[24px] ${
+                  className={`group flex h-full flex-col overflow-hidden rounded-[22px] border transition-colors duration-300 md:rounded-[24px] ${
                     onOpenRentalDetails ? "cursor-pointer" : ""
                   } ${
                     lightMode
@@ -794,6 +797,7 @@ export function RentalsSection({
                     </Button>
                   </div>
                 </article>
+                )}
               </li>
             ))}
           </ul>

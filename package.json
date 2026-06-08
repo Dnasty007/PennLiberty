@@ -7,7 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "qr:generate": "node scripts/generate-rental-qrs.mjs"
+    "qr:generate": "node scripts/generate-rental-qrs.mjs",
+    "rentals:json": "node scripts/build-rentals-json.mjs",
+    "rentals:list": "node scripts/rental-cli.mjs list",
+    "rentals:remove": "node scripts/rental-cli.mjs remove",
+    "rentals:add": "node scripts/rental-cli.mjs add",
+    "rentals:validate": "node scripts/rental-cli.mjs validate",
+    "rentals:push": "node scripts/push-rentals.mjs",
+    "rentals:push-photos": "node scripts/push-rental-photos.mjs",
+    "rentals:stage-photos": "node scripts/stage-rental-photos.mjs",
+    "rentals:publish": "node scripts/publish-rental.mjs",
+    "rentals:deploy": "node scripts/rental-cli.mjs validate && node scripts/push-rentals.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -29,6 +39,7 @@
     "@vercel/node": "^5.7.15",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.21",
+    "basic-ftp": "^6.0.1",
     "postcss": "^8.5.6",
     "qrcode": "^1.5.4",
     "tailwindcss": "^3.4.17",

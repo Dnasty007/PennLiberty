@@ -34,84 +34,6 @@ export type Rental = PropertyDetail & {
   videoUrl?: string;
 };
 
-function rentalAsset(slug: string, filename: string): string {
-  return `/Rentals/${slug}/${filename}`;
-}
-
-function rentalGallery(slug: string, filenames: readonly string[]): string[] {
-  return filenames.map((filename) => rentalAsset(slug, filename));
-}
-
-const diamond2fPhotos = [
-  "cover.png",
-  "img-2.png",
-  "img-3.png",
-  ...Array.from({ length: 22 }, (_, index) => `IMG_${index + 4}.jpg`),
-] as const;
-
-const diamond3fPhotos = [
-  "cover.png",
-  "img-2.png",
-  "img-3.png",
-  ...Array.from({ length: 6 }, (_, index) => `IMG_${index + 4}.jpg`),
-  ...Array.from({ length: 20 }, (_, index) => `IMG_${index + 10}.jpg`),
-  "IMG_430.jpg",
-] as const;
-
-const diamond2fGallery = rentalGallery("1704-w-diamond-st-2f", diamond2fPhotos);
-const diamond3fGallery = rentalGallery("1704-w-diamond-st-3f", diamond3fPhotos);
-
-/** Placeholder until photos land in folder — swap to rentalGallery(..., ["cover.jpg", ...]). */
-const cecilMoore2Gallery = ["/branding/liberty-head-grey.png"];
-const n15th3fRearGallery = ["/branding/liberty-head-grey.png"];
-const gratz2fGallery = ["/branding/liberty-head-grey.png"];
-const kensington3Gallery = ["/branding/liberty-head-grey.png"];
-const kensington1cPhotos = [
-  "cover-1.png",
-  "cover-2.png",
-  "IMG_5797.jpg",
-  "IMG_7380.jpg",
-  "IMG_7381.jpg",
-  "IMG_7382.jpg",
-] as const;
-const kensington1cGallery = rentalGallery("2633-kensington-ave-1c", kensington1cPhotos);
-const glenloch3fPhotos = [
-  "cover-1.jpg",
-  "20240911_134958.jpg",
-  "20240911_135008.jpg",
-  "20240911_135011.jpg",
-  "20240911_135016.jpg",
-  "20240911_135050.jpg",
-] as const;
-const glenloch3fGallery = rentalGallery("5316-glenloch-st-3f", glenloch3fPhotos);
-const n811_15thStPhotos = [
-  "IMG_0062.JPEG",
-  "IMG_0063.JPEG",
-  "IMG_0064.JPEG",
-  "IMG_0065.JPEG",
-  "IMG_0067.JPEG",
-  "IMG_0069.JPEG",
-  "IMG_0070.JPEG",
-  "IMG_0071.JPEG",
-  "IMG_0072.JPEG",
-  "IMG_0073.JPEG",
-  "IMG_0074.JPEG",
-  "IMG_0075.JPEG",
-  "IMG_0076.JPEG",
-  "IMG_0077.JPEG",
-  "IMG_0078.JPEG",
-  "IMG_0079.JPEG",
-  "IMG_0080.JPEG",
-  "IMG_0083.JPEG",
-  "IMG_0084.JPEG",
-  "IMG_9605.jpg",
-  "IMG_9612.JPEG",
-  "IMG_9613.JPEG",
-  "IMG_9614.JPEG",
-  "IMG_9615.JPEG",
-] as const;
-const n811_15thStGallery = rentalGallery("811-n-15th-st", n811_15thStPhotos);
-
 /** Default pin positions — fallback if image not in `rentalPinOffsetsBySrc`. */
 export const rentalMapPinOffsets = [
   { top: "83.6%", left: "56.7%" },
@@ -220,273 +142,6 @@ export type SaleListing = PropertyDetail & {
   units?: number;
   lotSqft?: number;
 };
-
-/**
- * Live rental inventory — add units here as photos and MLS details are ready.
- */
-export const initialRentals: Rental[] = [
-  {
-    id: 1,
-    slug: "1704-w-diamond-st-2f",
-    title: "1704 W Diamond St, Unit 2F",
-    price: "$1,150/mo",
-    address: "1704 W Diamond St #2, Philadelphia, PA 19121",
-    beds: 2,
-    baths: 1,
-    meta: "2 bed · 1 bath · Available 05/01/26",
-    area: "Temple University",
-    image: diamond2fGallery[0],
-    gallery: diamond2fGallery,
-    propertyType: "Residential Lease",
-    status: "Active",
-    mlsNumber: "PAPH2609562",
-    brokerage: "Penn Liberty Real Estate",
-    dateAvailable: "05/01/26",
-    securityDeposit: "$1,150",
-    applicationFee: "$50",
-    description:
-      "Great opportunity to rent this beautiful 2nd floor apartment in the heart of Temple University's campus. The unit features 2 spacious bedrooms, an outdoor deck, a full kitchen, and 1 bathroom. Additional features include basement laundry and an unfinished basement for storage space. The property is a stone's throw away from Temple University's main campus and is convenient to all major campus buildings. Move-in ready. Proof of income required, no evictions.",
-    highlights: [
-      "2 spacious bedrooms · 1 full bath",
-      "Outdoor deck",
-      "Basement laundry · storage in unfinished basement",
-      "Central A/C · forced air heat (tenant pays electric, gas, heat)",
-      "12–24 month lease · $50 application fee",
-      "No pets · no smoking",
-      "Steps from Temple University main campus",
-    ],
-  },
-  {
-    id: 2,
-    slug: "1704-w-diamond-st-3f",
-    title: "1704 W Diamond St, Unit 3F",
-    price: "$1,200/mo",
-    address: "1704 W Diamond St #3, Philadelphia, PA 19121",
-    beds: 2,
-    baths: 1,
-    meta: "2 bed · 1 bath · $1,200/mo · Temple University area",
-    area: "Temple University",
-    image: diamond3fGallery[0],
-    gallery: diamond3fGallery,
-    propertyType: "Residential Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    applicationFee: "$50",
-    description:
-      "Third-floor two-bedroom, one-bath apartment in the same classic Temple University area rowhome as our 2F listing — $1,200 per month. Contact Penn Liberty for move-in date and application details.",
-    highlights: [
-      "2 bedrooms · 1 bath · 3rd floor",
-      "Third-floor unit in 3-unit building (1915 masonry row)",
-      "Temple University neighborhood",
-      "$1,200/mo · $50 application fee",
-    ],
-  },
-  {
-    id: 3,
-    slug: "2542-cecil-b-moore-ave-2",
-    title: "2542 Cecil B. Moore Ave",
-    price: "$1,950/mo",
-    address: "2542 Cecil B. Moore Ave, Philadelphia, PA 19121",
-    beds: 4,
-    baths: 3,
-    sqft: 1472,
-    meta: "4 bed · 3 bath · Available 04/20/26",
-    area: "Brewerytown",
-    image: cecilMoore2Gallery[0],
-    gallery: cecilMoore2Gallery,
-    propertyType: "Residential Lease",
-    status: "Active",
-    mlsNumber: "PAPH2609626",
-    brokerage: "Penn Liberty Real Estate",
-    dateAvailable: "04/20/26",
-    securityDeposit: "$2,300",
-    description:
-      "Four bedrooms and three full baths with in-unit washer and dryer. All-new hardwood floors, fresh paint, and a modern kitchen with upgraded cabinets and appliances. Oversized rear deck with skyline views. Bi-level interior row/townhouse (1915) in Brewerytown with central A/C, full basement, and on-street parking.",
-    highlights: [
-      "4 bedrooms · 3 full baths · ~1,472 sq ft",
-      "Washer & dryer · new hardwood floors · freshly painted",
-      "Modern kitchen — upgraded cabinets & appliances",
-      "Oversized rear deck with skyline view",
-      "Central A/C · natural gas · on-street parking",
-      "12–24 month lease · $2,300 security deposit",
-      "Brewerytown · near Girard Ave corridor",
-    ],
-  },
-  {
-    id: 4,
-    slug: "1540-n-15th-st-3f-rear",
-    title: "1540 N 15th St, 3rd Floor Rear",
-    price: "$950/mo",
-    address: "1540 N 15th St, 3rd Floor Rear, Philadelphia, PA 19121",
-    beds: 1,
-    baths: 1,
-    sqft: 450,
-    meta: "1 bed · 1 bath · ~450 sq ft · Temple area",
-    area: "Temple University",
-    image: n15th3fRearGallery[0],
-    gallery: n15th3fRearGallery,
-    propertyType: "Residential Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    dateAvailable: "11/05/25",
-    securityDeposit: "$1,900",
-    applicationFee: "$50",
-    description:
-      "Third-floor rear one-bedroom, one-bath apartment blocks from Temple University. Steps from the Broad Street Line, campus buildings, and neighborhood restaurants. Large kitchen opens to a cozy living room with hardwood floors. Gas stove, full-size refrigerator, and generous cabinet and counter space. Corner building with abundant windows; bedroom at the rear with closet space and room to furnish comfortably.",
-    highlights: [
-      "1 bedroom · 1 bath · ~450 sq ft",
-      "Third floor rear · hardwood floors",
-      "Gas stove · full-size refrigerator",
-      "Corner building · bright, windowed rooms",
-      "Blocks from Temple U · near Broad St. Line",
-      "$1,900 security deposit · $50 application fee",
-    ],
-  },
-  {
-    id: 5,
-    slug: "1711-n-gratz-st-2f",
-    title: "1711 N Gratz St, Unit 2F",
-    price: "$1,100/mo",
-    address: "1711 N Gratz St, Unit 2F, Philadelphia, PA 19121",
-    beds: 2,
-    baths: 1,
-    meta: "2 bed · 1 bath · Temple University area",
-    area: "Temple University",
-    image: gratz2fGallery[0],
-    gallery: gratz2fGallery,
-    propertyType: "Residential Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    securityDeposit: "$2,100",
-    applicationFee: "$50",
-    description:
-      "Second-floor two-bedroom, one-bath apartment just off Temple University's main campus. Enter into a kitchen with a full-size refrigerator, electric stove, range hood, and eat-in dining space. Central air, gas heat, and in-unit laundry.",
-    highlights: [
-      "2 bedrooms · 1 bath · 2nd floor",
-      "Eat-in kitchen · full-size refrigerator",
-      "Electric stove · range hood",
-      "Central A/C · gas heat",
-      "In-unit laundry",
-      "Steps from Temple University main campus",
-      "$2,100 security deposit · $50 application fee",
-    ],
-  },
-  {
-    id: 6,
-    slug: "2633-kensington-ave-3",
-    title: "2633 Kensington Ave, Unit 3",
-    price: "$2,500/mo",
-    address: "2633 Kensington Ave, Unit 3, Philadelphia, PA 19125",
-    beds: 3,
-    baths: 2,
-    meta: "3 bed · 2 bath · Available 05/29/26",
-    area: "Kensington",
-    image: kensington3Gallery[0],
-    gallery: kensington3Gallery,
-    propertyType: "Residential Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    dateAvailable: "05/29/26",
-    securityDeposit: "$2,500",
-    applicationFee: "$50",
-    description:
-      "Three-bedroom, two-bath apartment at 2633 Kensington Avenue in the 19125 corridor. Contact Penn Liberty for a showing, full amenity list, and application details.",
-    highlights: [
-      "3 bedrooms · 2 baths",
-      "Kensington · Philadelphia 19125",
-      "Available 05/29/26",
-      "$2,500 security deposit · $50 application fee",
-      "Contact Penn Liberty to schedule a tour",
-    ],
-  },
-  {
-    id: 7,
-    slug: "2633-kensington-ave-1c",
-    title: "2633 Kensington Ave, Unit 1C — Storefront",
-    price: "$1,150/mo",
-    address: "2633 Kensington Ave, Unit 1C, Philadelphia, PA 19125",
-    beds: 0,
-    baths: 0,
-    meta: "$1,150/mo · Storefront · Kensington",
-    area: "Kensington",
-    image: kensington1cGallery[0],
-    gallery: kensington1cGallery,
-    propertyType: "Commercial Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    dateAvailable: "05/29/26",
-    securityDeposit: "$1,150",
-    applicationFee: "$50",
-    description:
-      "Storefront retail space at Unit 1C, 2633 Kensington Avenue in the 19125 corridor — $1,150 per month. Contact Penn Liberty for square footage, permitted uses, showing times, and application details.",
-    highlights: [
-      "Storefront · Unit 1C",
-      "$1,150/mo",
-      "Kensington · Philadelphia 19125",
-      "Available 05/29/26",
-      "$1,150 security deposit · $50 application fee",
-      "Same building as our Unit 3 listing — contact office to tour",
-    ],
-  },
-  {
-    id: 8,
-    slug: "5316-glenloch-st-3f",
-    title: "5316 Glenloch St",
-    price: "$1,350/mo",
-    address: "5316 Glenloch St, Philadelphia, PA 19124",
-    beds: 2,
-    baths: 1,
-    sqft: 660,
-    meta: "2 bed · 1 bath · ~660 sq ft · Available 06/01/26",
-    area: "Frankford",
-    image: glenloch3fGallery[0],
-    gallery: glenloch3fGallery,
-    propertyType: "Residential Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    dateAvailable: "06/01/26",
-    securityDeposit: "$1,350",
-    applicationFee: "$50",
-    description:
-      "Very nice two-bedroom ranch-style home at 5316 Glenloch Street. Ultra-modern kitchen and bathroom recently replaced. Hardwood floors throughout. Front and rear fenced yards. Granite counters with open bar area. Central air. Stackable washer and dryer included. Move-in ready — first month, last month, and security ($3,150 total). Proof of income required; no evictions.",
-    highlights: [
-      "2 bedrooms · 1 bath · ~660 sq ft",
-      "Ranch-style home · hardwood floors throughout",
-      "Ultra-modern kitchen & bath · granite counters · open bar",
-      "Central A/C · stackable washer & dryer included",
-      "Front & rear fenced yards · eat-in kitchen",
-      "Frankford · Philadelphia 19124",
-      "Available 06/01/26",
-      "$1,350 security deposit · $50 application fee",
-      "Move-in: 1st, last & security ($3,150 total)",
-    ],
-  },
-  {
-    id: 11,
-    slug: "811-n-15th-st",
-    title: "811 N 15th St",
-    price: "$3,500/mo",
-    address: "811 N 15th St, Philadelphia, PA 19130",
-    beds: 0,
-    baths: 0,
-    meta: "$3,500/mo · Fairmount · Philadelphia 19130",
-    area: "Fairmount",
-    image: n811_15thStGallery[0],
-    gallery: n811_15thStGallery,
-    propertyType: "Residential Lease",
-    status: "Available",
-    brokerage: "Penn Liberty Real Estate",
-    applicationFee: "$50",
-    description:
-      "Rental at 811 N 15th Street in the Fairmount neighborhood — $3,500 per month. Contact Penn Liberty for move-in date, bedroom and bath details, and application information.",
-    highlights: [
-      "$3,500/mo",
-      "Fairmount · Philadelphia 19130",
-      "Contact office for availability and showing times",
-      "$50 application fee",
-    ],
-  },
-];
 
 export const initialSaleListings: SaleListing[] = [
   {
@@ -717,17 +372,24 @@ export const teamPrincipals: readonly TeamPerson[] = [
     role: "Broker / Founder / U.S. Marine",
     bio: "Leads brokerage direction, deal strategy, and the firm's Foundation to the Company and his Clients.",
     taglines: ["License RM421140", "Penn Liberty License RB066799"],
+    phone: "215-669-6166",
+    emails: ["raypennliberty@gmail.com"],
   },
   {
-    name: "Ramon Caceres",
+    name: "Ramón Cáceres",
     role: "Co-Founder",
     bio: "Founding anchor of Penn Liberty, the father side of our family-founded firm, and a steady presence in our office.",
     tagline: "License RS152630A",
+    phone: "215-397-7043",
+    emails: ["ramoncaceres45@gmail.com"],
   },
   {
-    name: "Ramon L. Caceres",
-    role: "Operations & Systems Management",
-    bio: "Property Maintenance, overseeing the portal side of the business dealing with Owners and Vendors.",
+    name: "David Froelich",
+    role: "Head Property Manager / Agent",
+    bio: "Leads resident service and the Company Books while remaining active in brokerage.",
+    tagline: "License RS337196",
+    phone: "267-231-5148",
+    emails: ["Davepennliberty@gmail.com"],
   },
 ] as const;
 
@@ -741,12 +403,10 @@ export const teamStaff: readonly TeamPerson[] = [
     emails: ["Pennlibertyre@gmail.com", "Pennlibertyrentals@gmail.com"],
   },
   {
-    name: "David Froelich",
-    role: "Head Property Manager / Agent",
-    bio: "Leads resident service and the Company Books while remaining active in brokerage.",
-    tagline: "License RS337196",
-    phone: "267-231-5148",
-    emails: ["Davepennliberty@gmail.com"],
+    name: "Ramon L. Caceres",
+    role: "Operations & Systems Management",
+    bio: "Property Maintenance, overseeing the portal side of the business dealing with Owners and Vendors.",
+    emails: ["RaylukePennliberty@gmail.com"],
   },
   {
     name: "Brandon Lohr",
