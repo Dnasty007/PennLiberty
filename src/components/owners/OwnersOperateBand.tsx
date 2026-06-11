@@ -40,7 +40,7 @@ export function OwnersOperateBand({ lightMode, mutedText, subtleText }: OwnersOp
       className="relative scroll-mt-24 md:scroll-mt-[6.75rem]"
       aria-labelledby="owners-operate-heading"
     >
-      <div className={`overflow-hidden rounded-[28px] border p-6 backdrop-blur-lg md:p-8 lg:p-9 ${shell}`}>
+      <div className={`overflow-hidden rounded-[28px] border p-5 backdrop-blur-lg md:p-8 lg:p-9 ${shell}`}>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
           <div className="max-w-xl shrink-0">
             <span className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${eyebrow}`}>
@@ -75,7 +75,7 @@ export function OwnersOperateBand({ lightMode, mutedText, subtleText }: OwnersOp
           </div>
         </div>
 
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+        <ul className="mt-7 grid gap-3 sm:grid-cols-2 sm:gap-4 md:mt-10 xl:grid-cols-4">
           {ownersOperatePillars.map((pillar, i) => {
             const Icon = pillarIcons[i] ?? ShieldCheck;
             return (

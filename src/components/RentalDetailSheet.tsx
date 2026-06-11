@@ -469,8 +469,13 @@ export function RentalDetailSheet({
         </div>
 
         {/* ── Content card ── */}
-        <div className="absolute inset-x-0 bottom-0 flex flex-col" style={{ top: "calc(44% - 12px)" }}>
-          <div className={`relative flex h-full flex-col overflow-hidden rounded-t-[28px] border-l border-r border-t backdrop-blur-[20px] ${cardBg}`}>
+        <div
+          className="absolute inset-x-0 bottom-0 flex min-h-0 flex-col"
+          style={{ top: "calc(44% - 12px)" }}
+        >
+          <div
+            className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-t-[28px] border-l border-r border-t backdrop-blur-[20px] ${cardBg}`}
+          >
 
             {/* Drag handle */}
             <div className="flex shrink-0 justify-center pt-3">
@@ -547,8 +552,11 @@ export function RentalDetailSheet({
               <div className={`mt-5 h-px ${dividerColor}`} />
             </div>
 
-            {/* Scrollable details */}
-            <div className="flex-1 overflow-y-auto px-6 pb-32 pt-5">
+            {/* Scrollable details — min-h-0 required for flex overflow on iOS */}
+            <div
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-32 pt-5"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
               {rental.description && (
                 <div>
                   <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${mutedText} opacity-55`}>

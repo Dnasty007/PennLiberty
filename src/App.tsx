@@ -426,6 +426,18 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPopState);
   }, [applyRoute]);
 
+  /* Start each page at the top — skip first mount so reload keeps browser scroll
+     restoration. Detail-sheet open/close never changes activePage, so listing
+     scroll position is preserved (mobile roadmap decision 8). */
+  const firstPageRenderRef = useRef(true);
+  useEffect(() => {
+    if (firstPageRenderRef.current) {
+      firstPageRenderRef.current = false;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [activePage]);
+
   const pageOrder = useMemo(() => navItems.map((item) => item.key), []);
   const currentPageIndex = pageOrder.indexOf(activePage);
   const swipeTouchStart = useRef<{ x: number; y: number } | null>(null);
@@ -653,7 +665,8 @@ export default function App() {
           }`}
         >
           <div
-            className={`mx-auto min-w-0 max-w-7xl ${
+            key={activePage}
+            className={`pl-page-enter mx-auto min-w-0 max-w-7xl ${
               activePage === "listings" ||
               activePage === "team" ||
               activePage === "contact" ||

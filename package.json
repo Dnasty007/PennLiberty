@@ -17,7 +17,8 @@
     "rentals:push-photos": "node scripts/push-rental-photos.mjs",
     "rentals:stage-photos": "node scripts/stage-rental-photos.mjs",
     "rentals:publish": "node scripts/publish-rental.mjs",
-    "rentals:deploy": "node scripts/rental-cli.mjs validate && node scripts/push-rentals.mjs"
+    "rentals:deploy": "node scripts/rental-cli.mjs validate && node scripts/push-rentals.mjs",
+    "site:deploy": "node scripts/push-site.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

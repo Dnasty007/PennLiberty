@@ -230,14 +230,14 @@ export function TeamSection({
         <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${subtleText}`}>About</div>
 
         <h1
-          className={`mt-3 max-w-[22ch] font-semibold leading-[1.04] tracking-[-1.5px] text-[2.4rem] sm:text-[3rem] md:text-[3.55rem] lg:text-[4.1rem] ${
+          className={`mt-3 max-w-[22ch] font-semibold leading-[1.04] tracking-[-0.8px] text-[2rem] sm:text-[3rem] sm:tracking-[-1.5px] md:text-[3.55rem] lg:text-[4.1rem] ${
             lightMode ? "text-black" : "text-white"
           }`}
         >
           People first. Philadelphia anchored.
         </h1>
 
-        <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.22rem] ${mutedText}`}>
+        <p className={`mt-4 max-w-2xl text-[0.98rem] leading-snug md:mt-5 md:text-[1.22rem] ${mutedText}`}>
           Penn Liberty pairs sales, leasing, and property management inside one disciplined practice, so decisions
           move faster and communication stays humane.
         </p>

@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronRight, ClipboardList, KeyRound, Mail, MapPin, Play } from "lucide-react";
+import { ClipboardList, KeyRound, Mail, MapPin } from "lucide-react";
 import { CardImageCycler } from "@/components/CardImageCycler";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
+import { RentalListingCardMobile } from "@/components/RentalListingCardMobile";
 import {
   RentalsHeroPhysics,
   type RentalsHeroPhysicsHandle,
 } from "@/components/RentalsHeroPhysics";
 import { RentalsHeroInvadersGame } from "@/components/RentalsHeroInvadersGame";
+import { RentalsHeroStripMobile } from "@/components/RentalsHeroStripMobile";
 import { RentalsInvadersLauncher } from "@/components/RentalsInvadersLauncher";
 import { Button } from "@/components/ui/button";
 import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
@@ -398,48 +400,64 @@ export function RentalsSection({
   };
 
   return (
-    <section className="space-y-8 md:space-y-10 lg:space-y-12">
-      <div className="max-w-4xl">
-        <div
-          className={`mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
-            lightMode
-              ? "border-black/10 bg-white/45 text-black/78 backdrop-blur-xl"
-              : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
-          }`}
-        >
-          <KeyRound className="h-4 w-4 shrink-0 text-[#d6b06a]" aria-hidden />
-          <span>Leasing desk · Philadelphia metro</span>
-        </div>
-
-        <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${subtleText}`}>Rentals</div>
-
-        <h1
-          className={`mt-3 font-semibold leading-[0.94] tracking-[-1.2px] text-[2.35rem] sm:text-[3rem] md:text-[3.45rem] lg:text-[4rem] ${lightMode ? "text-black" : "text-white"}`}
-        >
-          Live Inventory, curated for touring.
-        </h1>
-
-        <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.2rem] ${lightMode ? "text-black" : mutedText}`}>
-          Browse available units below. Photos, rent, and neighborhood at a glance. Submit an application
-          directly from any card.
-        </p>
-        <p className={`mt-3 text-sm md:text-[0.9375rem] ${subtleText}`}>
-          Availability turns over fast, call{" "}
-          <a href={`tel:${PENN_PHONE_TEL}`} className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/55 underline-offset-[3px]">
-            215-922-7900
-          </a>{" "}
-          or{" "}
-          <button
-            type="button"
-            onClick={() => goToPage?.("contact")}
-            className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/55 underline-offset-[3px]"
+    <section className="space-y-6 md:space-y-10 lg:space-y-12">
+      {isMobile ? (
+        <div className="max-w-4xl">
+          <h1
+            className={`font-semibold leading-[1.02] tracking-[-0.6px] text-[1.95rem] ${lightMode ? "text-black" : "text-white"}`}
           >
-            email
-          </button>{" "}
-          for today&apos;s applications, pets policy, and showing windows.
-        </p>
-      </div>
+            Live inventory for touring.
+          </h1>
+          <p className={`mt-2.5 text-[0.95rem] leading-snug ${lightMode ? "text-black/80" : mutedText}`}>
+            Philadelphia leases — tap a unit for photos, tour, and apply.
+          </p>
+        </div>
+      ) : (
+        <div className="max-w-4xl">
+          <div
+            className={`mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
+              lightMode
+                ? "border-black/10 bg-white/45 text-black/78 backdrop-blur-xl"
+                : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
+            }`}
+          >
+            <KeyRound className="h-4 w-4 shrink-0 text-[#d6b06a]" aria-hidden />
+            <span>Leasing desk · Philadelphia metro</span>
+          </div>
 
+          <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${subtleText}`}>Rentals</div>
+
+          <h1
+            className={`mt-3 font-semibold leading-[0.94] tracking-[-1.2px] text-[2.35rem] sm:text-[3rem] md:text-[3.45rem] lg:text-[4rem] ${lightMode ? "text-black" : "text-white"}`}
+          >
+            Live Inventory, curated for touring.
+          </h1>
+
+          <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.2rem] ${lightMode ? "text-black" : mutedText}`}>
+            Browse available units below. Photos, rent, and neighborhood at a glance. Submit an application
+            directly from any card.
+          </p>
+          <p className={`mt-3 text-sm md:text-[0.9375rem] ${subtleText}`}>
+            Availability turns over fast, call{" "}
+            <a href={`tel:${PENN_PHONE_TEL}`} className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/55 underline-offset-[3px]">
+              215-922-7900
+            </a>{" "}
+            or{" "}
+            <button
+              type="button"
+              onClick={() => goToPage?.("contact")}
+              className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/55 underline-offset-[3px]"
+            >
+              email
+            </button>{" "}
+            for today&apos;s applications, pets policy, and showing windows.
+          </p>
+        </div>
+      )}
+
+      {isMobile ? (
+        <RentalsHeroStripMobile rentalsHeroSrc={rentalsHeroSrc} count={rentals.length} />
+      ) : (
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
@@ -657,95 +675,38 @@ export function RentalsSection({
         </div>
 
       </GlassCard>
+      )}
 
       {rentalsLoading ? (
         <p className={`py-8 text-center text-sm ${mutedText}`}>Loading listings…</p>
       ) : hasRentals ? (
-        <div>
-          <div className="mb-5 md:mb-6">
-            <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
-            <p className={`mt-4 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>Featured leases</p>
-            <h2 className={`mt-3 text-xl font-semibold tracking-tight md:text-[1.35rem] ${lightMode ? "text-black" : "text-white"}`}>
-              Available now ({rentals.length})
-            </h2>
+        <div id="rentals-list">
+          <div className="mb-4 md:mb-6">
+            {isMobile ? (
+              <h2 className={`text-lg font-semibold tracking-tight ${lightMode ? "text-black" : "text-white"}`}>
+                Available now · {rentals.length}
+              </h2>
+            ) : (
+              <>
+                <div className={`h-px w-12 rounded-full md:w-14 ${lightMode ? "bg-[#d6b06a]/55" : "bg-[#d6b06a]/65"}`} aria-hidden />
+                <p className={`mt-4 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>Featured leases</p>
+                <h2 className={`mt-3 text-xl font-semibold tracking-tight md:text-[1.35rem] ${lightMode ? "text-black" : "text-white"}`}>
+                  Available now ({rentals.length})
+                </h2>
+              </>
+            )}
           </div>
 
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 xl:gap-5">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 xl:gap-5">
             {rentals.map((rental) => (
               <li key={rental.id} className="min-w-0">
                 {isMobile ? (
-                <article
-                  className={`flex flex-col overflow-hidden rounded-[26px] border ${
-                    onOpenRentalDetails ? "cursor-pointer transition-transform active:scale-[0.99]" : ""
-                  } ${
-                    lightMode
-                      ? "border-black/[0.08] bg-gradient-to-br from-white/90 to-white/50 shadow-[0_16px_44px_rgba(12,18,28,0.09)]"
-                      : "border-white/[0.09] bg-gradient-to-b from-white/[0.07] to-white/[0.02] shadow-[0_18px_50px_rgba(0,0,0,0.32)]"
-                  }`}
-                  onClick={() => onOpenRentalDetails?.(rental.id)}
-                >
-                  <div className="relative isolate aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#0f1824]">
-                    <CardImageCycler
-                      images={rental.gallery?.length ? rental.gallery : [rental.image]}
-                      alt={rental.title}
-                      interval={4000}
-                      lightMode={lightMode}
-                    />
-                    {/* Soft top + bottom vignette only — keeps the photo clean */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050a11]/55 via-transparent to-[#050a11]/30" />
-
-                    {/* Neighborhood — top-left */}
-                    <div className="absolute left-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-1.5 rounded-full border border-white/18 bg-black/45 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md">
-                      <MapPin className="h-3 w-3 shrink-0 text-[#d6b06a]" aria-hidden />
-                      <span className="truncate">{rental.area}</span>
-                    </div>
-
-                    {/* Video tour indicator — bottom-left, only when a video exists */}
-                    {rental.videoUrl && (
-                      <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-[#d6b06a]/45 bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-[#f4dfb4] backdrop-blur-md">
-                        <Play className="h-3 w-3 shrink-0 fill-[#d6b06a] text-[#d6b06a]" aria-hidden />
-                        15s tour
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col px-5 pb-5 pt-4">
-                    {/* Price — prominent, gold, matches the detail sheet */}
-                    <div className="text-[1.55rem] font-semibold leading-none tabular-nums tracking-tight text-[#d6b06a]">
-                      {rental.price}
-                    </div>
-                    <h3 className={`mt-2.5 text-[1.05rem] font-semibold leading-snug tracking-tight ${lightMode ? "text-black/92" : "text-white"}`}>
-                      {rental.title}
-                    </h3>
-
-                    {/* Calm spec pills */}
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
-                        lightMode
-                          ? "border-black/[0.09] bg-black/[0.04] text-black/68"
-                          : "border-white/[0.10] bg-white/[0.05] text-white/68"
-                      }`}>
-                        {rental.beds} Bed · {rental.baths} Bath
-                      </span>
-                      {rental.status && (
-                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
-                          lightMode
-                            ? "border-black/[0.09] bg-black/[0.04] text-black/70"
-                            : "border-white/[0.10] bg-white/[0.05] text-white/72"
-                        }`}>
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#d6b06a]" aria-hidden />
-                          {rental.status}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Tap affordance */}
-                    <div className={`mt-4 flex items-center justify-between border-t pt-3.5 ${lightMode ? "border-black/[0.07]" : "border-white/[0.07]"}`}>
-                      <span className={`text-sm font-medium ${mutedText}`}>View details</span>
-                      <ChevronRight className="h-4 w-4 text-[#d6b06a]" aria-hidden />
-                    </div>
-                  </div>
-                </article>
+                  <RentalListingCardMobile
+                    rental={rental}
+                    lightMode={lightMode}
+                    mutedText={mutedText}
+                    onOpen={() => onOpenRentalDetails?.(rental.id)}
+                  />
                 ) : (
                 <article
                   className={`group flex h-full flex-col overflow-hidden rounded-[22px] border transition-colors duration-300 md:rounded-[24px] ${

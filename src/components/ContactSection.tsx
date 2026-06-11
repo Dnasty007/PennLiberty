@@ -3,6 +3,7 @@ import emailjs from "@emailjs/browser";
 import { Clock, Mail, MapPinned, MessageSquare, Phone, Send } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
+import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
 import type { PageKey } from "@/lib/data";
 
 const EMAILJS_SERVICE_ID  = "Owner_Email_Website";
@@ -77,6 +78,7 @@ export function ContactSection({
 }: ContactSectionProps) {
   const [noteDraft, setNoteDraft] = useState("");
   const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const { isMobile } = useRentalsHeroPhysicsMode();
 
   const sendMessage = async () => {
     if (!noteDraft.trim()) return;
@@ -146,7 +148,49 @@ export function ContactSection({
       : "rounded-[22px] border border-white/16 bg-white/[0.06] px-4 py-3.5 text-[15px] text-white placeholder:text-white/40 shadow-inner transition outline-none focus:border-[#d6b06a]/45 focus-visible:ring-2 focus-visible:ring-[#d6b06a]/25";
 
   return (
-    <section className="space-y-10 md:space-y-14">
+    <section className="space-y-6 md:space-y-14">
+      {isMobile ? (
+        <div>
+          <h1 className={`font-semibold leading-[1.04] tracking-[-0.6px] text-[1.95rem] ${lightMode ? "text-black" : "text-white"}`}>
+            Reach the desk.
+          </h1>
+          <p className={`mt-2 text-[0.95rem] leading-snug ${mutedText}`}>
+            Listings, leasing, and property management — we&apos;ll steer you right.
+          </p>
+
+          {/* Instant actions — same row treatment as the rental contact sheet */}
+          <div className="mt-5 space-y-3">
+            <a
+              href={`tel:${PENN_PHONE_TEL}`}
+              className="flex w-full items-center gap-3.5 rounded-[18px] border border-[#d6b06a]/30 bg-[#d6b06a]/10 px-4 py-3.5 transition active:bg-[#d6b06a]/20"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#d6b06a]/20">
+                <Phone className="h-4 w-4 text-[#d6b06a]" />
+              </span>
+              <span>
+                <span className={`block text-sm font-semibold ${lightMode ? "text-black/90" : "text-white"}`}>Call Penn Liberty</span>
+                <span className="block text-xs text-[#d6b06a]">{PENN_PHONE_DISPLAY}</span>
+              </span>
+            </a>
+            <a
+              href={mailtoHrefQuick}
+              className={`flex w-full items-center gap-3.5 rounded-[18px] border px-4 py-3.5 transition ${
+                lightMode
+                  ? "border-black/[0.08] bg-black/[0.03] active:bg-black/[0.06]"
+                  : "border-white/[0.09] bg-white/[0.04] active:bg-white/[0.08]"
+              }`}
+            >
+              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${lightMode ? "bg-black/[0.06]" : "bg-white/[0.07]"}`}>
+                <Mail className={`h-4 w-4 ${lightMode ? "text-black/55" : "text-white/55"}`} />
+              </span>
+              <span>
+                <span className={`block text-sm font-semibold ${lightMode ? "text-black/90" : "text-white"}`}>Email the desk</span>
+                <span className={`block text-xs ${lightMode ? "text-black/55" : "text-white/50"}`}>Opens a prefilled draft</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      ) : (
       <div className="max-w-4xl">
         <div
           className={`mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
@@ -172,6 +216,7 @@ export function ContactSection({
           listings, leasing, and property management in Philadelphia. We&apos;ll steer you right.
         </p>
       </div>
+      )}
 
       <div className="grid gap-5 lg:gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <GlassCard
@@ -229,7 +274,7 @@ export function ContactSection({
                   >
                     Use Gmail in the browser instead (opens compose in a new tab)
                   </a>
-                  <p className={`text-[12px] leading-relaxed ${mutedText}`}>
+                  <p className={`hidden text-[12px] leading-relaxed md:block ${mutedText}`}>
                     Bare mailto links can land on Gmail’s inbox depending on Chrome settings. We pass subject and a
                     starter message so handlers open a draft when they can.
                   </p>

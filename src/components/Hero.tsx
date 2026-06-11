@@ -1,5 +1,7 @@
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/GlassCard";
+import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
 import { platforms, serviceCards, type PageKey } from "@/lib/data";
 import type { ThemeMeta, WeatherState } from "@/lib/theme";
 import { use3DTilt } from "@/lib/use3DTilt";
@@ -56,7 +58,179 @@ type HeroProps = {
   weather: WeatherState;
 };
 
-export function Hero({
+/** Mobile-native homepage (<md): compact hero, contained stat band, tappable
+ *  service rows, horizontal platform strip, condensed about. Desktop unchanged. */
+function HeroMobile({
+  goToPage,
+  lightMode,
+  mutedText,
+  subtleText,
+  theme,
+  weather,
+}: HeroProps) {
+  const statChip = lightMode
+    ? "border-black/[0.09] bg-black/[0.04] text-black/72"
+    : "border-white/[0.10] bg-white/[0.05] text-white/75";
+  const rowStyle = lightMode
+    ? "border-black/[0.08] bg-black/[0.03] active:bg-black/[0.07]"
+    : "border-white/[0.09] bg-white/[0.04] active:bg-white/[0.09]";
+
+  return (
+    <>
+      {/* ── Hero ── */}
+      <section className="min-w-0">
+        <div
+          className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[13px] backdrop-blur-xl ${
+            lightMode
+              ? "border-black/10 bg-white/45 text-black/75"
+              : "border-white/15 bg-white/[0.012] text-white/80"
+          }`}
+        >
+          {theme.icon}
+          <span>
+            Philadelphia
+            {weather.temperature !== null ? ` - ${Math.round(weather.temperature)}°` : ""}
+          </span>
+        </div>
+
+        <h1 className="break-words text-[2.15rem] font-semibold leading-[1.04] tracking-[-0.8px]">
+          Professional Property Management in Philadelphia.
+        </h1>
+
+        <p className={`mt-3 text-[1rem] leading-snug ${mutedText}`}>
+          Reliable management, tenant placement, and maximized returns — local and hands-on.
+        </p>
+
+        <div className="mt-6 flex flex-col gap-3">
+          <Button
+            className="w-full rounded-full bg-[#d6b06a] py-6 text-base font-semibold text-[#08111f] shadow-[0_14px_34px_rgba(214,176,106,0.3)] transition-transform hover:bg-[#e4be78] active:scale-[0.985]"
+            onClick={() => goToPage("rentals")}
+          >
+            Browse Rentals
+          </Button>
+          <Button
+            variant="outline"
+            className={`w-full rounded-full py-6 text-base font-medium transition-transform active:scale-[0.985] ${
+              lightMode
+                ? "border-black/15 bg-white/40 text-black/80"
+                : "border-white/20 bg-white/[0.03] text-white/85"
+            }`}
+            onClick={() => goToPage("property-management")}
+          >
+            For Property Owners
+          </Button>
+        </div>
+      </section>
+
+      {/* ── Stat band ── */}
+      <GlassCard
+        variant={lightMode ? "frost" : "chrome"}
+        lightMode={lightMode}
+        className="p-4"
+      >
+        <div className="grid grid-cols-3 gap-2 text-center">
+          {[
+            ["100+", "Units"],
+            ["98%", "Occupancy"],
+            ["8+", "Platforms"],
+          ].map(([value, label]) => (
+            <div key={label} className={`rounded-2xl border px-2 py-3 ${statChip}`}>
+              <div className="text-xl font-semibold tracking-tight text-[#d6b06a]">{value}</div>
+              <div className={`mt-0.5 text-[11px] font-medium ${mutedText}`}>{label}</div>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* ── Services — tappable rows ── */}
+      <GlassCard variant={lightMode ? "frost" : "chrome"} lightMode={lightMode} className="p-4">
+        <p className={`px-1 pb-3 pt-1 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>
+          What we do
+        </p>
+        <div className="space-y-2.5">
+          {serviceCards.map((service) => (
+            <button
+              key={service.title}
+              type="button"
+              onClick={() => goToPage(service.page)}
+              className={`flex w-full items-center gap-3.5 rounded-[18px] border px-4 py-3.5 text-left transition ${rowStyle}`}
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#d6b06a]/12">
+                <service.icon className="h-5 w-5 text-[#d6b06a]" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className={`block text-[15px] font-semibold leading-snug ${lightMode ? "text-black/90" : "text-white"}`}>
+                  {service.title}
+                </span>
+                <span className={`mt-0.5 block truncate text-[12.5px] ${mutedText}`}>{service.desc}</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-[#d6b06a]" aria-hidden />
+            </button>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* ── Platforms — horizontal strip ── */}
+      <div>
+        <p className={`mb-2.5 px-1 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>
+          Listed on 8+ platforms
+        </p>
+        <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" data-pl-horizontal-scroll>
+          <div className="flex gap-2.5" style={{ width: "max-content" }}>
+            {platforms.map((platform) => (
+              <div
+                key={platform.name}
+                className={`inline-flex items-center gap-2.5 rounded-full border px-4 py-2.5 text-sm font-medium ${
+                  lightMode
+                    ? "border-black/[0.09] bg-white/55 text-black/75"
+                    : "border-white/[0.10] bg-white/[0.045] text-white/80"
+                }`}
+              >
+                <span className={`text-[13px] font-semibold ${platform.color}`}>{platform.mark}</span>
+                {platform.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── About — condensed ── */}
+      <GlassCard variant={lightMode ? "frost" : "chrome"} lightMode={lightMode} className="p-5">
+        <div className={`text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>About Us</div>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight">Penn Liberty Real Estate</h2>
+        <p className={`mt-3 text-[0.92rem] leading-relaxed ${mutedText}`}>
+          Founded in 2009 by a father and son — local market experts providing knowledgeable
+          representation across Philadelphia and surrounding counties.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-2.5">
+          {[
+            "2009 Founded",
+            "100+ Units",
+            "8+ Platforms",
+            "25+ Years Exp.",
+          ].map((value) => (
+            <div
+              key={value}
+              className={`rounded-2xl border px-3 py-3 text-[13px] font-semibold ${
+                lightMode ? "border-black/10 bg-black/5" : "border-white/10 bg-black/5 text-white"
+              }`}
+            >
+              {value}
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+    </>
+  );
+}
+
+export function Hero(props: HeroProps) {
+  const { isMobile } = useRentalsHeroPhysicsMode();
+  if (isMobile) return <HeroMobile {...props} />;
+  return <HeroDesktop {...props} />;
+}
+
+function HeroDesktop({
   goToPage,
   lightMode,
   mutedText,

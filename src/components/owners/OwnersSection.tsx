@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { ClipboardCheck, Mail, Phone } from "lucide-react";
 import { OwnersHero } from "@/components/owners/OwnersHero";
 import { OwnersWhyManagement } from "@/components/owners/OwnersWhyManagement";
 import { OwnersPaths } from "@/components/owners/OwnersPaths";
@@ -14,6 +15,57 @@ type OwnersSectionProps = {
   mutedText: string;
   subtleText: string;
 };
+
+const OWNERS_PHONE_TEL = "+12159227900";
+const OWNERS_PHONE_DISPLAY = "215-922-7900";
+const OWNERS_MAILTO =
+  "mailto:info@pennlibertyre.com?subject=" +
+  encodeURIComponent("Property owner inquiry") +
+  "&body=" +
+  encodeURIComponent("Hi Penn Liberty,\n\nI own a property in Philadelphia and would like to talk.\n\nAddress:\nQuestions:\n");
+
+/** Low-friction conversion actions surfaced right under the hero on phones —
+ *  the full review form (section 03) is several screens down on mobile. */
+function OwnersQuickActionsMobile({ lightMode }: { lightMode: boolean }) {
+  const glassRow = lightMode
+    ? "border-black/[0.10] bg-white/[0.55] text-black/85 active:bg-white/[0.75]"
+    : "border-white/[0.12] bg-white/[0.05] text-white/90 active:bg-white/[0.10]";
+
+  const scrollToReview = () => {
+    document
+      .getElementById("owners-property-review")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <div className="mt-7 space-y-3 md:hidden">
+      <button
+        type="button"
+        onClick={scrollToReview}
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-[#d6b06a] py-4 text-[15px] font-semibold text-[#08111f] shadow-[0_14px_32px_rgba(214,176,106,0.3)] transition active:brightness-95"
+      >
+        <ClipboardCheck className="h-4 w-4" aria-hidden />
+        Get a free property review
+      </button>
+      <div className="grid grid-cols-2 gap-3">
+        <a
+          href={`tel:${OWNERS_PHONE_TEL}`}
+          className={`flex items-center justify-center gap-2 rounded-full border py-3.5 text-sm font-semibold backdrop-blur-md transition ${glassRow}`}
+        >
+          <Phone className="h-4 w-4 text-[#d6b06a]" aria-hidden />
+          {OWNERS_PHONE_DISPLAY}
+        </a>
+        <a
+          href={OWNERS_MAILTO}
+          className={`flex items-center justify-center gap-2 rounded-full border py-3.5 text-sm font-semibold backdrop-blur-md transition ${glassRow}`}
+        >
+          <Mail className="h-4 w-4 text-[#d6b06a]" aria-hidden />
+          Email us
+        </a>
+      </div>
+    </div>
+  );
+}
 
 export function OwnersSection({
   backdropSrc,
@@ -71,12 +123,13 @@ export function OwnersSection({
         className="pointer-events-none absolute inset-x-10 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#d6b06a]/42 to-transparent sm:inset-x-14"
       />
 
-      <div className="relative z-[2] px-5 pb-14 pt-12 sm:px-8 md:px-10 md:pb-16 md:pt-14">
+      <div className="relative z-[2] px-5 pb-9 pt-9 sm:px-8 md:px-10 md:pb-16 md:pt-14">
         <OwnersHero lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+        <OwnersQuickActionsMobile lightMode={lightMode} />
       </div>
 
       <div className={`relative z-[2] border-t ${bodyTrayRule} ${bodyTrayBg} backdrop-blur-md`}>
-        <div className="mx-auto max-w-5xl space-y-20 px-5 py-16 sm:px-8 md:space-y-28 md:px-11 md:py-22 lg:py-24">
+        <div className="mx-auto max-w-5xl space-y-12 px-5 py-10 sm:px-8 md:space-y-28 md:px-11 md:py-22 lg:py-24">
           <OwnersOperateBand lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersWhyManagement lightMode={lightMode} mutedText={mutedText} />
           <OwnersPaths

@@ -266,54 +266,5 @@
       "$1,150 security deposit · $50 application fee",
       "Same building as our Unit 3 listing — contact office to tour"
     ]
-  },
-  {
-    "id": 11,
-    "slug": "811-n-15th-st",
-    "title": "811 N 15th St",
-    "price": "$3,500/mo",
-    "address": "811 N 15th St, Philadelphia, PA 19130",
-    "beds": 0,
-    "baths": 0,
-    "meta": "$3,500/mo · Fairmount · Philadelphia 19130",
-    "area": "Fairmount",
-    "image": "/Rentals/811-n-15th-st/IMG_0062.JPEG",
-    "gallery": [
-      "/Rentals/811-n-15th-st/IMG_0062.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0063.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0064.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0065.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0067.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0069.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0070.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0071.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0072.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0073.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0074.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0075.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0076.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0077.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0078.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0079.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0080.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0083.JPEG",
-      "/Rentals/811-n-15th-st/IMG_0084.JPEG",
-      "/Rentals/811-n-15th-st/IMG_9605.jpg",
-      "/Rentals/811-n-15th-st/IMG_9612.JPEG",
-      "/Rentals/811-n-15th-st/IMG_9613.JPEG",
-      "/Rentals/811-n-15th-st/IMG_9614.JPEG",
-      "/Rentals/811-n-15th-st/IMG_9615.JPEG"
-    ],
-    "propertyType": "Residential Lease",
-    "status": "Available",
-    "brokerage": "Penn Liberty Real Estate",
-    "applicationFee": "$50",
-    "description": "Rental at 811 N 15th Street in the Fairmount neighborhood — $3,500 per month. Contact Penn Liberty for move-in date, bedroom and bath details, and application information.",
-    "highlights": [
-      "$3,500/mo",
-      "Fairmount · Philadelphia 19130",
-      "Contact office for availability and showing times",
-      "$50 application fee"
-    ]
   }
 ]

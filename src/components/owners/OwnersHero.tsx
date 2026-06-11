@@ -56,14 +56,15 @@ export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: Owner
         </header>
 
         <aside className="lg:sticky lg:top-[6.75rem] lg:self-start">
-          <div className={`rounded-[22px] border p-6 backdrop-blur-xl ${asideShell}`}>
+          <div className={`rounded-[22px] border p-4 backdrop-blur-xl md:p-6 ${asideShell}`}>
             <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${glance}`}>At a glance</p>
-            <dl className="mt-6 space-y-6">
+            {/* Mobile: one compact 3-up row; md+: full stacked entries with notes */}
+            <dl className="mt-4 grid grid-cols-3 gap-2.5 md:mt-6 md:grid-cols-1 md:gap-6">
               {ownerProofPoints.map((row) => (
-                <div key={row.detail} className="border-l-2 border-[#d6b06a]/45 pl-4">
-                  <dt className={`text-[11px] font-medium uppercase tracking-[0.14em] ${dlTerm}`}>{row.term}</dt>
-                  <dd className={`mt-1 text-lg font-semibold tracking-tight ${dlVal}`}>{row.detail}</dd>
-                  <p className={`mt-2 text-[13px] leading-snug ${dlNote}`}>{row.note}</p>
+                <div key={row.detail} className="border-l-2 border-[#d6b06a]/45 pl-2.5 md:pl-4">
+                  <dt className={`text-[9px] font-medium uppercase tracking-[0.14em] md:text-[11px] ${dlTerm}`}>{row.term}</dt>
+                  <dd className={`mt-0.5 text-sm font-semibold tracking-tight md:mt-1 md:text-lg ${dlVal}`}>{row.detail}</dd>
+                  <p className={`mt-2 hidden text-[13px] leading-snug md:block ${dlNote}`}>{row.note}</p>
                 </div>
               ))}
             </dl>

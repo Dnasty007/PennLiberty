@@ -31,11 +31,11 @@ function PathCard({
   const tilt = use3DTilt({ maxRotateDeg: 7, trackLightSpot: true });
 
   const featuredBg = lightMode
-    ? "min-h-[260px] border-[#c49a42]/55 bg-[linear-gradient(150deg,rgba(214,176,106,0.28),rgba(255,255,255,0.55))] shadow-[0_22px_56px_-16px_rgba(12,18,28,0.16)]"
-    : "min-h-[260px] border-[#d6b06a]/45 bg-[linear-gradient(150deg,rgba(214,176,106,0.16),rgba(255,255,255,0.03))] shadow-[0_26px_64px_-18px_rgba(0,0,0,0.45)]";
+    ? "md:min-h-[260px] border-[#c49a42]/55 bg-[linear-gradient(150deg,rgba(214,176,106,0.28),rgba(255,255,255,0.55))] shadow-[0_22px_56px_-16px_rgba(12,18,28,0.16)]"
+    : "md:min-h-[260px] border-[#d6b06a]/45 bg-[linear-gradient(150deg,rgba(214,176,106,0.16),rgba(255,255,255,0.03))] shadow-[0_26px_64px_-18px_rgba(0,0,0,0.45)]";
   const defaultBg = lightMode
-    ? "min-h-[200px] border-black/[0.09] bg-white/[0.38] xl:min-h-[240px]"
-    : "min-h-[200px] border-white/[0.09] bg-[rgba(255,255,255,0.02)] xl:min-h-[240px]";
+    ? "md:min-h-[200px] border-black/[0.09] bg-white/[0.38] xl:min-h-[240px]"
+    : "md:min-h-[200px] border-white/[0.09] bg-[rgba(255,255,255,0.02)] xl:min-h-[240px]";
 
   const ringOffset = lightMode ? "focus-visible:ring-offset-[rgba(246,243,239,1)]" : "focus-visible:ring-offset-[rgba(10,21,39,1)]";
   const eyebrowDefault = lightMode ? "text-black/64" : "text-white/48";
@@ -129,7 +129,7 @@ export function OwnersPaths({
   return (
     <section>
       <SectionDivider lightMode={lightMode} label="However we can help" number="02" />
-      <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-6 grid gap-4 md:mt-10 md:grid-cols-2 md:gap-5 xl:grid-cols-3">
         {sorted.map((path) => (
           <PathCard
             key={path.key}
