@@ -96,6 +96,27 @@ export function ListingDetailsOverlay({
     return () => window.removeEventListener("keydown", onKey);
   }, [lightboxOpen, onNextImage, onPrevImage]);
 
+  /* Lock background scroll while the overlay is open — kills the "page scrolls
+     behind the modal" jank, especially on mobile. */
+  useEffect(() => {
+    if (!listing) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [listing]);
+
+  /* Escape closes the overlay (when the lightbox isn't the active layer). */
+  useEffect(() => {
+    if (!listing || lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [listing, lightboxOpen, onClose]);
+
   if (!listing) {
     return null;
   }
@@ -133,7 +154,7 @@ export function ListingDetailsOverlay({
     <>
     <div
       data-pl-no-page-swipe
-      className={`fixed inset-0 z-50 flex items-center justify-center p-0 backdrop-blur-xl md:p-8 ${
+      className={`pl-overlay-enter fixed inset-0 z-50 flex items-center justify-center p-3 backdrop-blur-xl sm:p-4 md:p-8 ${
         lightMode ? "bg-[rgba(9,16,26,0.18)]" : "bg-[rgba(4,10,16,0.72)]"
       }`}
     >
@@ -142,11 +163,11 @@ export function ListingDetailsOverlay({
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        className={`relative z-10 w-full max-w-[1320px] overflow-hidden max-md:h-full max-md:rounded-none md:max-h-[92vh] ${shellText} ${
+        className={`pl-sheet-enter relative z-10 w-full max-w-[1320px] overflow-hidden rounded-[26px] max-h-[94vh] md:max-h-[92vh] md:rounded-[30px] ${shellText} ${
           lightMode ? lightShellClasses : ""
         }`}
       >
-        <div className={`flex items-center justify-between border-b px-5 py-4 md:px-7 ${shellBorder}`}>
+        <div className={`flex shrink-0 items-center justify-between border-b px-5 py-3.5 md:px-7 md:py-4 ${shellBorder}`}>
           <div className="flex flex-wrap items-center gap-2">
             {listing.mlsNumber && (
               <div className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.18em] ${quietPill}`}>
@@ -169,9 +190,9 @@ export function ListingDetailsOverlay({
           </button>
         </div>
 
-        <div className="grid max-h-[calc(92vh-73px)] overflow-y-auto xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid max-h-[calc(94vh-58px)] overflow-y-auto overscroll-contain md:max-h-[calc(92vh-66px)] xl:grid-cols-[1.15fr_0.85fr]">
           <div className={`border-b xl:border-b-0 xl:border-r ${shellBorder}`}>
-            <div className="relative h-[420px] md:h-[520px] xl:h-[760px]">
+            <div className="relative aspect-[4/3] w-full md:aspect-auto md:h-[520px] xl:h-[760px]">
               <button
                 type="button"
                 className="group absolute inset-0 w-full cursor-zoom-in"
@@ -210,14 +231,17 @@ export function ListingDetailsOverlay({
             </div>
 
             {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-3 p-4 md:grid-cols-5 md:p-5">
+              <div
+                className="flex gap-2.5 overflow-x-auto p-4 [scrollbar-width:none] md:grid md:grid-cols-5 md:gap-3 md:overflow-visible md:p-5 [&::-webkit-scrollbar]:hidden"
+                data-pl-horizontal-scroll
+              >
                 {images.map((image, index) => {
                   const isActive = index === currentImageIndex;
                   return (
                     <button
                       key={`${listing.title}-thumb-${index}`}
                       onClick={() => onImageChange(index)}
-                      className={`overflow-hidden rounded-[18px] border transition ${
+                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-[14px] border transition md:h-auto md:w-auto md:rounded-[18px] ${
                         isActive
                           ? "border-[#d6b06a] shadow-[0_10px_24px_rgba(214,176,106,0.22)]"
                           : lightMode
@@ -228,7 +252,7 @@ export function ListingDetailsOverlay({
                       <img
                         src={image}
                         alt={`${listing.title} image ${index + 1}`}
-                        className="h-20 w-full object-cover md:h-24"
+                        className="h-full w-full object-cover md:h-24"
                       />
                     </button>
                   );
@@ -240,10 +264,10 @@ export function ListingDetailsOverlay({
           <div className="p-5 md:p-7">
             <div className="space-y-6">
               <div>
-                <div className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
+                <div className={`text-[2rem] font-semibold tracking-tight md:text-5xl ${lightMode ? "text-black" : "text-white"}`}>
                   {listing.price}
                 </div>
-                <h2 className="mt-2 text-2xl font-semibold text-white md:text-3xl">{listing.title}</h2>
+                <h2 className={`mt-2 text-xl font-semibold md:text-3xl ${lightMode ? "text-black" : "text-white"}`}>{listing.title}</h2>
                 <div className={`mt-3 text-base leading-relaxed ${detailMutedText}`}>{listing.address}</div>
                 {listing.brokerage && (
                   <div className="mt-3 text-sm uppercase tracking-[0.18em] text-[#d6b06a]">

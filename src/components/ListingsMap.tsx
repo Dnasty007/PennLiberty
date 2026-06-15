@@ -125,7 +125,7 @@ export function ListingsMap({
       {/* Editorial band — typography on global ambience (matches Home headline column). */}
       <div className="max-w-4xl">
         <div
-          className={`mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
+          className={`mb-4 hidden items-center gap-2 rounded-full border px-4 py-2 text-sm sm:inline-flex ${
             lightMode
               ? "border-black/10 bg-white/45 text-black/78 backdrop-blur-xl"
               : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
@@ -138,19 +138,19 @@ export function ListingsMap({
         <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${subtleText}`}>Listings</div>
 
         <h1
-          className={`mt-3 max-w-4xl font-semibold leading-[0.92] tracking-[-1.5px] text-[2.85rem] sm:text-[3.35rem] md:text-[4.05rem] lg:text-[4.85rem] ${
+          className={`mt-2 max-w-4xl font-semibold leading-[1.0] tracking-[-0.8px] text-[2.05rem] sm:mt-3 sm:text-[3.35rem] sm:leading-[0.92] sm:tracking-[-1.5px] md:text-[4.05rem] lg:text-[4.85rem] ${
             lightMode ? "text-black" : "text-white"
           }`}
         >
           Explore Philadelphia listings.
         </h1>
 
-        <p className={`mt-5 max-w-2xl text-[1.05rem] leading-snug md:text-[1.28rem] ${mutedText}`}>
+        <p className={`mt-3 max-w-2xl text-[0.95rem] leading-snug sm:mt-5 sm:text-[1.05rem] md:text-[1.28rem] ${mutedText}`}>
           Browse active MLS highlights, filter with search, then open the live map when you want
           geographic context. Full photos and tour requests stay one click away.
         </p>
 
-        <div className="mt-8 w-full max-w-xl">
+        <div className="mt-5 w-full max-w-xl sm:mt-8">
           <label className={`sr-only ${lightMode ? "text-black" : "text-white"}`}>Search listings</label>
           <div className="relative">
             <Search
@@ -199,7 +199,7 @@ export function ListingsMap({
           {filteredListings.length === 0 ? (
             <p className={`py-10 text-center text-sm ${mutedText}`}>Nothing matches your search. Try adjusting filters.</p>
           ) : (
-            <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
               {filteredListings.map((listing) => {
                 const isSelected = selectedListing.id === listing.id;
 
@@ -292,10 +292,10 @@ export function ListingsMap({
         <GlassCard
           variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className={`h-fit overflow-visible border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
+          className={`overflow-visible border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
         >
           <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
-            <div className="relative min-h-[400px] overflow-hidden rounded-[28px] border border-[#d6b06a]/20 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] md:min-h-[560px]">
+            <div className="relative min-h-[360px] overflow-hidden rounded-[28px] border border-[#d6b06a]/20 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] max-lg:order-2 md:min-h-[560px]">
               <a
                 href={mapsSearchUrl}
                 target="_blank"
@@ -357,7 +357,7 @@ export function ListingsMap({
                         aria-hidden
                       />
                       <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center px-6 pb-[5.75rem] pt-[4.75rem] sm:px-8 md:pb-24 md:pt-28">
-                        <div className="pointer-events-auto w-full max-w-lg rounded-[22px] border border-white/20 bg-black/88 px-5 py-4 shadow-[0_24px_56px_rgba(0,0,0,0.65)] backdrop-blur-xl md:max-w-xl md:max-h-[min(52vh,380px)] md:overflow-y-auto">
+                        <div className="pointer-events-auto max-h-full w-full max-w-lg overflow-y-auto rounded-[22px] border border-white/20 bg-black/88 px-5 py-4 shadow-[0_24px_56px_rgba(0,0,0,0.65)] backdrop-blur-xl md:max-w-xl">
                           <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#e8cc8b]">
                             Selected listing
                           </div>
@@ -365,7 +365,7 @@ export function ListingsMap({
                             {selectedListing.title}
                           </div>
                           <div className="mt-1 text-xs leading-relaxed text-white/80">{selectedListing.address}</div>
-                          <p className="mt-3 text-[13.5px] leading-relaxed text-white">
+                          <p className="mt-3 line-clamp-4 text-[13.5px] leading-relaxed text-white sm:line-clamp-none">
                             {teaserParagraph}
                           </p>
                         </div>
