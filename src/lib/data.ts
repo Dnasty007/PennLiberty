@@ -446,6 +446,48 @@ export const initialSaleListings: SaleListing[] = [
       "Drive-by showings — contact listing agent",
     ],
   },
+  {
+    id: 7,
+    slug: "2919-w-lehigh-ave",
+    title: "2919 W Lehigh Ave — Vacant Land",
+    propertyType: "Land",
+    price: "$35,000",
+    address: "2919 W Lehigh Ave, Philadelphia, PA 19132",
+    beds: 0,
+    baths: 0,
+    sqft: 1125,
+    lotSqft: 1125,
+    lat: 39.9932,
+    lng: -75.1648,
+    top: "42%",
+    left: "48%",
+    image: "/listings/2919-w-lehigh-ave/cover.jpg",
+    gallery: [
+      "/listings/2919-w-lehigh-ave/cover.jpg",
+      "/listings/2919-w-lehigh-ave/gallery-1.jpg",
+      "/listings/2919-w-lehigh-ave/gallery-2.jpg",
+    ],
+    status: "Active Land",
+    mlsNumber: "PAPH2498106",
+    brokerage: "Penn Liberty Real Estate",
+    listingAgent: {
+      name: "Juanita Sharperson",
+      phone: "215-435-2825",
+      email: "jsharperson68@gmail.com",
+      license: "RS314983",
+    },
+    description:
+      "Vacant residential lot in Strawberry Mansion — 15 × 75 feet (~1,125 sq ft) with RSA-5 zoning and possible residential or apartment use per MLS. Public water and sewer; electric available. Strong development entry point on West Lehigh Avenue near 29th Street with public transit nearby. Immediate possession; cash or conventional financing.",
+    highlights: [
+      "1,125 sq ft lot · 15 × 75 ft dimensions",
+      "RSA-5 zoning · vacant land",
+      "Strawberry Mansion · Philadelphia 19132",
+      "Public water & sewer · electric available",
+      "Near Lehigh Ave & 29th St · transit access",
+      "Immediate possession",
+      "Drive-by showings — contact listing agent",
+    ],
+  },
 ];
 
 export const platforms = [
