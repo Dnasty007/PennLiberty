@@ -1,5 +1,12 @@
 import { Briefcase, Building2, Home, type LucideIcon } from "lucide-react";
 
+export type ListingAgent = {
+  name: string;
+  phone?: string;
+  email?: string;
+  license?: string;
+};
+
 /** Shared fields for sale listings and rental detail overlays. */
 export type PropertyDetail = {
   title: string;
@@ -13,6 +20,8 @@ export type PropertyDetail = {
   status?: string;
   mlsNumber?: string;
   brokerage?: string;
+  listingAgent?: ListingAgent;
+  coListingAgent?: ListingAgent;
   description?: string;
   highlights?: string[];
   sqft?: number;
@@ -336,6 +345,59 @@ export const initialSaleListings: SaleListing[] = [
       "Business use: apartment building",
       "Close to Broad Street subway",
       "Major rehab / redevelopment opportunity"
+    ],
+  },
+  {
+    id: 5,
+    slug: "205-berbro-ave",
+    title: "205 Berbro Ave — Upper Darby Duplex",
+    propertyType: "Multi-Family",
+    units: 2,
+    price: "$395,000",
+    address: "205 Berbro Ave, Upper Darby, PA 19082",
+    beds: 0,
+    baths: 0,
+    sqft: 1590,
+    lat: 39.9628,
+    lng: -75.2705,
+    top: "58%",
+    left: "18%",
+    image: "/listings/205-berbro-ave/cover.jpg",
+    gallery: [
+      "/listings/205-berbro-ave/cover.jpg",
+      "/listings/205-berbro-ave/gallery-1.jpg",
+      "/listings/205-berbro-ave/gallery-2.jpg",
+      "/listings/205-berbro-ave/gallery-3.jpg",
+      "/listings/205-berbro-ave/gallery-4.jpg",
+      "/listings/205-berbro-ave/gallery-5.jpg",
+      "/listings/205-berbro-ave/gallery-6.jpg",
+      "/listings/205-berbro-ave/gallery-7.jpg",
+    ],
+    status: "Active Multi-Family",
+    mlsNumber: "PADE2117528",
+    brokerage: "Penn Liberty Real Estate",
+    listingAgent: {
+      name: "David Froelich",
+      phone: "215-922-7900",
+      email: "davepennliberty@gmail.com",
+      license: "RS337196",
+    },
+    coListingAgent: {
+      name: "Danilo Burgos",
+      phone: "267-628-8748",
+      email: "danilo@burg-properties.com",
+      license: "RS370004",
+    },
+    description:
+      "Twin/semi-detached duplex in Upper Darby's Beverly Hills neighborhood — two separately leased 2-bedroom, 1-bath units (~795 sq ft each) with projected rents of $675 and $750 per month. Stone and stucco construction (1927) with a full unfinished basement, wall-unit cooling, and baseboard hot-water heat fueled by natural gas. Driveway and on-street parking. Fee-simple ownership in Delaware County with convenient access to West Chester Pike and SEPTA.",
+    highlights: [
+      "2-unit duplex · 1,590 sq ft total",
+      "Each unit: 2 bed · 1 bath · ~795 sq ft",
+      "Twin/semi-detached · built 1927",
+      "Projected rents: $675 / $750 per month",
+      "Full unfinished basement · natural gas heat",
+      "Upper Darby · Beverly Hills · near West Chester Pike",
+      "Possession: 61–90 days from contract",
     ],
   },
 ];

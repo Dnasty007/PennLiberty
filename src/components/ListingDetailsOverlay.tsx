@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, Mail, Phone, X } from "lucide-react";
+import type { ListingAgent } from "@/lib/data";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import type { PropertyDetail } from "@/lib/data";
@@ -18,6 +19,56 @@ type ListingDetailsOverlayProps = {
   primaryActionLabel?: string;
   backLabel?: string;
 };
+
+function AgentContactRow({
+  label,
+  agent,
+  lightMode,
+  detailMutedText,
+  shellBorder,
+  shellText,
+}: {
+  label: string;
+  agent: ListingAgent;
+  lightMode: boolean;
+  detailMutedText: string;
+  shellBorder: string;
+  shellText: string;
+}) {
+  const rowBg = lightMode
+    ? "border-black/10 bg-white/40"
+    : "border-white/10 bg-white/[0.05]";
+
+  return (
+    <div className={`rounded-[20px] border p-4 ${rowBg} ${shellBorder}`}>
+      <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>{label}</div>
+      <div className={`mt-2 text-lg font-semibold ${shellText}`}>{agent.name}</div>
+      {agent.license && (
+        <div className={`mt-1 text-sm ${detailMutedText}`}>License {agent.license}</div>
+      )}
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        {agent.phone && (
+          <a
+            href={`tel:${agent.phone.replace(/\D/g, "")}`}
+            className="inline-flex items-center gap-2 rounded-full border border-[#d6b06a]/35 bg-[#d6b06a]/10 px-4 py-2.5 text-sm font-medium text-[#d6b06a] transition hover:bg-[#d6b06a]/20"
+          >
+            <Phone className="h-4 w-4" />
+            {agent.phone}
+          </a>
+        )}
+        {agent.email && (
+          <a
+            href={`mailto:${agent.email}`}
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-white/90 transition hover:bg-white/[0.1]"
+          >
+            <Mail className="h-4 w-4" />
+            Email
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function ListingDetailsOverlay({
   currentImageIndex,
@@ -82,7 +133,7 @@ export function ListingDetailsOverlay({
     <>
     <div
       data-pl-no-page-swipe
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl md:p-8 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-0 backdrop-blur-xl md:p-8 ${
         lightMode ? "bg-[rgba(9,16,26,0.18)]" : "bg-[rgba(4,10,16,0.72)]"
       }`}
     >
@@ -91,7 +142,7 @@ export function ListingDetailsOverlay({
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
-        className={`relative z-10 max-h-[92vh] w-full max-w-[1320px] overflow-hidden ${shellText} ${
+        className={`relative z-10 w-full max-w-[1320px] overflow-hidden max-md:h-full max-md:rounded-none md:max-h-[92vh] ${shellText} ${
           lightMode ? lightShellClasses : ""
         }`}
       >
@@ -200,6 +251,31 @@ export function ListingDetailsOverlay({
                   </div>
                 )}
               </div>
+
+              {(listing.listingAgent || listing.coListingAgent) && (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {listing.listingAgent && (
+                    <AgentContactRow
+                      label="Listing Agent"
+                      agent={listing.listingAgent}
+                      lightMode={lightMode}
+                      detailMutedText={detailMutedText}
+                      shellBorder={shellBorder}
+                      shellText={shellText}
+                    />
+                  )}
+                  {listing.coListingAgent && (
+                    <AgentContactRow
+                      label="Co-Listing Agent"
+                      agent={listing.coListingAgent}
+                      lightMode={lightMode}
+                      detailMutedText={detailMutedText}
+                      shellBorder={shellBorder}
+                      shellText={shellText}
+                    />
+                  )}
+                </div>
+              )}
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
