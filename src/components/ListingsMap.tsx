@@ -192,7 +192,7 @@ export function ListingsMap({
         <GlassCard
           variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className={`overflow-visible px-5 py-6 md:px-7 md:py-8 ${lightMode ? "ring-1 ring-black/[0.04]" : "ring-1 ring-white/[0.06]"} ${lightMode ? "" : listingsRailChromeClass}`}
+          className={`min-w-0 overflow-hidden px-5 py-6 md:overflow-visible md:px-7 md:py-8 ${lightMode ? "ring-1 ring-black/[0.04]" : "ring-1 ring-white/[0.06]"} ${lightMode ? "" : listingsRailChromeClass}`}
         >
           <div className="mb-6 md:mb-8">
             <div
@@ -219,11 +219,11 @@ export function ListingsMap({
               {filteredListings.map((listing) => {
                 const isSelected = selectedListing.id === listing.id;
                 return (
-                  <li key={listing.id}>
+                  <li key={listing.id} className="min-w-0">
                     <button
                       type="button"
                       onClick={() => handleSelectListing(listing.id)}
-                      className={`flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition ${
+                      className={`flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-2xl border p-2.5 text-left transition ${
                         isSelected
                           ? lightMode
                             ? "border-[#d6b06a]/55 bg-white/75 ring-1 ring-[#d6b06a]/35"
@@ -362,10 +362,10 @@ export function ListingsMap({
           id="listings-selected"
           variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className={`scroll-mt-24 overflow-visible border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
+          className={`min-w-0 scroll-mt-24 overflow-hidden border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit lg:overflow-visible xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
         >
-          <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
-            <div className="relative min-h-[360px] overflow-hidden rounded-[28px] border border-[#d6b06a]/20 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] max-lg:order-2 md:min-h-[560px]">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_300px]">
+            <div className="relative min-w-0 min-h-[360px] overflow-hidden rounded-[28px] border border-[#d6b06a]/20 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] max-lg:order-2 md:min-h-[560px]">
               <a
                 href={mapsSearchUrl}
                 target="_blank"
@@ -468,7 +468,7 @@ export function ListingsMap({
             <GlassCard
               variant={lightMode ? "frost" : "soft"}
               lightMode={lightMode}
-              className={`p-5 ring-2 ring-[#d6b06a]/20 md:p-6 ${
+              className={`min-w-0 p-5 ring-2 ring-[#d6b06a]/20 md:p-6 ${
                 lightMode ? "shadow-[0_26px_60px_rgba(12,18,28,0.1)]" : "shadow-[0_28px_70px_rgba(0,0,0,0.32)]"
               }`}
             >
@@ -493,7 +493,7 @@ export function ListingsMap({
                 {selectedListing.price}
               </div>
               <div className={`mt-1.5 text-lg font-semibold leading-snug ${lightMode ? "text-black/92" : "text-white"}`}>{selectedListing.title}</div>
-              <div className={`mt-2 text-sm leading-relaxed ${mutedText}`}>{selectedListing.address}</div>
+              <div className={`mt-2 break-words text-sm leading-relaxed ${mutedText}`}>{selectedListing.address}</div>
               <div
                 className={`mt-4 rounded-2xl border px-4 py-3 text-sm leading-relaxed ${
                   lightMode ? "border-black/8 bg-black/[0.03]" : "border-white/[0.08] bg-white/[0.035]"
@@ -503,12 +503,12 @@ export function ListingsMap({
               </div>
               <div className="mt-5 flex flex-col gap-3">
                 <Button
-                  className="rounded-full bg-[#d6b06a] py-6 text-[15px] font-semibold text-[#08111f] shadow-[0_14px_32px_rgba(214,176,106,0.35)] hover:bg-[#e4be78]"
+                  className="w-full rounded-full bg-[#d6b06a] py-6 text-[15px] font-semibold text-[#08111f] shadow-[0_14px_32px_rgba(214,176,106,0.35)] hover:bg-[#e4be78]"
                   onClick={onOpenListingDetails}
                 >
                   View full listing
                 </Button>
-                <Button variant="outline" className={outlineButtonClasses} onClick={onOpenScheduleTour}>
+                <Button variant="outline" className={`w-full ${outlineButtonClasses}`} onClick={onOpenScheduleTour}>
                   Schedule a tour
                 </Button>
               </div>
