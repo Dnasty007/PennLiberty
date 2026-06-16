@@ -246,7 +246,7 @@ export function ListingsMap({
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <span className={`truncate text-[14.5px] font-semibold leading-snug ${lightMode ? "text-black/92" : "text-white"}`}>
+                          <span className={`min-w-0 truncate text-[14.5px] font-semibold leading-snug ${lightMode ? "text-black/92" : "text-white"}`}>
                             {listing.title}
                           </span>
                           <span className="shrink-0 text-sm font-semibold tabular-nums text-[#d6b06a]">
@@ -255,7 +255,7 @@ export function ListingsMap({
                         </div>
                         <div className={`mt-1 flex items-center gap-1.5 text-xs ${mutedText}`}>
                           <MapPin className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                          <span className="truncate">{listing.address}</span>
+                          <span className="min-w-0 truncate">{listing.address}</span>
                         </div>
                       </div>
                       <ChevronRight
