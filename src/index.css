@@ -150,6 +150,24 @@ input {
   }
 }
 
+/* Home — mobile platform strip auto-marquee (HeroMobile only) */
+@keyframes pl-platform-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.pl-platform-marquee {
+  animation: pl-platform-marquee 42s linear infinite;
+  will-change: transform;
+}
+.pl-platform-marquee:active {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pl-platform-marquee {
+    animation: none;
+  }
+}
+
 /* Space Invaders launcher — 2-frame pixel-invader bob (desktop only) */
 /* Collage overlay compositing — opacity is on each img (see RentalsSection). */
 .rentals-collage-overlay {

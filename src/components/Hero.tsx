@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/GlassCard";
 import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
@@ -57,6 +58,72 @@ type HeroProps = {
   theme: ThemeMeta;
   weather: WeatherState;
 };
+
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setPrefersReducedMotion(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
+function PlatformPill({
+  platform,
+  lightMode,
+}: {
+  platform: (typeof platforms)[number];
+  lightMode: boolean;
+}) {
+  return (
+    <div
+      className={`inline-flex shrink-0 items-center gap-2.5 rounded-full border px-4 py-2.5 text-sm font-medium ${
+        lightMode
+          ? "border-black/[0.09] bg-white/55 text-black/75"
+          : "border-white/[0.10] bg-white/[0.045] text-white/80"
+      }`}
+    >
+      <span className={`text-[13px] font-semibold ${platform.color}`}>{platform.mark}</span>
+      {platform.name}
+    </div>
+  );
+}
+
+/** Mobile-only: slow auto-marquee so every platform is visible without manual swiping. */
+function PlatformMarqueeMobile({ lightMode }: { lightMode: boolean }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const marqueeItems = [...platforms, ...platforms];
+
+  if (prefersReducedMotion) {
+    return (
+      <div
+        className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        data-pl-horizontal-scroll
+      >
+        <div className="flex w-max gap-2.5">
+          {platforms.map((platform) => (
+            <PlatformPill key={platform.name} platform={platform} lightMode={lightMode} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative -mx-4 overflow-hidden px-4">
+      <div className="pl-platform-marquee flex w-max gap-2.5">
+        {marqueeItems.map((platform, index) => (
+          <PlatformPill key={`${platform.name}-${index}`} platform={platform} lightMode={lightMode} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /** Mobile-native homepage (<md): compact hero, contained stat band, tappable
  *  service rows, horizontal platform strip, condensed about. Desktop unchanged. */
@@ -170,28 +237,12 @@ function HeroMobile({
         </div>
       </GlassCard>
 
-      {/* ── Platforms — horizontal strip ── */}
+      {/* ── Platforms — auto-marquee on mobile ── */}
       <div>
         <p className={`mb-2.5 px-1 text-[10px] font-bold uppercase tracking-[0.28em] ${subtleText}`}>
           Listed on 8+ platforms
         </p>
-        <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" data-pl-horizontal-scroll>
-          <div className="flex gap-2.5" style={{ width: "max-content" }}>
-            {platforms.map((platform) => (
-              <div
-                key={platform.name}
-                className={`inline-flex items-center gap-2.5 rounded-full border px-4 py-2.5 text-sm font-medium ${
-                  lightMode
-                    ? "border-black/[0.09] bg-white/55 text-black/75"
-                    : "border-white/[0.10] bg-white/[0.045] text-white/80"
-                }`}
-              >
-                <span className={`text-[13px] font-semibold ${platform.color}`}>{platform.mark}</span>
-                {platform.name}
-              </div>
-            ))}
-          </div>
-        </div>
+        <PlatformMarqueeMobile lightMode={lightMode} />
       </div>
 
       {/* ── About — condensed ── */}
