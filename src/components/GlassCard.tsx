@@ -10,6 +10,7 @@ export const listingsRailChromeClass =
 type GlassCardProps = {
   children: ReactNode;
   className?: string;
+  id?: string;
   lightMode?: boolean;
   softenChrome?: boolean;
   /** When set, overrides legacy `lightMode` / `softenChrome` resolution. */
@@ -39,6 +40,7 @@ function resolveVariant(
 export function GlassCard({
   children,
   className,
+  id,
   lightMode = false,
   softenChrome = false,
   variant: variantProp,
@@ -48,7 +50,7 @@ export function GlassCard({
     variant === "frost" ? frostClasses : variant === "soft" ? softClasses : chromeClasses;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-[30px] border", baseClasses, className)}>
+    <div id={id} className={cn("relative overflow-hidden rounded-[30px] border", baseClasses, className)}>
       <div className="relative z-10">{children}</div>
     </div>
   );

@@ -1,11 +1,12 @@
 import { Suspense, lazy, useEffect, useState } from "react";
-import { MapPin, MapPinned, Search } from "lucide-react";
+import { ChevronRight, MapPin, MapPinned, Search } from "lucide-react";
 import { CardImageCycler } from "@/components/CardImageCycler";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { ListingDetailsOverlay } from "@/components/ListingDetailsOverlay";
 import { ScheduleTourModal } from "@/components/ScheduleTourModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
 import type { SaleListing } from "@/lib/data";
 import { listingSummary } from "@/lib/theme";
 
@@ -96,7 +97,21 @@ export function ListingsMap({
 }: ListingsMapProps) {
   const selectedPreviewImage = selectedListing.gallery[0] || selectedListing.image;
 
+  const { isMobile } = useRentalsHeroPhysicsMode();
   const reduceMotion = useReducedMotionPreferred();
+
+  /* Mobile: tapping a compact row selects it AND glides to the detail card so the
+     list → detail connection is obvious without a long manual scroll. */
+  const handleSelectListing = (id: number) => {
+    onSelectListing(id);
+    if (isMobile) {
+      requestAnimationFrame(() => {
+        document
+          .getElementById("listings-selected")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
   const fadeMs = reduceMotion ? 120 : 750;
 
   const [leafletMounted, setLeafletMounted] = useState(false);
@@ -198,6 +213,60 @@ export function ListingsMap({
 
           {filteredListings.length === 0 ? (
             <p className={`py-10 text-center text-sm ${mutedText}`}>Nothing matches your search. Try adjusting filters.</p>
+          ) : isMobile ? (
+            /* Mobile: compact, scannable list — all listings at a glance, light scroll. */
+            <ul className="flex flex-col gap-2.5">
+              {filteredListings.map((listing) => {
+                const isSelected = selectedListing.id === listing.id;
+                return (
+                  <li key={listing.id}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectListing(listing.id)}
+                      className={`flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition ${
+                        isSelected
+                          ? lightMode
+                            ? "border-[#d6b06a]/55 bg-white/75 ring-1 ring-[#d6b06a]/35"
+                            : "border-[#d6b06a]/50 bg-white/[0.07] ring-1 ring-[#d6b06a]/35"
+                          : lightMode
+                            ? "border-black/[0.07] bg-white/45 active:bg-white/70"
+                            : "border-white/[0.09] bg-white/[0.03] active:bg-white/[0.07]"
+                      }`}
+                    >
+                      <div className="relative h-[62px] w-[84px] shrink-0 overflow-hidden rounded-xl bg-[#0a121c]">
+                        <img
+                          src={listing.gallery?.length ? listing.gallery[0] : listing.image}
+                          alt=""
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                        {isSelected && (
+                          <span className="absolute inset-0 ring-2 ring-inset ring-[#d6b06a]/70" aria-hidden />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`truncate text-[14.5px] font-semibold leading-snug ${lightMode ? "text-black/92" : "text-white"}`}>
+                            {listing.title}
+                          </span>
+                          <span className="shrink-0 text-sm font-semibold tabular-nums text-[#d6b06a]">
+                            {listing.price}
+                          </span>
+                        </div>
+                        <div className={`mt-1 flex items-center gap-1.5 text-xs ${mutedText}`}>
+                          <MapPin className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
+                          <span className="truncate">{listing.address}</span>
+                        </div>
+                      </div>
+                      <ChevronRight
+                        className={`h-4 w-4 shrink-0 ${isSelected ? "text-[#d6b06a]" : "opacity-40"}`}
+                        aria-hidden
+                      />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
               {filteredListings.map((listing) => {
@@ -290,9 +359,10 @@ export function ListingsMap({
         </GlassCard>
 
         <GlassCard
+          id="listings-selected"
           variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className={`overflow-visible border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
+          className={`scroll-mt-24 overflow-visible border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
         >
           <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
             <div className="relative min-h-[360px] overflow-hidden rounded-[28px] border border-[#d6b06a]/20 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] max-lg:order-2 md:min-h-[560px]">
