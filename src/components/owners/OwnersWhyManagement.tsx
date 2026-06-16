@@ -1,8 +1,9 @@
-import { useSyncExternalStore, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore, useState } from "react";
 import { ownersTabs } from "@/lib/owners";
 import { SectionDivider } from "@/components/owners/SectionDivider";
 
 const FINE_POINTER_MQ = "(hover: hover) and (pointer: fine)";
+const MOBILE_TAB_CYCLE_MS = 6000;
 
 function subscribeFinePointerMedia(onChange: () => void) {
   const mq = window.matchMedia(FINE_POINTER_MQ);
@@ -28,8 +29,62 @@ type OwnersWhyManagementProps = {
 
 export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagementProps) {
   const [active, setActive] = useState(ownersTabs[0].key);
+  const [displayedKey, setDisplayedKey] = useState(ownersTabs[0].key);
+  const [panelVisible, setPanelVisible] = useState(true);
   const hoverSwitchPanels = usePrefersFinePointerHover();
-  const panel = ownersTabs.find((tab) => tab.key === active) ?? ownersTabs[0];
+  const isMobileTabs = !hoverSwitchPanels;
+  const userInteractingRef = useRef(false);
+  const panel = ownersTabs.find((tab) => tab.key === displayedKey) ?? ownersTabs[0];
+
+  useEffect(() => {
+    if (!isMobileTabs || active === displayedKey) return;
+
+    setPanelVisible(false);
+    const swapTimer = window.setTimeout(() => {
+      setDisplayedKey(active);
+      setPanelVisible(true);
+    }, 280);
+
+    return () => window.clearTimeout(swapTimer);
+  }, [active, displayedKey, isMobileTabs]);
+
+  useEffect(() => {
+    if (isMobileTabs) return;
+    setDisplayedKey(active);
+    setPanelVisible(true);
+  }, [active, isMobileTabs]);
+
+  useEffect(() => {
+    if (!isMobileTabs) return;
+
+    const timer = window.setInterval(() => {
+      if (userInteractingRef.current) return;
+      setActive((prev) => {
+        const idx = ownersTabs.findIndex((tab) => tab.key === prev);
+        return ownersTabs[(idx + 1) % ownersTabs.length].key;
+      });
+    }, MOBILE_TAB_CYCLE_MS);
+
+    return () => window.clearInterval(timer);
+  }, [isMobileTabs]);
+
+  useEffect(() => {
+    if (!isMobileTabs) return;
+    const btn = document.getElementById(`owners-why-tab-${active}`);
+    btn?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [active, isMobileTabs]);
+
+  const pauseAutoCycle = () => {
+    userInteractingRef.current = true;
+  };
+
+  const resumeAutoCycle = () => {
+    userInteractingRef.current = false;
+  };
+
+  const selectTab = (key: (typeof ownersTabs)[number]["key"]) => {
+    setActive(key);
+  };
 
   const inactiveTab = lightMode
     ? "border-black/[0.10] bg-black/[0.03] text-black/72 hover:bg-black/[0.06] hover:text-black"
@@ -50,16 +105,22 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
   const bodyInk = mutedText;
 
   return (
-    <section className="relative">
+    <section
+      className="relative"
+      onTouchStart={isMobileTabs ? pauseAutoCycle : undefined}
+      onTouchEnd={isMobileTabs ? resumeAutoCycle : undefined}
+      onTouchCancel={isMobileTabs ? resumeAutoCycle : undefined}
+    >
       <SectionDivider lightMode={lightMode} label="Why good management matters" number="01" />
       <p className="sr-only">
-        Desktop: resting the pointer over a pillar shows its story. Touch devices: tap a pillar.
+        Desktop: resting the pointer over a pillar shows its story. Touch devices: tabs auto-advance; tap or swipe to browse.
       </p>
       <div className="mt-8 grid gap-8 lg:grid-cols-[260px,minmax(0,1fr)] lg:gap-12">
         <nav
           role="tablist"
           aria-label="Why management pillars"
-          className="pl-touch-scroll-x flex flex-row gap-2 overflow-x-auto pb-2 lg:sticky lg:top-[6.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"
+          className="pl-touch-scroll-x flex flex-row gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-[6.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"
+          style={isMobileTabs ? { WebkitOverflowScrolling: "touch" } : undefined}
           data-pl-horizontal-scroll
         >
           {ownersTabs.map((tab) => {
@@ -73,9 +134,9 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
                 aria-selected={isActive}
                 id={`owners-why-tab-${tab.key}`}
                 aria-controls={WHY_DETAIL_PANEL_ID}
-                onClick={() => setActive(tab.key)}
-                onMouseEnter={hoverSwitchPanels ? () => setActive(tab.key) : undefined}
-                onFocus={() => setActive(tab.key)}
+                onClick={() => selectTab(tab.key)}
+                onMouseEnter={hoverSwitchPanels ? () => selectTab(tab.key) : undefined}
+                onFocus={() => selectTab(tab.key)}
                 className={`flex min-w-[9.5rem] shrink-0 items-center gap-3 rounded-2xl border px-3.5 py-3 text-left text-sm transition-all duration-200 lg:min-w-0 lg:px-4 ${
                   isActive ? activeTab : inactiveTab
                 }`}
@@ -97,7 +158,13 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
           role="tabpanel"
           id={WHY_DETAIL_PANEL_ID}
           aria-labelledby={`owners-why-detail-${panel.key}`}
-          className={`min-w-0 rounded-[26px] border px-6 py-7 backdrop-blur-[12px] md:px-8 md:py-9 lg:rounded-[28px] ${panelShell}`}
+          className={`min-w-0 rounded-[26px] border px-6 py-7 backdrop-blur-[12px] transition-[opacity,transform] duration-[280ms] ease-out md:px-8 md:py-9 lg:rounded-[28px] ${
+            isMobileTabs
+              ? panelVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-2 opacity-0"
+              : ""
+          } ${panelShell}`}
         >
           <span className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${eyebrow}`}>
             {panel.label}

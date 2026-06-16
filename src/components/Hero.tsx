@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/GlassCard";
 import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
@@ -59,20 +59,6 @@ type HeroProps = {
   weather: WeatherState;
 };
 
-function usePrefersReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setPrefersReducedMotion(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  return prefersReducedMotion;
-}
-
 function PlatformPill({
   platform,
   lightMode,
@@ -94,29 +80,75 @@ function PlatformPill({
   );
 }
 
-/** Mobile-only: slow auto-marquee so every platform is visible without manual swiping. */
+/** Mobile-only: auto-slides by default; users can still swipe the strip manually. */
 function PlatformMarqueeMobile({ lightMode }: { lightMode: boolean }) {
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const userInteractingRef = useRef(false);
   const marqueeItems = [...platforms, ...platforms];
 
-  if (prefersReducedMotion) {
-    return (
-      <div
-        className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        data-pl-horizontal-scroll
-      >
-        <div className="flex w-max gap-2.5">
-          {platforms.map((platform) => (
-            <PlatformPill key={platform.name} platform={platform} lightMode={lightMode} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    let raf = 0;
+    let last = performance.now();
+    const pxPerSecond = 36;
+
+    const normalizeScroll = () => {
+      const half = scroller.scrollWidth / 2;
+      if (half > 0 && scroller.scrollLeft >= half) {
+        scroller.scrollLeft -= half;
+      }
+    };
+
+    const tick = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      if (!userInteractingRef.current) {
+        const half = scroller.scrollWidth / 2;
+        if (half > 0) {
+          scroller.scrollLeft += pxPerSecond * dt;
+          if (scroller.scrollLeft >= half) {
+            scroller.scrollLeft -= half;
+          }
+        }
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const handleScroll = () => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const half = scroller.scrollWidth / 2;
+    if (half > 0 && scroller.scrollLeft >= half) {
+      scroller.scrollLeft -= half;
+    }
+  };
 
   return (
-    <div className="relative -mx-4 overflow-hidden px-4">
-      <div className="pl-platform-marquee flex w-max gap-2.5">
+    <div
+      ref={scrollerRef}
+      className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      style={{ WebkitOverflowScrolling: "touch" }}
+      data-pl-horizontal-scroll
+      onTouchStart={() => {
+        userInteractingRef.current = true;
+      }}
+      onTouchEnd={() => {
+        userInteractingRef.current = false;
+      }}
+      onTouchCancel={() => {
+        userInteractingRef.current = false;
+      }}
+      onScroll={handleScroll}
+    >
+      <div className="flex w-max gap-2.5">
         {marqueeItems.map((platform, index) => (
           <PlatformPill key={`${platform.name}-${index}`} platform={platform} lightMode={lightMode} />
         ))}
