@@ -185,6 +185,37 @@ function ListingDetailBody({
         </div>
       )}
 
+      {listing.description && (
+        <div>
+          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Property Description</div>
+          <p className={`mt-3 text-[1.02rem] leading-8 ${detailMutedText}`}>{listing.description}</p>
+        </div>
+      )}
+
+      {!!listing.highlights?.length && (
+        <div>
+          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Highlights</div>
+          <div className="mt-3 grid gap-3">
+            {listing.highlights.map((highlight) => (
+              <div key={highlight} className={`rounded-[20px] border px-4 py-3 ${highlightCardClasses}`}>
+                {highlight}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
+          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Property Type</div>
+          <div className="mt-2 text-lg font-medium">{listing.propertyType ?? "Residential"}</div>
+        </GlassCard>
+        <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
+          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Overview</div>
+          <div className="mt-2 text-lg font-medium">{propertyOverview(listing)}</div>
+        </GlassCard>
+      </div>
+
       {(listing.listingAgent || listing.coListingAgent) && (
         <div className="grid gap-3 sm:grid-cols-2">
           {listing.listingAgent && (
@@ -207,37 +238,6 @@ function ListingDetailBody({
               shellText={shellText}
             />
           )}
-        </div>
-      )}
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
-          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Property Type</div>
-          <div className="mt-2 text-lg font-medium">{listing.propertyType ?? "Residential"}</div>
-        </GlassCard>
-        <GlassCard variant={lightMode ? "frost" : "soft"} lightMode={lightMode} className={`p-4 ${shellText}`}>
-          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Overview</div>
-          <div className="mt-2 text-lg font-medium">{propertyOverview(listing)}</div>
-        </GlassCard>
-      </div>
-
-      {listing.description && (
-        <div>
-          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Property Description</div>
-          <p className={`mt-3 text-[1.02rem] leading-8 ${detailMutedText}`}>{listing.description}</p>
-        </div>
-      )}
-
-      {!!listing.highlights?.length && (
-        <div>
-          <div className={`text-xs uppercase tracking-[0.18em] ${detailMutedText}`}>Highlights</div>
-          <div className="mt-3 grid gap-3">
-            {listing.highlights.map((highlight) => (
-              <div key={highlight} className={`rounded-[20px] border px-4 py-3 ${highlightCardClasses}`}>
-                {highlight}
-              </div>
-            ))}
-          </div>
         </div>
       )}
 
@@ -288,7 +288,7 @@ function ListingImageGallery({
     <div className={compact ? "space-y-3" : "space-y-4"}>
       <div
         className={`relative w-full overflow-hidden rounded-[22px] bg-[#0a121c] ${
-          compact ? "aspect-[16/10] max-h-[min(360px,42vh)]" : "aspect-[16/10] max-h-[min(420px,45vh)]"
+          compact ? "aspect-[16/11] max-h-[min(300px,34vh)]" : "aspect-[16/10] max-h-[min(420px,45vh)]"
         }`}
       >
         <button
@@ -428,30 +428,34 @@ function ListingOverlayPanel({
       <div
         className={`pl-sheet-enter relative z-10 flex h-dvh max-h-dvh w-full flex-col overflow-hidden border-0 ${shellText} ${cardBg} lg:my-auto lg:h-auto lg:max-h-[min(920px,calc(100dvh-2rem))] lg:max-w-[920px] lg:rounded-[28px] lg:border ${desktopShellClasses}`}
       >
-        <div className={`flex shrink-0 items-start justify-between gap-4 border-b px-5 py-4 pt-[max(1rem,env(safe-area-inset-top))] lg:px-6 lg:py-5 lg:pt-5 ${shellBorder}`}>
+        <div className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:items-start lg:px-6 lg:py-5 lg:pt-5 ${shellBorder}`}>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               {listing.mlsNumber && (
-                <div className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.18em] ${quietPill}`}>
+                <div className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.18em] lg:text-xs ${quietPill}`}>
                   MLS# {listing.mlsNumber}
                 </div>
               )}
               {listing.status && (
-                <div className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.18em] ${quietPill}`}>
+                <div className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.18em] lg:text-xs ${quietPill}`}>
                   {listing.status}
                 </div>
               )}
             </div>
-            <div className="mt-3 text-[2rem] font-semibold leading-none tracking-tight text-[#d6b06a] lg:text-[2.35rem]">
-              {listing.price}
+            {/* Desktop keeps the rich pinned header; on mobile this moves into the
+                scroll body so the reading area gets the full screen height. */}
+            <div className="hidden lg:block">
+              <div className="mt-3 text-[2.35rem] font-semibold leading-none tracking-tight text-[#d6b06a]">
+                {listing.price}
+              </div>
+              <h2 className={`mt-2.5 text-2xl font-semibold leading-snug tracking-tight ${titleColor}`}>
+                {listing.title}
+              </h2>
+              <p className={`mt-2 text-base leading-relaxed ${detailMutedText}`}>{listing.address}</p>
+              {listing.brokerage && (
+                <p className="mt-2 text-sm uppercase tracking-[0.18em] text-[#d6b06a]">{listing.brokerage}</p>
+              )}
             </div>
-            <h2 className={`mt-2.5 text-xl font-semibold leading-snug tracking-tight lg:text-2xl ${titleColor}`}>
-              {listing.title}
-            </h2>
-            <p className={`mt-2 text-base leading-relaxed ${detailMutedText}`}>{listing.address}</p>
-            {listing.brokerage && (
-              <p className="mt-2 text-sm uppercase tracking-[0.18em] text-[#d6b06a]">{listing.brokerage}</p>
-            )}
           </div>
 
           <button
@@ -468,6 +472,20 @@ function ListingOverlayPanel({
           className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 lg:px-6 lg:py-5"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
+          {/* Mobile identity — scrolls with content (desktop shows it pinned in the header) */}
+          <div className="mb-4 lg:hidden">
+            <div className="text-[1.85rem] font-semibold leading-none tracking-tight text-[#d6b06a]">
+              {listing.price}
+            </div>
+            <h2 className={`mt-2 text-lg font-semibold leading-snug tracking-tight ${titleColor}`}>
+              {listing.title}
+            </h2>
+            <p className={`mt-1.5 text-sm leading-relaxed ${detailMutedText}`}>{listing.address}</p>
+            {listing.brokerage && (
+              <p className="mt-1.5 text-xs uppercase tracking-[0.18em] text-[#d6b06a]">{listing.brokerage}</p>
+            )}
+          </div>
+
           <ListingImageGallery
             listing={listing}
             images={images}
