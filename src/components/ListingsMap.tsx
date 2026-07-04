@@ -362,7 +362,7 @@ export function ListingsMap({
           id="listings-selected"
           variant={lightMode ? "frost" : "chrome"}
           lightMode={lightMode}
-          className={`min-w-0 scroll-mt-24 overflow-hidden border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit lg:overflow-visible xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+5.75rem),5.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
+          className={`min-w-0 scroll-mt-24 overflow-hidden border-[#d6b06a]/15 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.14)] md:p-6 lg:h-fit lg:overflow-visible xl:sticky xl:top-[max(calc(env(safe-area-inset-top)+7.75rem),7.75rem)] xl:z-[1] xl:self-start ${lightMode ? "" : listingsRailChromeClass}`}
         >
           <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_300px]">
             <div className="relative min-w-0 min-h-[360px] overflow-hidden rounded-[28px] border border-[#d6b06a]/20 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] max-lg:order-2 md:min-h-[560px]">

@@ -76,8 +76,8 @@ export function Header({
     ? "text-black/72 hover:bg-black/7 hover:text-black"
     : "text-white/78 hover:bg-white/[0.055] hover:text-white";
   const navActiveClasses = lightMode
-    ? "bg-black/7 text-black shadow-sm"
-    : "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]";
+    ? "bg-black/7 text-black shadow-sm ring-1 ring-[#d6b06a]/45"
+    : "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-[#d6b06a]/40";
   const mobileBorder = lightMode ? "border-black/10" : "border-white/10";
   const mobileActiveClasses = lightMode
     ? "bg-black/8 text-black"
@@ -93,7 +93,9 @@ export function Header({
     : "rounded-full bg-white/[0.05] px-3 py-1 text-xs text-white";
 
   return (
-    <header className="relative z-20 px-4 pt-6 md:px-8 md:pt-8">
+    // Desktop: sticky floating pill — nav stays reachable while content glides
+    // beneath the glass. Mobile keeps in-flow (sticky + page swipes jank).
+    <header className="relative z-30 px-4 pt-6 md:px-8 md:pt-8 lg:sticky lg:top-0 lg:pt-6">
       <GlassCard
         variant={lightMode ? "frost" : "chrome"}
         lightMode={lightMode}
@@ -146,10 +148,11 @@ export function Header({
               href={manageBuildingResidentLoginUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`rounded-full px-4 py-2 text-sm transition-colors duration-200 ${navIdleClasses}`}
+              className={`group rounded-full px-4 py-2 text-sm transition-colors duration-200 ${navIdleClasses}`}
               aria-label="Resident login, opens Buildium Resident portal in a new tab"
             >
               Resident Log in
+              <span aria-hidden className="ml-1 inline-block text-[11px] opacity-50 transition-opacity group-hover:opacity-90">↗</span>
             </a>
           </nav>
 

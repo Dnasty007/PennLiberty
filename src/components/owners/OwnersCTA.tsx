@@ -124,7 +124,7 @@ export function OwnersCTA({
   );
 
   return (
-    <section id="owners-property-review" className="scroll-mt-24 md:scroll-mt-28">
+    <section id="owners-property-review" className="scroll-mt-24 lg:scroll-mt-36">
       <SectionDivider lightMode={lightMode} label="Let's start simple" number="03" />
       <div className="mt-9 grid gap-11 lg:grid-cols-[minmax(0,1.06fr)_minmax(280px,0.94fr)] lg:gap-14 lg:items-center">
 

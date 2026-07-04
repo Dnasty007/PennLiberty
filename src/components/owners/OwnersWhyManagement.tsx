@@ -119,7 +119,7 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
         <nav
           role="tablist"
           aria-label="Why management pillars"
-          className="pl-touch-scroll-x flex flex-row gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-[6.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"
+          className="pl-touch-scroll-x flex flex-row gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-[7.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"
           style={isMobileTabs ? { WebkitOverflowScrolling: "touch" } : undefined}
           data-pl-horizontal-scroll
         >

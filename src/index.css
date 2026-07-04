@@ -23,6 +23,60 @@ html {
 body {
   margin: 0;
   overscroll-behavior-x: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Desktop browser fit-and-finish ─────────────────────────────────────── */
+
+/* Brand text selection — default blue clashes with gold/navy */
+::selection {
+  background: rgba(214, 176, 106, 0.32);
+  color: inherit;
+}
+
+/* Slim, quiet scrollbars that match the glass language (page + inner scrollers) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(214, 176, 106, 0.28) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(214, 176, 106, 0.24);
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 176, 106, 0.45);
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: content-box;
+}
+
+/* Buttons should read as clickable on desktop (Tailwind preflight leaves default cursor) */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* Keyboard users get a consistent gold focus ring (components with their own
+   focus-visible styles override this via outline-none). */
+:focus-visible {
+  outline: 2px solid rgba(214, 176, 106, 0.65);
+  outline-offset: 2px;
+}
+
+/* Photos aren't drag targets — stops accidental ghost-drags on galleries */
+img {
+  -webkit-user-drag: none;
 }
 
 /* Horizontal tab strips / carousels */

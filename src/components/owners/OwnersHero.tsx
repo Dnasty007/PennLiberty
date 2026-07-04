@@ -55,7 +55,7 @@ export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: Owner
           </p>
         </header>
 
-        <aside className="lg:sticky lg:top-[6.75rem] lg:self-start">
+        <aside className="lg:sticky lg:top-[7.75rem] lg:self-start">
           <div className={`rounded-[22px] border p-4 backdrop-blur-xl md:p-6 ${asideShell}`}>
             <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${glance}`}>At a glance</p>
             {/* Mobile: one compact 3-up row; md+: full stacked entries with notes */}
