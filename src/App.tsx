@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
+import { ArrowUp } from "lucide-react";
 import { Header } from "@/components/Header";
 import { DevImageEditor } from "@/components/DevImageEditor";
 import { Hero } from "@/components/Hero";
@@ -75,6 +76,84 @@ function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
         backgroundSize: "36px 36px",
       }}
     />
+  );
+}
+
+/** Desktop-only: 2px gold progress bar along the top edge — reading position at
+ *  a glance. Writes transform directly (no per-frame React renders). */
+function DesktopScrollProgress() {
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - window.innerHeight;
+      const progress = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+      if (barRef.current) barRef.current.style.transform = `scaleX(${progress})`;
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-[70] hidden h-[2px] lg:block" aria-hidden>
+      <div
+        ref={barRef}
+        className="h-full w-full origin-left bg-gradient-to-r from-[#d6b06a]/70 via-[#e4be78] to-[#f4dfb4] shadow-[0_0_8px_rgba(214,176,106,0.45)]"
+        style={{ transform: "scaleX(0)" }}
+      />
+    </div>
+  );
+}
+
+/** Desktop-only: quiet glass back-to-top button, fades in after ~1 screen. */
+function BackToTopButton({ lightMode }: { lightMode: boolean }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setVisible(window.scrollY > 700);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="Back to top"
+      tabIndex={visible ? 0 : -1}
+      className={`fixed bottom-6 right-6 z-40 hidden h-11 w-11 items-center justify-center rounded-full border shadow-[0_14px_38px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-all duration-300 lg:flex ${
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
+      } ${
+        lightMode
+          ? "border-black/10 bg-white/70 text-black/70 hover:bg-white/90 hover:text-black"
+          : "border-white/15 bg-black/45 text-white/80 hover:border-[#d6b06a]/45 hover:bg-black/65 hover:text-white"
+      }`}
+    >
+      <ArrowUp className="h-4 w-4" />
+    </button>
   );
 }
 
@@ -448,6 +527,34 @@ export default function App() {
   currentPageIndexRef.current = currentPageIndex;
   goToPageRef.current = goToPage;
 
+  /* Desktop: ← / → arrows page through the site (keyboard mirror of the mobile
+     swipe). Skips typing contexts, modifier combos, and any open overlay/game —
+     all of those mount [data-pl-no-page-swipe] while active. */
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) return;
+      }
+      if (document.querySelector("[data-pl-no-page-swipe]")) return;
+
+      const idx = currentPageIndexRef.current;
+      if (e.key === "ArrowRight" && idx < pageOrder.length - 1) {
+        e.preventDefault();
+        goToPageRef.current(pageOrder[idx + 1] as PageKey);
+      } else if (e.key === "ArrowLeft" && idx > 0) {
+        e.preventDefault();
+        goToPageRef.current(pageOrder[idx - 1] as PageKey);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [pageOrder]);
+
   useEffect(() => {
     swipeBlockedRef.current = Boolean(
       showListingDetails ||
@@ -652,6 +759,9 @@ export default function App() {
           theme={theme}
           weather={weather}
         />
+
+      <DesktopScrollProgress />
+      <BackToTopButton lightMode={lightMode} />
 
       <main
         className={`relative z-10 min-w-0 w-full px-4 pb-8 md:px-8 md:pb-12 ${
