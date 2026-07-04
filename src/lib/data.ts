@@ -512,7 +512,7 @@ export const initialSaleListings: SaleListing[] = [
       "/listings/1751-n-27th-st/gallery-5.jpg",
       "/listings/1751-n-27th-st/gallery-6.jpg",
     ],
-    status: "Active Residential",
+    status: "Under Contract",
     mlsNumber: "PAPH2617242",
     brokerage: "Penn Liberty Real Estate",
     listingAgent: {
