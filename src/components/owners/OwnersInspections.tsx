@@ -6,9 +6,11 @@ import {
   ClipboardList,
   FileText,
   Paintbrush,
+  Plus,
   Receipt,
   ShieldCheck,
   Wrench,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +69,7 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [property, setProperty] = useState("");
+  const [addresses, setAddresses] = useState<string[]>([""]);
   const [propertyType, setPropertyType] = useState<string>(propertyTypes[0]);
   const [cadence, setCadence] = useState<string>(cadenceOptions[0]);
   const [attempted, setAttempted] = useState(false);
@@ -76,8 +78,15 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
   const nameEmpty = name.trim().length === 0;
   const emailEmpty = email.trim().length === 0;
   const phoneEmpty = phone.trim().length === 0;
-  const propertyEmpty = property.trim().length === 0;
+  const filledAddresses = addresses.map((a) => a.trim()).filter(Boolean);
+  const propertyEmpty = filledAddresses.length === 0;
   const isValid = !nameEmpty && !emailEmpty && !phoneEmpty && !propertyEmpty;
+
+  const updateAddress = (index: number, val: string) =>
+    setAddresses((prev) => prev.map((a, i) => (i === index ? val : a)));
+  const addAddress = () => setAddresses((prev) => (prev.length < 12 ? [...prev, ""] : prev));
+  const removeAddress = (index: number) =>
+    setAddresses((prev) => prev.filter((_, i) => i !== index));
 
   const submit = async () => {
     if (!isValid) {
@@ -95,8 +104,11 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
           name: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
-          address: property.trim(),
-          message: `Inspection Program opt-in — ${propertyType}; cadence: ${cadence}.`,
+          address:
+            filledAddresses.length > 1
+              ? filledAddresses.map((a, i) => `${i + 1}. ${a}`).join("  |  ")
+              : filledAddresses[0] ?? "",
+          message: `Inspection Program opt-in — ${propertyType}; cadence: ${cadence}; ${filledAddresses.length} propert${filledAddresses.length === 1 ? "y" : "ies"}.`,
           time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
         },
         EMAILJS_PUBLIC_KEY,
@@ -105,7 +117,7 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
       setName("");
       setEmail("");
       setPhone("");
-      setProperty("");
+      setAddresses([""]);
       setPropertyType(propertyTypes[0]);
       setCadence(cadenceOptions[0]);
       setAttempted(false);
@@ -286,14 +298,42 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
                     />
                   </div>
 
-                  <div className="grid gap-1">
+                  <div className="grid gap-1.5">
                     {attempted && propertyEmpty && fieldLabel("Property address")}
-                    <AddressAutocomplete
-                      value={property}
-                      onChange={setProperty}
-                      placeholder="Property address (add multiple if needed)"
-                      className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${attempted && propertyEmpty ? inputError : inputBase}`}
-                    />
+                    {addresses.map((addr, i) => (
+                      <div key={i} className="flex items-stretch gap-2">
+                        <div className="min-w-0 flex-1">
+                          <AddressAutocomplete
+                            value={addr}
+                            onChange={(v) => updateAddress(i, v)}
+                            placeholder={i === 0 ? "Property address" : `Property address #${i + 1}`}
+                            className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${attempted && propertyEmpty ? inputError : inputBase}`}
+                          />
+                        </div>
+                        {addresses.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeAddress(i)}
+                            aria-label={`Remove property ${i + 1}`}
+                            className={`inline-flex w-11 shrink-0 items-center justify-center rounded-md border transition ${
+                              lightMode
+                                ? "border-black/12 bg-black/[0.03] text-black/50 hover:bg-black/[0.06] hover:text-black"
+                                : "border-white/[0.12] bg-white/[0.04] text-white/50 hover:bg-white/[0.09] hover:text-white"
+                            }`}
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={addAddress}
+                      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d6b06a]/35 bg-[#d6b06a]/10 px-3.5 py-2 text-[13px] font-semibold text-[#d6b06a] transition hover:bg-[#d6b06a]/18"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add another property
+                    </button>
                   </div>
 
                   <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-3">
