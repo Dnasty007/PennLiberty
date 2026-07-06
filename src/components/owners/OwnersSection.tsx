@@ -5,6 +5,7 @@ import { OwnersWhyManagement } from "@/components/owners/OwnersWhyManagement";
 import { OwnersPaths } from "@/components/owners/OwnersPaths";
 import { OwnersCTA } from "@/components/owners/OwnersCTA";
 import { OwnersCoverageBand } from "@/components/owners/OwnersCoverageBand";
+import { OwnersInspections } from "@/components/owners/OwnersInspections";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
 import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
 
@@ -139,6 +140,7 @@ export function OwnersSection({
             onPresetPropertyReviewInterest={presetInterestForCards}
           />
           <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersInspections lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersCTA
             lightMode={lightMode}
             mutedText={mutedText}
