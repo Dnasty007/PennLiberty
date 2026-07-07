@@ -246,14 +246,14 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
             </span>
             <div className="min-w-0">
               <p className={`text-[10px] font-bold uppercase tracking-[0.24em] ${eyebrow}`}>
-                As mailed to owners
+                Program guide
               </p>
               <h4 className={`mt-1 text-lg font-semibold tracking-tight ${heading}`}>
-                The Program Brochure
+                The Inspection Program Brochure
               </h4>
               <p className={`mt-1 text-[13.5px] leading-relaxed ${mutedText}`}>
-                The full five-page program — the same document from your letter — readable right
-                here, any time.
+                Everything in one place — what&apos;s included, the room-by-room walkthrough,
+                pricing, and how enrollment works.
               </p>
             </div>
           </div>

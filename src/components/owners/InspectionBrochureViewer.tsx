@@ -128,7 +128,7 @@ export default function InspectionBrochureViewer({ onClose }: { onClose: () => v
             Penn Liberty · Inspection Program
           </p>
           <p className="mt-0.5 hidden text-xs text-white/55 sm:block">
-            The full program brochure, as mailed to owners
+            The complete program guide
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
