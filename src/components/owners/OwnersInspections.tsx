@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import emailjs from "@emailjs/browser";
 import {
+  BookOpen,
   Camera,
   CalendarClock,
   ClipboardList,
+  Download,
   FileText,
   Paintbrush,
   Plus,
@@ -17,6 +19,12 @@ import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { SectionDivider } from "@/components/owners/SectionDivider";
+
+const InspectionBrochureViewer = lazy(
+  () => import("@/components/owners/InspectionBrochureViewer"),
+);
+
+const BROCHURE_PDF = "/owners/inspection-program.pdf";
 
 const EMAILJS_SERVICE_ID = "Owner_Email_Website";
 const EMAILJS_TEMPLATE_ID = "template_mol56qf";
@@ -66,6 +74,7 @@ type OwnersInspectionsProps = {
 
 export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersInspectionsProps) {
   const [formOpen, setFormOpen] = useState(false);
+  const [brochureOpen, setBrochureOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -220,6 +229,57 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#d6b06a]" aria-hidden />
               <span>Covers the walkthrough and report; approved repairs are quoted separately.</span>
             </div>
+          </div>
+        </div>
+
+        {/* The brochure — the exact document mailed to owners, readable in place */}
+        <div
+          className={`mt-8 flex flex-col gap-4 rounded-[22px] border p-5 sm:flex-row sm:items-center sm:justify-between md:p-6 ${
+            lightMode
+              ? "border-[#c49a42]/40 bg-[linear-gradient(140deg,rgba(214,176,106,0.16),rgba(255,255,255,0.5))]"
+              : "border-[#d6b06a]/30 bg-[linear-gradient(140deg,rgba(214,176,106,0.10),rgba(255,255,255,0.02))]"
+          }`}
+        >
+          <div className="flex min-w-0 items-start gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#d6b06a]/15">
+              <BookOpen className="h-6 w-6 text-[#d6b06a]" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className={`text-[10px] font-bold uppercase tracking-[0.24em] ${eyebrow}`}>
+                As mailed to owners
+              </p>
+              <h4 className={`mt-1 text-lg font-semibold tracking-tight ${heading}`}>
+                The Program Brochure
+              </h4>
+              <p className={`mt-1 text-[13.5px] leading-relaxed ${mutedText}`}>
+                The full five-page program — the same document from your letter — readable right
+                here, any time.
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-col gap-2.5 sm:flex-row sm:items-center">
+            <Button
+              type="button"
+              onClick={() => setBrochureOpen(true)}
+              className="rounded-full bg-[#d6b06a] px-6 py-5 text-sm font-semibold text-[#08111f] transition-transform hover:bg-[#e4be78] active:scale-[0.985]"
+            >
+              <span className="inline-flex items-center gap-2">
+                <BookOpen className="h-4 w-4" aria-hidden />
+                Read the brochure
+              </span>
+            </Button>
+            <a
+              href={BROCHURE_PDF}
+              download="Penn-Liberty-Inspection-Program.pdf"
+              className={`inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition ${
+                lightMode
+                  ? "border-black/14 bg-white/45 text-black/80 hover:bg-white/70"
+                  : "border-white/[0.16] bg-white/[0.04] text-white/85 hover:bg-white/[0.09]"
+              }`}
+            >
+              <Download className="h-4 w-4" aria-hidden />
+              Download PDF
+            </a>
           </div>
         </div>
 
@@ -383,6 +443,20 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
           )}
         </div>
       </div>
+
+      {brochureOpen && (
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-[220] flex items-center justify-center bg-[rgba(3,8,16,0.9)] backdrop-blur-md">
+              <p className="animate-pulse text-sm tracking-[0.2em] text-[#d6b06a]/80">
+                OPENING THE BROCHURE…
+              </p>
+            </div>
+          }
+        >
+          <InspectionBrochureViewer onClose={() => setBrochureOpen(false)} />
+        </Suspense>
+      )}
     </section>
   );
 }
