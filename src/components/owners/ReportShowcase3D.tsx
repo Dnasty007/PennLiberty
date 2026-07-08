@@ -111,21 +111,43 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
     const geo = new THREE.BoxGeometry(W, H, 0.05);
     const edgeMat = new THREE.MeshStandardMaterial({
       color: GOLD,
-      metalness: 0.85,
-      roughness: 0.32,
+      metalness: 0.8,
+      roughness: 0.28,
+      emissive: GOLD,
+      emissiveIntensity: 0.22,
     });
     const backMat = new THREE.MeshStandardMaterial({
       color: 0x0d1a2c,
       metalness: 0.35,
       roughness: 0.5,
     });
-    const frontMat = new THREE.MeshStandardMaterial({
-      color: 0xf5f2ec,
-      roughness: 0.55,
-      metalness: 0.04,
-    });
+    /* Unlit front — the cover shows at the PDF's true brightness and color,
+       exactly like the printed page, instead of being grayed by scene lighting. */
+    const frontMat = new THREE.MeshBasicMaterial({ color: 0xf5f2ec });
     const doc = new THREE.Mesh(geo, [edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat]);
     group.add(doc);
+
+    /* Soft gold aura behind the document — lifts it off the page background */
+    const auraCanvas = document.createElement("canvas");
+    auraCanvas.width = auraCanvas.height = 256;
+    const actx = auraCanvas.getContext("2d")!;
+    const aGrad = actx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    aGrad.addColorStop(0, "rgba(214,176,106,0.55)");
+    aGrad.addColorStop(0.45, "rgba(214,176,106,0.18)");
+    aGrad.addColorStop(1, "rgba(214,176,106,0)");
+    actx.fillStyle = aGrad;
+    actx.fillRect(0, 0, 256, 256);
+    const auraMat = new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(auraCanvas),
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      opacity: 0.8,
+    });
+    const aura = new THREE.Sprite(auraMat);
+    aura.scale.setScalar(6.4);
+    aura.position.z = -1.1;
+    scene.add(aura);
 
     /* Gold motes drifting around the document */
     const MOTES = 56;
@@ -230,6 +252,8 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
       moteGeo.dispose();
       moteMat.map?.dispose();
       moteMat.dispose();
+      auraMat.map?.dispose();
+      auraMat.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
     };

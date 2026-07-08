@@ -159,7 +159,7 @@ export function OwnersMarketReports({ lightMode, mutedText, subtleText }: Owners
             url={REPORT_URL}
             downloadName="Penn-Liberty-Sample-Market-Report.pdf"
             eyebrow="Penn Liberty · Market Report"
-            subline="Sample rental analysis — Philadelphia single-family"
+            subline="Sample rental analysis report"
           />
         </Suspense>
       )}
