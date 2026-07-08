@@ -219,7 +219,9 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
       const w = mount.clientWidth;
       const h = mount.clientHeight;
       if (w <= 0 || h <= 0) return;
-      renderer.setSize(w, h, false);
+      /* updateStyle=true — CSS size must match the container or the canvas
+         overflows the layout on scaled/zoomed displays (buffer is w×dpr). */
+      renderer.setSize(w, h, true);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     };
@@ -297,7 +299,7 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
           onOpen();
         }
       }}
-      className="h-full w-full cursor-pointer outline-none focus-visible:rounded-[24px]"
+      className="h-full w-full cursor-pointer overflow-hidden outline-none focus-visible:rounded-[24px]"
     />
   );
 }
