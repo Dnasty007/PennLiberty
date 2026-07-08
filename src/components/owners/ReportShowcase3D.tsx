@@ -63,7 +63,7 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
   useEffect(() => {
     if (!useFlat) return;
     let cancelled = false;
-    renderCoverCanvas(560)
+    renderCoverCanvas(900)
       .then((canvas) => {
         if (!cancelled) setCoverUrl(canvas.toDataURL("image/jpeg", 0.92));
       })
@@ -184,12 +184,13 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
 
     /* Cover texture — real page 1, rendered by pdf.js */
     let coverTex: THREE.CanvasTexture | null = null;
-    renderCoverCanvas(1024)
+    renderCoverCanvas(2048)
       .then((canvas) => {
         if (disposed) return;
         coverTex = new THREE.CanvasTexture(canvas);
         coverTex.colorSpace = THREE.SRGBColorSpace;
-        coverTex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+        /* Max anisotropy keeps the page crisp while the document is tilted */
+        coverTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
         frontMat.map = coverTex;
         frontMat.color.set(0xffffff);
         frontMat.needsUpdate = true;
