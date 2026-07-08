@@ -165,10 +165,12 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
     const spriteCanvas = document.createElement("canvas");
     spriteCanvas.width = spriteCanvas.height = 64;
     const sctx = spriteCanvas.getContext("2d")!;
+    /* Rich gold motes — normal blending so the gold reads as gold on the light
+       backdrop (additive washed the centers out to white). */
     const grad = sctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, "rgba(244,223,180,1)");
-    grad.addColorStop(0.4, "rgba(214,176,106,0.55)");
-    grad.addColorStop(1, "rgba(214,176,106,0)");
+    grad.addColorStop(0, "rgba(214,176,106,1)");
+    grad.addColorStop(0.45, "rgba(196,154,66,0.6)");
+    grad.addColorStop(1, "rgba(196,154,66,0)");
     sctx.fillStyle = grad;
     sctx.fillRect(0, 0, 64, 64);
     const moteMat = new THREE.PointsMaterial({
@@ -176,8 +178,7 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
       map: new THREE.CanvasTexture(spriteCanvas),
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      opacity: 0.85,
+      opacity: 0.9,
     });
     const motes = new THREE.Points(moteGeo, moteMat);
     scene.add(motes);
