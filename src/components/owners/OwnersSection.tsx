@@ -6,6 +6,7 @@ import { OwnersPaths } from "@/components/owners/OwnersPaths";
 import { OwnersCTA } from "@/components/owners/OwnersCTA";
 import { OwnersCoverageBand } from "@/components/owners/OwnersCoverageBand";
 import { OwnersInspections } from "@/components/owners/OwnersInspections";
+import { OwnersMarketReports } from "@/components/owners/OwnersMarketReports";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
 import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
 
@@ -141,6 +142,7 @@ export function OwnersSection({
           />
           <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersInspections lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersMarketReports lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersCTA
             lightMode={lightMode}
             mutedText={mutedText}

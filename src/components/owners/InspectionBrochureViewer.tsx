@@ -7,13 +7,27 @@ import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
-const BROCHURE_URL = "/owners/inspection-program.pdf";
+type BrochureViewerProps = {
+  onClose: () => void;
+  /** Defaults cover the Inspection Program brochure; pass overrides to reuse
+   *  the reader for any other owner document (e.g. the sample market report). */
+  url?: string;
+  downloadName?: string;
+  eyebrow?: string;
+  subline?: string;
+};
 
-/** Full-screen brochure reader for the Inspection Program PDF. Lazy-loaded —
- *  pdf.js only downloads when an owner actually opens the brochure. Renders the
- *  designed pages onto canvas, so it reads identically on desktop and phones
- *  (where a bare PDF link would often force-download instead of displaying). */
-export default function InspectionBrochureViewer({ onClose }: { onClose: () => void }) {
+/** Full-screen PDF reader. Lazy-loaded — pdf.js only downloads when an owner
+ *  actually opens a document. Renders the designed pages onto canvas, so it
+ *  reads identically on desktop and phones (where a bare PDF link would often
+ *  force-download instead of displaying). */
+export default function InspectionBrochureViewer({
+  onClose,
+  url = "/owners/inspection-program.pdf",
+  downloadName = "Penn-Liberty-Inspection-Program.pdf",
+  eyebrow = "Penn Liberty · Inspection Program",
+  subline = "The complete program guide",
+}: BrochureViewerProps) {
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(1);
@@ -27,7 +41,7 @@ export default function InspectionBrochureViewer({ onClose }: { onClose: () => v
   /* Load the document once */
   useEffect(() => {
     let cancelled = false;
-    const task = pdfjsLib.getDocument({ url: BROCHURE_URL });
+    const task = pdfjsLib.getDocument({ url });
     task.promise
       .then((loaded) => {
         if (cancelled) return; // cleanup's task.destroy() releases the doc
@@ -125,16 +139,14 @@ export default function InspectionBrochureViewer({ onClose }: { onClose: () => v
       >
         <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#d6b06a]">
-            Penn Liberty · Inspection Program
+            {eyebrow}
           </p>
-          <p className="mt-0.5 hidden text-xs text-white/55 sm:block">
-            The complete program guide
-          </p>
+          <p className="mt-0.5 hidden text-xs text-white/55 sm:block">{subline}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <a
-            href={BROCHURE_URL}
-            download="Penn-Liberty-Inspection-Program.pdf"
+            href={url}
+            download={downloadName}
             className="inline-flex items-center gap-2 rounded-full border border-[#d6b06a]/45 bg-[#d6b06a]/12 px-4 py-2.5 text-[13px] font-semibold text-[#f4dfb4] backdrop-blur-md transition hover:bg-[#d6b06a]/22"
           >
             <Download className="h-4 w-4" aria-hidden />
@@ -168,9 +180,9 @@ export default function InspectionBrochureViewer({ onClose }: { onClose: () => v
         <div className="flex h-full w-full items-center justify-center">
           {error ? (
             <div className="max-w-sm rounded-[22px] border border-white/15 bg-white/[0.05] px-6 py-8 text-center">
-              <p className="text-sm text-white/85">The brochure couldn&apos;t load here.</p>
+              <p className="text-sm text-white/85">The document couldn&apos;t load here.</p>
               <a
-                href={BROCHURE_URL}
+                href={url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#d6b06a] px-5 py-2.5 text-sm font-semibold text-[#08111f]"
