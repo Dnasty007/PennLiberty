@@ -123,19 +123,6 @@ export function OwnersMarketReports({ lightMode, mutedText, subtleText }: Owners
               Request yours — free
             </Button>
           </div>
-
-          <p className={`mt-4 text-[11px] ${subtleText}`}>
-            Market data powered by{" "}
-            <a
-              href="https://www.rentrange.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-[#d6b06a] underline decoration-[#d6b06a]/45 underline-offset-2"
-            >
-              RentRange®
-            </a>
-            . Sample shown for a Philadelphia single-family property.
-          </p>
         </div>
 
         {/* The report as an object — 3D on desktop, floating cover on mobile */}
