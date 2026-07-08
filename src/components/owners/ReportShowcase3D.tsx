@@ -192,7 +192,7 @@ export default function ReportShowcase3D({ onOpen, flat = false }: ReportShowcas
         /* Max anisotropy keeps the page crisp while the document is tilted */
         coverTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
         frontMat.map = coverTex;
-        frontMat.color.set(0xffffff);
+        frontMat.color.set(0xe9e9e9); // slight gray — soft paper, not blazing white
         frontMat.needsUpdate = true;
       })
       .catch(() => {
