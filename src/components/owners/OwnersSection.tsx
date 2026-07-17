@@ -30,7 +30,7 @@ const OWNERS_MAILTO =
  *  the full review form (section 03) is several screens down on mobile. */
 function OwnersQuickActionsMobile({ lightMode }: { lightMode: boolean }) {
   const glassRow = lightMode
-    ? "border-black/[0.10] bg-white/[0.55] text-black/85 active:bg-white/[0.75]"
+    ? "border-black/[0.12] bg-white/88 text-black/85 active:bg-white"
     : "border-white/[0.12] bg-white/[0.05] text-white/90 active:bg-white/[0.10]";
 
   const scrollToReview = () => {
@@ -132,7 +132,7 @@ export function OwnersSection({
 
       <div className={`relative z-[2] border-t ${bodyTrayRule} ${bodyTrayBg} backdrop-blur-md`}>
         <div className="mx-auto max-w-5xl space-y-12 px-5 py-10 sm:px-8 md:space-y-28 md:px-11 md:py-22 lg:py-24">
-          <OwnersOperateBand lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          {/* Pain → intent → convert first; systems & products support below */}
           <OwnersWhyManagement lightMode={lightMode} mutedText={mutedText} />
           <OwnersPaths
             lightMode={lightMode}
@@ -140,9 +140,6 @@ export function OwnersSection({
             subtleText={subtleText}
             onPresetPropertyReviewInterest={presetInterestForCards}
           />
-          <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
-          <OwnersInspections lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
-          <OwnersMarketReports lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersCTA
             lightMode={lightMode}
             mutedText={mutedText}
@@ -150,6 +147,10 @@ export function OwnersSection({
             reviewInterestPreset={reviewInterestPreset}
             onConsumeReviewPreset={consumeReviewPreset}
           />
+          <OwnersOperateBand lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersMarketReports lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersInspections lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
         </div>
       </div>
     </section>

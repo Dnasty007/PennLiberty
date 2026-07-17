@@ -34,14 +34,14 @@ export function ScheduleTourModal({
   }
 
   const inputClasses = lightMode
-    ? "border-black/12 bg-white/48 text-black placeholder:text-black/35"
+    ? "border-black/12 bg-white/90 text-black placeholder:text-black/35"
     : "border-white/10 bg-white/[0.05] text-white placeholder:text-white/36";
   const shellText = lightMode ? "text-black" : "text-white";
   const closeButton = lightMode
-    ? "border-black/10 bg-white/40 text-black"
+    ? "border-black/12 bg-white/85 text-black"
     : "border-white/10 bg-white/[0.05] text-white";
   const cancelButton = lightMode
-    ? "rounded-full border-black/12 bg-white/40 px-6 py-6 text-black hover:bg-white/60"
+    ? "rounded-full border-black/12 bg-white/88 px-6 py-6 text-black hover:bg-white"
     : "rounded-full border-white/15 bg-white/[0.04] px-6 py-6 text-white hover:bg-white/[0.08]";
   const detailMutedText = lightMode ? "text-black/78" : "text-white/68";
   const lightShellClasses =

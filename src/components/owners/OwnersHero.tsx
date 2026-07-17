@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { ClipboardCheck, Mail, Phone } from "lucide-react";
+import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
 
 type OwnersHeroProps = {
   lightMode: boolean;
@@ -13,19 +15,36 @@ const ownerProofPoints = [
   { term: "Where", detail: "Block-level", note: "Not flyover playbook management" },
 ] as const;
 
+const OWNERS_MAILTO =
+  "mailto:info@pennlibertyre.com?subject=" +
+  encodeURIComponent("Property owner inquiry") +
+  "&body=" +
+  encodeURIComponent(
+    "Hi Penn Liberty,\n\nI own a property in Philadelphia and would like to talk.\n\nAddress:\nQuestions:\n",
+  );
+
 export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: OwnersHeroProps) {
   const topRule = lightMode ? "border-black/10" : "border-white/[0.09]";
-  const eyebrow = lightMode ? "text-[#a67c32]" : "text-[#dcb672]";
+  const eyebrow = lightMode ? "text-pl-gold-deep" : "text-[#dcb672]";
   const h1Strong = lightMode ? "text-black" : "text-white";
   const h1Sub = lightMode ? "text-black/[0.92]" : "text-white/[0.93]";
   const strongInk = lightMode ? "text-black/92" : "text-white/92";
   const asideShell = lightMode
     ? "border-black/12 bg-gradient-to-br from-white/80 to-white/55 shadow-[inset_0_0_0_1px_rgba(214,176,106,0.12)]"
     : "border-white/[0.11] bg-[linear-gradient(160deg,rgba(18,32,54,0.55),rgba(8,14,26,0.42))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]";
-  const glance = lightMode ? "text-[#8b6914]" : "text-[#d6b06a]/90";
+  const glance = lightMode ? "text-pl-gold-ink" : "text-pl-gold/90";
   const dlTerm = subtleText;
   const dlVal = lightMode ? "text-black" : "text-white";
   const dlNote = mutedText;
+  const glassRow = lightMode
+    ? "border-black/[0.12] bg-white/88 text-black/85 hover:bg-white"
+    : "border-white/[0.12] bg-white/[0.05] text-white/90 hover:bg-white/[0.10]";
+
+  const scrollToReview = () => {
+    document
+      .getElementById("owners-property-review")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <section className="relative">
@@ -53,6 +72,32 @@ export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: Owner
             you&apos;re a first-time landlord or running a portfolio, we&apos;ll walk you through what disciplined
             management protects and why it matters more than most owners expect.
           </p>
+
+          {/* Desktop conversion — mirrors mobile quick actions */}
+          <div className="mt-8 hidden gap-3 md:flex md:flex-wrap md:items-center">
+            <button
+              type="button"
+              onClick={scrollToReview}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-pl-gold px-7 py-3.5 text-[15px] font-semibold text-pl-navy shadow-cta transition hover:bg-pl-gold-hover"
+            >
+              <ClipboardCheck className="h-4 w-4" aria-hidden />
+              Get a free property review
+            </button>
+            <a
+              href={`tel:${PENN_PHONE_TEL}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3.5 text-sm font-semibold backdrop-blur-md transition ${glassRow}`}
+            >
+              <Phone className="h-4 w-4 text-pl-gold" aria-hidden />
+              {PENN_PHONE_DISPLAY}
+            </a>
+            <a
+              href={OWNERS_MAILTO}
+              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3.5 text-sm font-semibold backdrop-blur-md transition ${glassRow}`}
+            >
+              <Mail className="h-4 w-4 text-pl-gold" aria-hidden />
+              Email us
+            </a>
+          </div>
         </header>
 
         <aside className="lg:sticky lg:top-[7.75rem] lg:self-start">

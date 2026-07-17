@@ -214,12 +214,12 @@ export const rentalsHeroCollageOverlays: Record<string, RentalsCollageOverlay[]>
  * Wide distant skyline for the listings map teaser — bundled under `/public` so it always
  * resolves (no remote outages / PATH-length issues during local dev).
  */
-/** Listings page map hero only — not the site-wide sky (see `public/listings/`). */
-export const listingsMapTeaserDefaultSrc = "/listings/teaser-1.jpg" as const;
+/** Listings page map hero only — not the site-wide sky (see `public/sale-media/`). */
+export const listingsMapTeaserDefaultSrc = "/sale-media/teaser-1.jpg" as const;
 
 export const listingsMapTeaserPool = [
   listingsMapTeaserDefaultSrc,
-  "/listings/teaser-2.jpg",
+  "/sale-media/teaser-2.jpg",
 ] as const;
 
 /** @deprecated Use listingsMapTeaserPool */

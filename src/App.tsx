@@ -44,10 +44,28 @@ import {
   syncBrowserUrl,
   type AppRoute,
 } from "@/lib/routing";
+import {
+  PENN_BROKERAGE_LICENSE,
+  PENN_CITY,
+  PENN_COPYRIGHT_YEAR,
+  PENN_EMAIL,
+  PENN_FOUNDED_YEAR,
+  PENN_PHONE_DISPLAY,
+  PENN_PHONE_TEL,
+} from "@/lib/brand";
 
 const EMAILJS_SERVICE_ID = "Owner_Email_Website";
 const EMAILJS_TEMPLATE_ID = "template_mol56qf";
 const EMAILJS_PUBLIC_KEY = "ykKMeoPCgTNLT5di1";
+
+const PAGE_DOCUMENT_TITLES: Record<PageKey, string> = {
+  home: "Penn Liberty | Philadelphia Property Management & Rentals",
+  "property-management": "For Owners | Penn Liberty Property Management",
+  rentals: "Philadelphia Rentals | Penn Liberty",
+  listings: "Investment Listings | Penn Liberty Real Estate",
+  team: "About the Team | Penn Liberty Real Estate",
+  contact: "Contact | Penn Liberty Real Estate",
+};
 
 function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
   if (type === "none") {
@@ -79,9 +97,12 @@ function AmbienceLayer({ type }: { type: "none" | "rain" | "snow" }) {
   );
 }
 
-/** Desktop-only: 2px gold progress bar along the top edge — reading position at
- *  a glance. Writes transform directly (no per-frame React renders). */
-function DesktopScrollProgress() {
+/**
+ * Desktop-only top rail:
+ * 1) Scroll progress fill (grows as you read)
+ * 2) Living gold sweep — continuous shimmer in ALL modes (neutral / light / dark)
+ */
+function DesktopScrollProgress({ lightMode }: { lightMode: boolean }) {
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,11 +128,35 @@ function DesktopScrollProgress() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[70] hidden h-[2px] lg:block" aria-hidden>
+    <div
+      className="pointer-events-none fixed inset-x-0 top-0 z-[70] hidden h-[3px] overflow-hidden lg:block"
+      aria-hidden
+    >
+      {/* Base track — always visible in every mode */}
+      <div
+        className={`absolute inset-0 ${
+          lightMode
+            ? "bg-gradient-to-r from-[#d6b06a]/20 via-[#d6b06a]/35 to-[#d6b06a]/20"
+            : "bg-gradient-to-r from-[#d6b06a]/15 via-[#d6b06a]/28 to-[#d6b06a]/15"
+        }`}
+      />
+      {/* Scroll progress fill */}
       <div
         ref={barRef}
-        className="h-full w-full origin-left bg-gradient-to-r from-[#d6b06a]/70 via-[#e4be78] to-[#f4dfb4] shadow-[0_0_8px_rgba(214,176,106,0.45)]"
+        className={`absolute inset-y-0 left-0 w-full origin-left ${
+          lightMode
+            ? "bg-gradient-to-r from-[#a67c32] via-[#d6b06a] to-[#e4be78] shadow-[0_0_12px_rgba(214,176,106,0.65)]"
+            : "bg-gradient-to-r from-[#d6b06a]/90 via-[#e4be78] to-[#f4dfb4] shadow-[0_0_12px_rgba(214,176,106,0.6)]"
+        }`}
         style={{ transform: "scaleX(0)" }}
+      />
+      {/* Continuous gold sweep — same “living bar” energy in light + dark */}
+      <div
+        className={`pl-gold-seam-sweep absolute inset-y-0 w-1/3 ${
+          lightMode
+            ? "bg-gradient-to-r from-transparent via-[#fff6e0] to-transparent opacity-90"
+            : "bg-gradient-to-r from-transparent via-[#fff6e0] to-transparent opacity-80"
+        }`}
       />
     </div>
   );
@@ -333,6 +378,14 @@ export default function App() {
   );
   const lightMode = theme.lightMode;
 
+  useEffect(() => {
+    document.documentElement.dataset.mode = displayMode;
+  }, [displayMode]);
+
+  useEffect(() => {
+    document.title = PAGE_DOCUMENT_TITLES[activePage] ?? PAGE_DOCUMENT_TITLES.home;
+  }, [activePage]);
+
   /** Same day/night pick on every page (Home used a separate path before — broke Light on sub-pages). */
   const siteBackdropSrc =
     displayMode === "light"
@@ -352,7 +405,20 @@ export default function App() {
       return true;
     }
 
-    return [listing.title, listing.address, listing.price].join(" ").toLowerCase().includes(q);
+    return [
+      listing.title,
+      listing.address,
+      listing.price,
+      listing.mlsNumber,
+      listing.status,
+      listing.propertyType,
+      listing.description,
+      ...(listing.highlights ?? []),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(q);
   });
 
   const selectedRental = rentals.find((r) => r.id === selectedRentalId) ?? null;
@@ -428,8 +494,10 @@ export default function App() {
     const rental = rentals.find((r) => r.id === id);
     if (!rental) return;
 
-    const url = resolveRentalApplicationUrl(rental);
-    window.open(url, "_blank", "noopener,noreferrer");
+    setRentalApplicationId(id);
+    setRentalApplicationStatus("idle");
+    setRentalApplicationOpenedExternal(false);
+    setShowRentalApplication(true);
   };
 
   const closeRentalApplication = () => {
@@ -703,7 +771,7 @@ export default function App() {
       ].join("\n"),
     );
 
-    window.location.href = `mailto:info@pennlibertyre.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${PENN_EMAIL}?subject=${subject}&body=${body}`;
     setShowScheduleTour(false);
   };
 
@@ -718,11 +786,15 @@ export default function App() {
     ? "rounded-full bg-black/8 px-4 py-2 text-sm"
     : "rounded-full bg-black/5 px-4 py-2 text-sm";
   const outlineButtonClasses = lightMode
-    ? "rounded-full border-black/20 bg-white/52 px-6 py-6 text-base text-black shadow-[0_16px_40px_rgba(12,18,28,0.08)] hover:bg-white/72"
+    ? "rounded-full border-black/18 bg-white/88 px-6 py-6 text-base text-black shadow-[0_16px_40px_rgba(12,18,28,0.08)] hover:bg-white"
     : "rounded-full border-white/20 bg-white/[0.05] px-6 py-6 text-base text-white shadow-[0_16px_40px_rgba(0,0,0,0.24)] hover:bg-white/[0.08]";
   const footerClasses = lightMode
-    ? "px-4 py-8 text-black/70 md:px-8"
-    : "px-4 py-8 text-white/55 md:px-8";
+    ? "border-t border-black/12 bg-[#ebe8e1]/80 px-4 py-10 text-[#1a2230] md:px-8"
+    : "border-t border-white/10 px-4 py-10 text-white/80 md:px-8";
+  const footerMuted = lightMode ? "text-black/72" : "text-white/60";
+  const footerLink = lightMode
+    ? "font-semibold text-[#0c1220] hover:text-[#1746b8]"
+    : "font-medium text-white/85 hover:text-pl-gold";
   const inputClasses = lightMode
     ? "border-black/15 bg-white/70"
     : "border-white/10 bg-white/[0.04] text-white placeholder:text-white/40";
@@ -760,7 +832,7 @@ export default function App() {
           weather={weather}
         />
 
-      <DesktopScrollProgress />
+      <DesktopScrollProgress lightMode={lightMode} />
       <BackToTopButton lightMode={lightMode} />
 
       <main
@@ -929,8 +1001,38 @@ export default function App() {
       <footer
         className={`relative z-10 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] ${footerClasses}`}
       >
-        <div className="mx-auto max-w-7xl py-2">
-          <span className="text-sm">&copy;2008 Penn Liberty</span>
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="text-sm font-semibold tracking-wide">
+              <span className={lightMode ? "text-[#3d4654]" : "text-[#cdd5e1]"}>PEN</span>
+              <span
+                className={`bg-gradient-to-r bg-clip-text text-transparent ${
+                  lightMode ? "from-[#3d4654] to-[#1746b8]" : "from-[#cdd5e1] to-[#3f86f7]"
+                }`}
+              >
+                N
+              </span>
+              <span className={lightMode ? "text-[#1746b8]" : "text-[#3f86f7]"}> LIBERTY</span>
+            </div>
+            <p className={`mt-1.5 text-[13px] font-medium leading-snug ${footerMuted}`}>
+              Philadelphia property management · rentals · multi-family sales
+            </p>
+            <p className={`mt-2 text-[12px] font-medium ${footerMuted}`}>
+              PA Brokerage License {PENN_BROKERAGE_LICENSE} · Est. {PENN_FOUNDED_YEAR}
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-1">
+            <a href={`tel:${PENN_PHONE_TEL}`} className={footerLink}>
+              {PENN_PHONE_DISPLAY}
+            </a>
+            <a href={`mailto:${PENN_EMAIL}`} className={footerLink}>
+              {PENN_EMAIL}
+            </a>
+            <span className={`font-medium ${footerMuted}`}>{PENN_CITY}</span>
+          </div>
+          <div className={`text-[12px] font-medium ${footerMuted}`}>
+            &copy;{PENN_COPYRIGHT_YEAR} Penn Liberty Real Estate
+          </div>
         </div>
       </footer>
     </div>

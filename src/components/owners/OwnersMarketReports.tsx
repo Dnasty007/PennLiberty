@@ -116,11 +116,11 @@ export function OwnersMarketReports({ lightMode, mutedText, subtleText }: Owners
               onClick={scrollToReview}
               className={`rounded-full px-7 py-6 text-[15px] font-medium transition-transform active:scale-[0.985] ${
                 lightMode
-                  ? "border-black/15 bg-white/40 text-black/80 hover:bg-white/65"
+                  ? "border-black/15 bg-white/85 text-black/80 hover:bg-white"
                   : "border-white/20 bg-white/[0.03] text-white/85 hover:bg-white/[0.08]"
               }`}
             >
-              Request yours — free
+              Request yours
             </Button>
           </div>
         </div>

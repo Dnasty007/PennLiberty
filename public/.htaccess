@@ -2,7 +2,12 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
   RewriteRule ^index\.html$ - [L]
+
+  # Safety: if sale-media ever collides, still prefer SPA for bare routes
+  # Media lives under /sale-media/ so /listings SPA route is free.
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]

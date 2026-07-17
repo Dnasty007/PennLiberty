@@ -142,7 +142,7 @@ export function ListingsMap({
         <div
           className={`mb-4 hidden items-center gap-2 rounded-full border px-4 py-2 text-sm sm:inline-flex ${
             lightMode
-              ? "border-black/10 bg-white/45 text-black/78 backdrop-blur-xl"
+              ? "border-black/12 bg-white/85 text-black/80 backdrop-blur-xl"
               : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
           }`}
         >
@@ -229,7 +229,7 @@ export function ListingsMap({
                             ? "border-[#d6b06a]/55 bg-white/75 ring-1 ring-[#d6b06a]/35"
                             : "border-[#d6b06a]/50 bg-white/[0.07] ring-1 ring-[#d6b06a]/35"
                           : lightMode
-                            ? "border-black/[0.07] bg-white/45 active:bg-white/70"
+                            ? "border-black/[0.10] bg-white/85 active:bg-white"
                             : "border-white/[0.09] bg-white/[0.03] active:bg-white/[0.07]"
                       }`}
                     >
@@ -281,7 +281,7 @@ export function ListingsMap({
                         lightMode
                           ? isSelected
                             ? "border border-[#d6b06a]/55 bg-white/70 shadow-[0_26px_64px_rgba(214,176,106,0.16)] ring-2 ring-[#d6b06a]/40 ring-offset-transparent"
-                            : "border border-black/[0.07] bg-white/45 shadow-[0_14px_40px_rgba(12,18,28,0.06)] hover:border-[#d6b06a]/35 hover:bg-white/[0.88] hover:shadow-[0_22px_56px_rgba(12,18,28,0.11)] focus-visible:border-[#d6b06a]/50 focus-visible:ring-2 focus-visible:ring-[#d6b06a]/35"
+                            : "border border-black/[0.10] bg-white/88 shadow-[0_14px_40px_rgba(12,18,28,0.08)] hover:border-[#d6b06a]/35 hover:bg-white hover:shadow-[0_22px_56px_rgba(12,18,28,0.11)] focus-visible:border-[#d6b06a]/50 focus-visible:ring-2 focus-visible:ring-[#d6b06a]/35"
                           : isSelected
                             ? "border border-[#d6b06a]/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.02))] shadow-[0_28px_80px_rgba(0,0,0,0.55)] ring-2 ring-[#d6b06a]/40 ring-offset-transparent"
                             : "border border-white/[0.09] bg-white/[0.025] shadow-[0_14px_48px_rgba(0,0,0,0.28)] hover:border-[#d6b06a]/22 hover:bg-white/[0.055] hover:shadow-[0_22px_60px_rgba(0,0,0,0.38)] focus-visible:border-[#d6b06a]/40 focus-visible:ring-2 focus-visible:ring-[#d6b06a]/30"

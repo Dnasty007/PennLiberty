@@ -22,7 +22,7 @@ export function RentalListingCardMobile({
     <article
       className={`flex cursor-pointer flex-col overflow-hidden rounded-[26px] border transition-transform active:scale-[0.99] ${
         lightMode
-          ? "border-black/[0.08] bg-gradient-to-br from-white/90 to-white/50 shadow-[0_16px_44px_rgba(12,18,28,0.09)]"
+          ? "border-black/[0.12] bg-gradient-to-br from-white/[0.95] to-white/[0.90] shadow-[0_16px_44px_rgba(12,18,28,0.11)]"
           : "border-white/[0.09] bg-gradient-to-b from-white/[0.07] to-white/[0.02] shadow-[0_18px_50px_rgba(0,0,0,0.32)]"
       }`}
       onClick={onOpen}

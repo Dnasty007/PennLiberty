@@ -55,13 +55,13 @@ function buildListingTheme(lightMode: boolean): ListingTheme {
     shellText: lightMode ? "text-black" : "text-white",
     shellBorder: lightMode ? "border-black/10" : "border-white/10",
     quietPill: lightMode
-      ? "border-black/10 bg-white/40 text-black/62"
+      ? "border-black/12 bg-white/85 text-black/70"
       : "border-white/10 bg-white/[0.05] text-white/72",
     closeButton: lightMode
-      ? "border-black/10 bg-white/40 text-black"
+      ? "border-black/12 bg-white/85 text-black"
       : "border-white/10 bg-white/[0.05] text-white",
     secondaryButton: lightMode
-      ? "rounded-full border-black/12 bg-white/40 px-6 py-6 text-black hover:bg-white/60"
+      ? "rounded-full border-black/12 bg-white/88 px-6 py-6 text-black hover:bg-white"
       : "rounded-full border-white/15 bg-white/[0.04] px-6 py-6 text-white hover:bg-white/[0.08]",
     detailMutedText: lightMode ? "text-black/78" : "text-white/68",
     highlightCardClasses: lightMode
@@ -110,7 +110,7 @@ function AgentContactRow({
   shellText: string;
 }) {
   const rowBg = lightMode
-    ? "border-black/10 bg-white/40"
+    ? "border-black/12 bg-white/85"
     : "border-white/10 bg-white/[0.05]";
   const emailBtn = lightMode
     ? "border-black/12 bg-black/[0.04] text-black/80 hover:bg-black/[0.07]"
@@ -349,7 +349,7 @@ function ListingImageGallery({
                   isActive
                     ? "border-[#d6b06a] shadow-[0_10px_24px_rgba(214,176,106,0.22)]"
                     : lightMode
-                      ? "border-black/10 bg-white/42"
+                      ? "border-black/12 bg-white/85"
                       : "border-white/10 bg-white/[0.04]"
                 }`}
               >

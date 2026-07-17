@@ -100,4 +100,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    // Bind IPv4 so both localhost and 127.0.0.1 work on Windows
+    host: "0.0.0.0",
+    port: 5173,
+    strictPort: true,
+    open: false,
+  },
 });

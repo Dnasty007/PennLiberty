@@ -273,7 +273,7 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
               download="Penn-Liberty-Inspection-Program.pdf"
               className={`inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition ${
                 lightMode
-                  ? "border-black/14 bg-white/45 text-black/80 hover:bg-white/70"
+                  ? "border-black/14 bg-white/85 text-black/80 hover:bg-white"
                   : "border-white/[0.16] bg-white/[0.04] text-white/85 hover:bg-white/[0.09]"
               }`}
             >
@@ -289,7 +289,11 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
             <Button
               type="button"
               onClick={() => setFormOpen(true)}
-              className="w-full rounded-full bg-[#d6b06a] py-7 text-[16px] font-semibold tracking-tight text-[#08111f] shadow-[0_14px_32px_rgba(214,176,106,0.3)] transition-transform hover:bg-[#e4be78] active:scale-[0.985] sm:w-auto sm:px-10"
+              className={`w-full rounded-full border py-7 text-[16px] font-semibold tracking-tight transition-transform active:scale-[0.985] sm:w-auto sm:px-10 ${
+                lightMode
+                  ? "border-black/12 bg-white/88 text-black/85 hover:bg-white"
+                  : "border-white/15 bg-white/[0.05] text-white/90 hover:bg-white/[0.08]"
+              }`}
             >
               Opt in to the Inspection Program
             </Button>

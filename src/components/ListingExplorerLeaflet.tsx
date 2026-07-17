@@ -96,15 +96,23 @@ export function ListingExplorerLeaflet({
       marker.addTo(layerGroup);
     }
 
-    if (filteredListings.length === 0) {
+    const selected = filteredListings.find((l) => l.id === selectedListingId);
+    if (selected) {
+      map.panTo([selected.lat, selected.lng], { animate: true });
+    } else if (filteredListings.length === 0) {
       map.setView([39.9526, -75.1652], 12);
-    } else {
-      const bounds = L.latLngBounds(filteredListings.map((l) => [l.lat, l.lng] as L.LatLngTuple));
-      map.fitBounds(bounds.pad(0.12), { maxZoom: 14 });
     }
 
     requestAnimationFrame(() => map.invalidateSize());
   }, [filteredListings, selectedListingId]);
+
+  // Fit inventory bounds only when the filtered set changes (not every selection).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || filteredListings.length === 0) return;
+    const bounds = L.latLngBounds(filteredListings.map((l) => [l.lat, l.lng] as L.LatLngTuple));
+    map.fitBounds(bounds.pad(0.12), { maxZoom: 14 });
+  }, [filteredListings]);
 
   return (
     <>

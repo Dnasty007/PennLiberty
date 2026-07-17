@@ -34,6 +34,7 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
   const hoverSwitchPanels = usePrefersFinePointerHover();
   const isMobileTabs = !hoverSwitchPanels;
   const userInteractingRef = useRef(false);
+  const tabListRef = useRef<HTMLElement>(null);
   const panel = ownersTabs.find((tab) => tab.key === displayedKey) ?? ownersTabs[0];
 
   useEffect(() => {
@@ -70,8 +71,18 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
 
   useEffect(() => {
     if (!isMobileTabs) return;
+
+    const nav = tabListRef.current;
     const btn = document.getElementById(`owners-why-tab-${active}`);
-    btn?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    if (!nav || !btn) return;
+
+    // Keep the active pill visible in the horizontal strip only — never scroll the page.
+    const navRect = nav.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const btnCenterInNav = btnRect.left - navRect.left + btnRect.width / 2;
+    const delta = btnCenterInNav - navRect.width / 2;
+
+    nav.scrollTo({ left: nav.scrollLeft + delta, behavior: "smooth" });
   }, [active, isMobileTabs]);
 
   const pauseAutoCycle = () => {
@@ -117,6 +128,7 @@ export function OwnersWhyManagement({ lightMode, mutedText }: OwnersWhyManagemen
       </p>
       <div className="mt-8 grid gap-8 lg:grid-cols-[260px,minmax(0,1fr)] lg:gap-12">
         <nav
+          ref={tabListRef}
           role="tablist"
           aria-label="Why management pillars"
           className="pl-touch-scroll-x flex flex-row gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-[7.75rem] lg:flex-col lg:gap-2 lg:self-start lg:overflow-visible lg:pb-0"

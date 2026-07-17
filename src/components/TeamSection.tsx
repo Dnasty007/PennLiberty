@@ -92,7 +92,7 @@ function TeamPortraitCard({
           <>
             <img
               src={photo}
-              alt=""
+              alt={`${person.name}, ${person.role}`}
               decoding="async"
               className={`absolute inset-0 z-[1] h-full w-full object-cover object-[center_28%] transition duration-500 motion-safe:group-hover:scale-[1.03]`}
             />
@@ -219,7 +219,7 @@ export function TeamSection({
         <div
           className={`mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
             lightMode
-              ? "border-black/10 bg-white/45 text-black/78 backdrop-blur-xl"
+              ? "border-black/12 bg-white/85 text-black/80 backdrop-blur-xl"
               : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
           }`}
         >
@@ -265,7 +265,7 @@ export function TeamSection({
                 key={item.title}
                 className={`rounded-[22px] border px-5 py-5 md:px-6 md:py-6 ${
                   lightMode
-                    ? "border-black/[0.08] bg-white/50 shadow-[0_12px_36px_rgba(12,18,28,0.06)]"
+                    ? "border-black/[0.12] bg-white/88 shadow-[0_12px_36px_rgba(12,18,28,0.08)]"
                     : "border-white/[0.08] bg-white/[0.03] shadow-[0_14px_44px_rgba(0,0,0,0.26)]"
                 }`}
               >

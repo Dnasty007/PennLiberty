@@ -23,8 +23,9 @@ const chromeClasses =
 const softClasses =
   "border-white/10 bg-[linear-gradient(180deg,rgba(8,15,26,0.84),rgba(8,15,26,0.74))] shadow-[0_28px_84px_rgba(0,0,0,0.38)] backdrop-blur-[14px]";
 
+/** Light-mode glass: denser paper frost so skyline backdrops don't wash out type */
 const frostClasses =
-  "border-black/[0.11] bg-white/[0.58] shadow-[0_20px_70px_rgba(12,18,28,0.13)] backdrop-blur-[16px]";
+  "border-black/[0.13] bg-white/[0.86] shadow-[0_22px_70px_rgba(12,18,28,0.14)] backdrop-blur-[20px]";
 
 function resolveVariant(
   variant: GlassCardVariant | undefined,

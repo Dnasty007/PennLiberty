@@ -124,11 +124,11 @@ export function AIAssistant({ lightMode = false }: AIAssistantProps) {
   };
 
   const launcher = lightMode
-    ? "border-black/14 bg-white/62 text-black/75 backdrop-blur transition hover:border-[#c49a42]/55 hover:text-black"
+    ? "border-black/14 bg-white/88 text-black/80 backdrop-blur transition hover:border-[#c49a42]/55 hover:text-black"
     : "border-white/16 bg-[rgba(8,17,31,0.4)] text-white/80 backdrop-blur transition hover:border-[#d6b06a]/50 hover:text-white";
 
   const dialogShell = lightMode
-    ? "border-black/12 bg-[rgba(255,252,246,0.88)] shadow-[0_30px_80px_rgba(12,18,28,0.14)] backdrop-blur-[22px]"
+    ? "border-black/13 bg-[rgba(255,252,246,0.94)] shadow-[0_30px_80px_rgba(12,18,28,0.14)] backdrop-blur-[22px]"
     : "border-white/12 bg-[rgba(10,18,30,0.78)] shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-[22px]";
 
   const dialogHeaderFooterRule = lightMode ? "border-black/[0.08]" : "border-white/8";
@@ -146,7 +146,7 @@ export function AIAssistant({ lightMode = false }: AIAssistantProps) {
   const dotColor = lightMode ? "bg-black/38" : "bg-white/55";
 
   const suggestBtn = lightMode
-    ? "rounded-full border border-black/12 bg-white/55 px-3 py-1.5 text-left text-xs text-black/78 hover:border-[#c49a42]/55 hover:bg-white/82 hover:text-black"
+    ? "rounded-full border border-black/12 bg-white/88 px-3 py-1.5 text-left text-xs text-black/80 hover:border-[#c49a42]/55 hover:bg-white hover:text-black"
     : "rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-left text-xs text-white/80 hover:border-[#d6b06a]/45 hover:bg-white/[0.07] hover:text-white";
 
   const composeRow = dialogHeaderFooterRule;

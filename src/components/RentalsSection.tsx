@@ -417,7 +417,7 @@ export function RentalsSection({
           <div
             className={`mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
               lightMode
-                ? "border-black/10 bg-white/45 text-black/78 backdrop-blur-xl"
+                ? "border-black/12 bg-white/85 text-black/80 backdrop-blur-xl"
                 : "border-white/15 bg-white/[0.012] text-white/82 backdrop-blur-xl"
             }`}
           >
@@ -713,7 +713,7 @@ export function RentalsSection({
                     onOpenRentalDetails ? "cursor-pointer" : ""
                   } ${
                     lightMode
-                      ? "border-black/[0.08] bg-gradient-to-br from-white/88 to-white/45 shadow-[0_14px_42px_rgba(12,18,28,0.07)] hover:border-[#d6b06a]/38"
+                      ? "border-black/[0.12] bg-gradient-to-br from-white/[0.94] to-white/[0.88] shadow-[0_16px_44px_rgba(12,18,28,0.10)] hover:border-[#d6b06a]/38"
                       : "border-white/[0.09] bg-gradient-to-b from-white/[0.08] to-white/[0.025] shadow-[0_14px_48px_rgba(0,0,0,0.26)] hover:border-[#d6b06a]/28"
                   }`}
                   onClick={() => onOpenRentalDetails?.(rental.id)}
@@ -734,7 +734,7 @@ export function RentalsSection({
                     </div>
                     <div
                       className={`pointer-events-none absolute left-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] backdrop-blur-md ${
-                        lightMode ? "bg-white/88 text-black/62 ring-1 ring-black/12" : "bg-black/54 text-[#efd9a9] ring-1 ring-white/16"
+                        lightMode ? "bg-white/95 text-black/70 ring-1 ring-black/12" : "bg-black/54 text-[#efd9a9] ring-1 ring-white/16"
                       }`}
                     >
                       <MapPin className="mr-1.5 h-3 w-3 shrink-0 text-[#d6b06a]" aria-hidden />
@@ -799,7 +799,7 @@ export function RentalsSection({
             <Button
               type="button"
               variant="outline"
-              className={`rounded-full px-8 py-6 text-[15px] [translate:5px_18px] ${outlineButtonClasses}`}
+              className={`rounded-full px-8 py-6 text-[15px] ${outlineButtonClasses}`}
               onClick={() => goToPage("contact")}
             >
               Go to contact

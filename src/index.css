@@ -3,8 +3,29 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
+  font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --pl-gold: #d6b06a;
+  --pl-gold-hover: #e4be78;
+  --pl-gold-soft: #f4dfb4;
+  --pl-navy: #08111f;
+  --pl-shell: #f5f3ee;
+  --pl-ink: #0c1220;
+  --pl-ink-muted: rgba(12, 18, 32, 0.72);
+  --pl-border: rgba(12, 18, 32, 0.12);
+}
+
+[data-mode="dark"] {
   color-scheme: dark;
-  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --pl-ink: #ffffff;
+  --pl-ink-muted: rgba(255, 255, 255, 0.72);
+  --pl-border: rgba(255, 255, 255, 0.12);
+  --pl-shell: #06101d;
+}
+
+[data-mode="light"],
+[data-mode="neutral"] {
+  color-scheme: light;
 }
 
 * {
@@ -164,6 +185,36 @@ input {
 }
 .rental-pin--physics .rental-pin-chip {
   pointer-events: auto;
+}
+
+/* Homepage portfolio — gentle breathing Ken Burns on the active hero photo */
+@keyframes pl-portfolio-ken {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+.pl-portfolio-ken {
+  animation: pl-portfolio-ken 9s ease-in-out infinite;
+}
+/* Living gold seam — sweeping highlight (portfolio card + optional top rail) */
+@keyframes pl-gold-seam-sweep {
+  0%   { transform: translateX(-130%); }
+  100% { transform: translateX(330%); }
+}
+.pl-gold-seam-sweep {
+  animation: pl-gold-seam-sweep 2.6s ease-in-out infinite;
+}
+
+/* Alias kept for existing class names */
+.pl-portfolio-seam {
+  animation: pl-gold-seam-sweep 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-portfolio-ken,
+  .pl-portfolio-seam,
+  .pl-gold-seam-sweep {
+    animation: none;
+  }
 }
 
 /* Page transition — calm fade + rise on every page change (nav click or swipe).

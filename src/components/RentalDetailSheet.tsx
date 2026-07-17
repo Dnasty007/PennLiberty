@@ -359,7 +359,7 @@ export function RentalDetailSheet({
 
   // Card theme tokens
   const cardBg = lightMode
-    ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(250,247,243,0.98))] border-black/[0.08]"
+    ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(250,247,243,0.99))] border-black/[0.12]"
     : "bg-[linear-gradient(180deg,rgba(8,14,26,0.97),rgba(5,10,20,0.99))] border-white/[0.09]";
   const titleColor = lightMode ? "text-black/92" : "text-white";
   const pillBg = lightMode
@@ -367,14 +367,14 @@ export function RentalDetailSheet({
     : "border-white/[0.10] bg-white/[0.05] text-white/68";
   const dividerColor = lightMode ? "bg-black/[0.06]" : "bg-white/[0.07]";
   const ctaBg = lightMode
-    ? "bg-gradient-to-t from-white/[0.98] via-white/90 to-transparent"
+    ? "bg-gradient-to-t from-white via-white/95 to-transparent"
     : "bg-gradient-to-t from-[#05101e]/[0.98] via-[#05101e]/90 to-transparent";
   const outlineBtn = lightMode
-    ? "border-black/12 bg-black/[0.04] text-black/80"
+    ? "border-black/14 bg-white/90 text-black/85"
     : "border-white/[0.12] bg-white/[0.04] text-white/85";
   // Primary browse action — solid neutral fill, the stronger of the two media buttons
   const photosBtn = lightMode
-    ? "border-black/[0.10] bg-black/[0.07] text-black/85"
+    ? "border-black/[0.12] bg-white/92 text-black/85"
     : "border-white/[0.14] bg-white/[0.10] text-white";
   // Secondary/optional — quiet outline; gold lives only in the play icon
   const videoBtn = lightMode
