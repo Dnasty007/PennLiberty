@@ -1,19 +1,25 @@
-import { useEffect, useMemo } from "react";
-import { X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Trophy, X } from "lucide-react";
+import { HallOfFamePanel } from "@/components/arcade/HallOfFamePanel";
 import {
   catalogByEra,
   type ArcadeGameId,
   type ArcadeGameMeta,
 } from "@/lib/arcade/catalog";
+import { isHallOfFameEnabled } from "@/lib/arcade/hallOfFame";
 
 type RentalsArcadeHubProps = {
   onPlay: (game: ArcadeGameId) => void;
   onQuit: () => void;
 };
 
-/** CRT timeline hub — games sorted by original release year. */
+type HubTab = "games" | "fame";
+
+/** CRT timeline hub — games sorted by year + global Hall of Fame. */
 export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
   const eras = useMemo(() => catalogByEra(), []);
+  const [tab, setTab] = useState<HubTab>("games");
+  const hofLive = isHallOfFameEnabled();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -22,10 +28,17 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
         onQuit();
         return;
       }
+      if (e.code === "KeyH" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        // H = Hall of Fame (when not typing)
+        e.preventDefault();
+        setTab((t) => (t === "fame" ? "games" : "fame"));
+        return;
+      }
+      if (tab !== "games") return;
       const digit = e.code.match(/^(?:Digit|Numpad)(\d)$/)?.[1];
       if (digit !== undefined) {
         const game = eras
-          .flatMap((e) => e.games)
+          .flatMap((er) => er.games)
           .find((g) => g.hotkey === digit);
         if (game) {
           e.preventDefault();
@@ -34,9 +47,9 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
         return;
       }
       const letter = e.code.match(/^Key([A-Z])$/)?.[1];
-      if (letter) {
+      if (letter && letter !== "H") {
         const game = eras
-          .flatMap((e) => e.games)
+          .flatMap((er) => er.games)
           .find((g) => g.hotkey.toUpperCase() === letter);
         if (game) {
           e.preventDefault();
@@ -46,7 +59,7 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onPlay, onQuit, eras]);
+  }, [onPlay, onQuit, eras, tab]);
 
   const total = eras.reduce((n, e) => n + e.games.length, 0);
 
@@ -56,7 +69,6 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
       role="dialog"
       aria-label="Classic arcade game select — chronological"
     >
-      {/* CRT backdrop */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,28,18,0.85)_0%,rgba(0,4,3,0.94)_70%)]" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
@@ -65,7 +77,6 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
             "repeating-linear-gradient(0deg, transparent, transparent 2px, #000 2px, #000 3px)",
         }}
       />
-      {/* soft gold vignette edge */}
       <div className="pointer-events-none absolute inset-0 rounded-[26px] shadow-[inset_0_0_80px_rgba(214,176,106,0.08)]" />
 
       <button
@@ -78,7 +89,6 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
       </button>
 
       <div className="relative z-[32] flex h-full flex-col">
-        {/* Header */}
         <header className="shrink-0 border-b border-[#33ff66]/10 px-5 pb-3 pt-5 sm:px-7">
           <div className="flex flex-wrap items-end justify-between gap-2 pr-10">
             <div>
@@ -96,48 +106,89 @@ export function RentalsArcadeHub({ onPlay, onQuit }: RentalsArcadeHubProps) {
               </div>
             </div>
           </div>
-          {/* decade rail */}
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {eras.map(({ era }) => (
-              <span
-                key={era}
-                className="rounded-full border border-[#33ff66]/20 bg-[#33ff66]/5 px-2.5 py-0.5 font-mono text-[9px] tracking-[0.2em] text-[#33ff66]/80"
-              >
-                {era}
-              </span>
-            ))}
+
+          {/* Tabs */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTab("games")}
+              className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold tracking-[0.2em] transition ${
+                tab === "games"
+                  ? "border-[#33ff66]/50 bg-[#33ff66]/15 text-[#33ff66]"
+                  : "border-white/10 text-white/45 hover:border-white/25 hover:text-white/70"
+              }`}
+            >
+              GAMES
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("fame")}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[10px] font-bold tracking-[0.2em] transition ${
+                tab === "fame"
+                  ? "border-[#d6b06a]/60 bg-[#d6b06a]/15 text-[#d6b06a]"
+                  : "border-white/10 text-white/45 hover:border-white/25 hover:text-white/70"
+              }`}
+            >
+              <Trophy className="h-3 w-3" />
+              HALL OF FAME
+              {hofLive ? (
+                <span className="ml-0.5 rounded bg-[#33ff66]/20 px-1 text-[8px] text-[#33ff66]">
+                  LIVE
+                </span>
+              ) : (
+                <span className="ml-0.5 rounded bg-white/10 px-1 text-[8px] text-white/40">
+                  SETUP
+                </span>
+              )}
+            </button>
+            {tab === "games" &&
+              eras.map(({ era }) => (
+                <span
+                  key={era}
+                  className="hidden rounded-full border border-[#33ff66]/15 bg-[#33ff66]/5 px-2 py-0.5 font-mono text-[9px] tracking-[0.2em] text-[#33ff66]/70 sm:inline"
+                >
+                  {era}
+                </span>
+              ))}
           </div>
         </header>
 
-        {/* Scrollable timeline */}
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
-          <div className="mx-auto max-w-4xl space-y-6">
-            {eras.map(({ era, games }, eraIdx) => (
-              <section key={era} className="relative">
-                {/* era spine */}
-                <div className="mb-2.5 flex items-center gap-3">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#d6b06a]/40 bg-black/50 font-mono text-[10px] font-bold text-[#d6b06a]">
-                    {String(eraIdx + 1).padStart(2, "0")}
+          {tab === "fame" ? (
+            <div className="mx-auto max-w-4xl">
+              <HallOfFamePanel />
+              <p className="mt-4 text-center font-mono text-[10px] tracking-widest text-white/35">
+                BEAT A SCORE · SUBMIT INITIALS · YOUR NAME ON THE CABINET
+              </p>
+            </div>
+          ) : (
+            <div className="mx-auto max-w-4xl space-y-6">
+              {eras.map(({ era, games }, eraIdx) => (
+                <section key={era} className="relative">
+                  <div className="mb-2.5 flex items-center gap-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#d6b06a]/40 bg-black/50 font-mono text-[10px] font-bold text-[#d6b06a]">
+                      {String(eraIdx + 1).padStart(2, "0")}
+                    </div>
+                    <div className="h-px flex-1 bg-gradient-to-r from-[#d6b06a]/50 to-transparent" />
+                    <h3 className="shrink-0 font-mono text-xs font-bold tracking-[0.35em] text-[#d6b06a]">
+                      {era}
+                    </h3>
+                    <div className="h-px flex-1 bg-gradient-to-l from-[#d6b06a]/50 to-transparent" />
                   </div>
-                  <div className="h-px flex-1 bg-gradient-to-r from-[#d6b06a]/50 to-transparent" />
-                  <h3 className="shrink-0 font-mono text-xs font-bold tracking-[0.35em] text-[#d6b06a]">
-                    {era}
-                  </h3>
-                  <div className="h-px flex-1 bg-gradient-to-l from-[#d6b06a]/50 to-transparent" />
-                </div>
 
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {games.map((g) => (
-                    <GameTile key={g.id} game={g} onPlay={onPlay} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {games.map((g) => (
+                      <GameTile key={g.id} game={g} onPlay={onPlay} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
         </div>
 
         <footer className="shrink-0 border-t border-white/5 px-5 py-2.5 text-center font-mono text-[9px] tracking-[0.25em] text-white/30">
-          HOTKEYS ON TILES · LAZY-LOADED · ONE GAME AT A TIME
+          H · HALL OF FAME · HOTKEYS ON TILES · DESKTOP ONLY
         </footer>
       </div>
     </div>
@@ -157,7 +208,6 @@ function GameTile({
       onClick={() => onPlay(game.id)}
       className="group relative flex items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-black/40 text-left backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-[#33ff66]/35 hover:bg-black/55 hover:shadow-[0_8px_28px_rgba(51,255,102,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#33ff66]/55"
     >
-      {/* year strip */}
       <div
         className="flex w-14 shrink-0 flex-col items-center justify-center border-r border-white/5 px-1 py-3"
         style={{ background: `${game.accent}12` }}

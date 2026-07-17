@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
+import { ScoreSubmitBar } from "@/components/arcade/ScoreSubmitBar";
 import type { PhysicsBody } from "@/lib/rentalHeroPhysics";
 import { CAPTURED_CODES, KEYS } from "@/lib/rentalsInvaders/constants";
 import type { GameController, HudInfo } from "@/lib/rentalsInvaders/createGame";
@@ -249,6 +250,11 @@ export function RentalsHeroInvadersGame({
               </span>
             )}
           </p>
+          <ScoreSubmitBar
+            gameId="invaders"
+            score={overlay.score}
+            accent="#33ff66"
+          />
           <div className="mt-2 flex gap-3">
             <button
               type="button"

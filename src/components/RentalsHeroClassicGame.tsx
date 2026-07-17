@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
+import { ScoreSubmitBar } from "@/components/arcade/ScoreSubmitBar";
 import {
   ARCADE_CATALOG,
   type ClassicShellId,
@@ -276,6 +277,11 @@ export function RentalsHeroClassicGame({
               </span>
             )}
           </p>
+          <ScoreSubmitBar
+            gameId={gameId}
+            score={overlay.score}
+            accent={accent}
+          />
           <div className="mt-2 flex gap-3">
             <button
               type="button"

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
+import { ScoreSubmitBar } from "@/components/arcade/ScoreSubmitBar";
 import { CAPTURED_CODES, KEYS } from "@/lib/rentalsTetris/constants";
 import type { GameController, HudInfo } from "@/lib/rentalsTetris/createGame";
 import type { Phase } from "@/lib/rentalsTetris/types";
@@ -207,6 +208,11 @@ export function RentalsHeroTetrisGame({
               </span>
             )}
           </p>
+          <ScoreSubmitBar
+            gameId="tetris"
+            score={overlay.score}
+            accent="#5ec8ff"
+          />
           <div className="mt-2 flex gap-3">
             <button
               type="button"
