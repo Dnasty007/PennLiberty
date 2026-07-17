@@ -1,6 +1,15 @@
-/** Spawning + per-step movement for game entities. Pure-ish: these mutate the
- *  passed state but never touch audio/render (the engine owns those). */
-import { BULLET, ENEMY_FIRE, GRID, MARCH, PLAYER, UFO } from "./constants";
+/** Spawning + per-step movement for game entities. Pure simulation: mutates
+ *  the passed state but never touches audio/render (the engine owns those). */
+import {
+  BULLET,
+  ENEMY_FIRE,
+  GRID,
+  MARCH,
+  MYSTERY_POINTS,
+  PLAYER,
+  UFO,
+} from "./constants";
+import { spawnBunkers } from "./bunkers";
 import type { Bullet, GameState, Invader, Particle } from "./types";
 
 export function rand(min: number, max: number): number {
@@ -24,16 +33,22 @@ export function createInitialState(
     wave: 1,
     player: { x: width / 2, y: 0, cooldown: 0, invuln: 0 },
     invaders: [],
-    playerBullets: Array.from({ length: BULLET.maxPlayer }, () => idleBullet("player")),
-    enemyBullets: Array.from({ length: BULLET.maxEnemy }, () => idleBullet("enemy")),
+    playerBullets: Array.from({ length: BULLET.maxPlayer }, () =>
+      idleBullet("player"),
+    ),
+    enemyBullets: Array.from({ length: BULLET.maxEnemy }, () =>
+      idleBullet("enemy"),
+    ),
     ufo: { active: false, x: 0, y: 0, vx: 0, points: 0 },
     particles: [],
     pins: [],
+    bunkers: [],
     dir: 1,
     marchTimer: 0,
     stepFrame: 0,
     enemyFireTimer: ENEMY_FIRE.baseIntervalMs,
     ufoTimer: rand(UFO.minSpawnMs, UFO.maxSpawnMs),
+    playerShotsFired: 0,
     phaseTimer: 0,
     shake: 0,
     width,
@@ -59,14 +74,15 @@ export function layoutPlayer(state: GameState) {
   );
 }
 
-/** Build the 5×11 formation, scaled + centered to the current hero size. */
+/** Build the 5×11 formation, scaled + centered; reset bunkers each wave. */
 export function spawnWave(state: GameState) {
   const { rows, cols } = GRID;
   const blockW = state.width * GRID.widthFraction;
   const stride = blockW / cols;
   const startX = (state.width - blockW) / 2 + stride / 2;
   const rowStride = GRID.invaderHeight + 14;
-  const top = GRID.topPad + (state.wave - 1) * 6; // each wave starts a touch lower
+  // Each successive wave starts a touch lower (classic pressure).
+  const top = GRID.topPad + (state.wave - 1) * 6;
 
   const invaders: Invader[] = [];
   for (let row = 0; row < rows; row++) {
@@ -77,7 +93,8 @@ export function spawnWave(state: GameState) {
         row,
         x: startX + col * stride,
         y: top + row * rowStride,
-        points: GRID.rowPointsBottomToTop[rows - 1 - row]!,
+        // Classic: top row worth most (squid 30 → octopus 10).
+        points: GRID.rowPointsTopToBottom[row]!,
         sprite: GRID.rowSpriteTopToBottom[row]!,
         dying: 0,
       });
@@ -89,6 +106,13 @@ export function spawnWave(state: GameState) {
   state.marchTimer = MARCH.baseStepMs;
   state.stepFrame = 0;
   state.enemyFireTimer = ENEMY_FIRE.baseIntervalMs;
+
+  // Clear live projectiles; bunkers restore each wave.
+  for (const b of state.playerBullets) b.active = false;
+  for (const b of state.enemyBullets) b.active = false;
+  state.ufo.active = false;
+  layoutPlayer(state);
+  state.bunkers = spawnBunkers(state.width, state.height, state.player.y);
 }
 
 export function clamp(v: number, min: number, max: number): number {
@@ -108,6 +132,11 @@ export function movePlayer(state: GameState, stepMs: number) {
   if (state.player.invuln > 0) state.player.invuln -= stepMs;
 }
 
+/**
+ * Classic SI: fire only when no player bullet is active (max 1 on screen).
+ * Short cooldown is anti-repeat only. Increments playerShotsFired for the
+ * mystery-ship point table.
+ */
 export function tryFirePlayer(state: GameState): boolean {
   if (state.player.cooldown > 0) return false;
   const slot = state.playerBullets.find((b) => !b.active);
@@ -118,6 +147,7 @@ export function tryFirePlayer(state: GameState): boolean {
   slot.vx = 0;
   slot.vy = -BULLET.playerSpeed;
   state.player.cooldown = PLAYER.fireCooldownMs;
+  state.playerShotsFired += 1;
   return true;
 }
 
@@ -125,9 +155,15 @@ export function moveBullets(state: GameState, stepMs: number) {
   const dt = stepMs / (1000 / 60);
   for (const b of [...state.playerBullets, ...state.enemyBullets]) {
     if (!b.active) continue;
+    // Vertical only for both sides (classic).
     b.x += b.vx * dt;
     b.y += b.vy * dt;
-    if (b.y < -16 || b.y > state.height + 16 || b.x < -16 || b.x > state.width + 16) {
+    if (
+      b.y < -16 ||
+      b.y > state.height + 16 ||
+      b.x < -16 ||
+      b.x > state.width + 16
+    ) {
       b.active = false;
     }
   }
@@ -142,7 +178,12 @@ function marchStepInterval(state: GameState): number {
   return clamp(interval, MARCH.minStepMs, MARCH.baseStepMs);
 }
 
-/** Returns true when a horizontal step happened (for step SFX). */
+/**
+ * Synchronized block march: step left/right; when ANY edge invader would
+ * leave the screen, reverse direction and drop the whole formation.
+ * Toggles the 2-frame walk animation on each step. Returns true on a step
+ * (for step SFX).
+ */
 export function marchInvaders(state: GameState, stepMs: number): boolean {
   for (const inv of state.invaders) {
     if (inv.dying > 0) inv.dying = Math.max(0, inv.dying - stepMs);
@@ -170,6 +211,7 @@ export function marchInvaders(state: GameState, stepMs: number): boolean {
     (state.dir === -1 && minX - hStep - half < pad);
 
   if (wouldExceed) {
+    // Classic: drop + reverse on the same beat (no horizontal travel that step).
     state.dir = (state.dir === 1 ? -1 : 1) as 1 | -1;
     for (const inv of state.invaders) inv.y += MARCH.dropPx;
   } else {
@@ -180,21 +222,26 @@ export function marchInvaders(state: GameState, stepMs: number): boolean {
   return true;
 }
 
-/** Bottom-most alive invader per column may shoot (classic). */
+/**
+ * Only the bottom-most alive invader in a column may shoot. Pick a random
+ * eligible column. Bullets travel vertically only (no aiming). Cap is
+ * BULLET.maxEnemy concurrent shots.
+ */
 export function maybeEnemyFire(state: GameState, stepMs: number) {
   state.enemyFireTimer -= stepMs;
   if (state.enemyFireTimer > 0) return;
 
   const base = Math.max(
     ENEMY_FIRE.minIntervalMs,
-    ENEMY_FIRE.baseIntervalMs - (state.wave - 1) * ENEMY_FIRE.perWaveReductionMs,
+    ENEMY_FIRE.baseIntervalMs -
+      (state.wave - 1) * ENEMY_FIRE.perWaveReductionMs,
   );
   state.enemyFireTimer = base * rand(0.7, 1.3);
 
   const slot = state.enemyBullets.find((b) => !b.active);
   if (!slot) return;
 
-  // bottom-most alive invader for each column
+  // Bottom-most alive invader per column.
   const bottoms = new Map<number, Invader>();
   for (const inv of state.invaders) {
     if (!inv.alive) continue;
@@ -209,12 +256,16 @@ export function maybeEnemyFire(state: GameState, stepMs: number) {
   slot.x = shooter.x;
   slot.y = shooter.y + GRID.invaderHeight / 2;
   slot.vy = BULLET.enemySpeed;
-  slot.vx = 0;
+  slot.vx = 0; // vertical only — classic SI never aimed
+}
 
-  if (state.wave >= ENEMY_FIRE.aimedFromWave && Math.random() < ENEMY_FIRE.aimedChance) {
-    const dx = state.player.x - shooter.x;
-    slot.vx = clamp(dx * 0.01, -1.6, 1.6);
-  }
+/**
+ * Mystery ship: spawn every 20–40s, fly across the top.
+ * Points are resolved from the classic shot-count table at spawn (and
+ * re-checked at hit for safety) via mysteryPointsFor(shots).
+ */
+export function mysteryPointsFor(playerShotsFired: number): number {
+  return MYSTERY_POINTS[playerShotsFired % MYSTERY_POINTS.length]!;
 }
 
 export function updateUfo(state: GameState, stepMs: number): "spawn" | null {
@@ -237,7 +288,8 @@ export function updateUfo(state: GameState, stepMs: number): "spawn" | null {
     x: fromLeft ? -UFO.width : state.width + UFO.width,
     y: UFO.topOffset,
     vx: fromLeft ? UFO.speed : -UFO.speed,
-    points: UFO.pointChoices[Math.floor(Math.random() * UFO.pointChoices.length)]!,
+    // Snapshot table value; engine re-resolves on hit with current shot count.
+    points: mysteryPointsFor(state.playerShotsFired),
   };
   return "spawn";
 }

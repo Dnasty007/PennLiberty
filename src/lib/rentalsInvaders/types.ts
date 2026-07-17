@@ -42,7 +42,7 @@ export type Ufo = {
 export type Player = {
   x: number; // center
   y: number; // center
-  cooldown: number; // ms until next shot allowed
+  cooldown: number; // ms until next shot allowed (anti-repeat only)
   invuln: number; // ms of post-respawn invulnerability
 };
 
@@ -64,6 +64,18 @@ export type PinObstacle = {
   radius: number;
 };
 
+/** Single filled pixel-block of a classic SI bunker (center coords). */
+export type BunkerBlock = {
+  x: number;
+  y: number;
+  alive: boolean;
+};
+
+/** One of the four house-shaped bunkers above the player. */
+export type Bunker = {
+  blocks: BunkerBlock[];
+};
+
 export type GameState = {
   phase: Phase;
   score: number;
@@ -78,6 +90,8 @@ export type GameState = {
   ufo: Ufo;
   particles: Particle[];
   pins: PinObstacle[];
+  /** Four classic destructible bunkers (reset each wave). */
+  bunkers: Bunker[];
 
   /** Formation march state. */
   dir: 1 | -1;
@@ -85,6 +99,12 @@ export type GameState = {
   stepFrame: 0 | 1;
   enemyFireTimer: number;
   ufoTimer: number;
+
+  /**
+   * Total successful player shots this game (resets on restart).
+   * Indexes the classic mystery-ship point table: MYSTERY[shots % 15].
+   */
+  playerShotsFired: number;
 
   /** Counts down generic phase transitions (ready / dying / wave-clear). */
   phaseTimer: number;

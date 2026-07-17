@@ -2,10 +2,12 @@
  *  calls update()/render() each frame; the engine owns all game state. */
 import { GameAudio } from "./audio";
 import {
-  bulletHitsInvader,
-  bulletHitsPin,
-  rectsOverlap,
-} from "./collision";
+  bunkerCellSize,
+  carveBunkersByInvaders,
+  damageBunkerAtBullet,
+  scaleBunkers,
+} from "./bunkers";
+import { bulletHitsInvader, rectsOverlap } from "./collision";
 import { FX, GRID, HIGH_SCORE_KEY, PLAYER, STEP_MS, UFO } from "./constants";
 import {
   aliveInvaders,
@@ -15,6 +17,7 @@ import {
   maybeEnemyFire,
   moveBullets,
   movePlayer,
+  mysteryPointsFor,
   spawnParticles,
   spawnWave,
   tryFirePlayer,
@@ -109,6 +112,7 @@ export class InvadersEngine {
     }
     s.player.x *= sx;
     s.ufo.x *= sx;
+    scaleBunkers(s.bunkers, sx, sy);
     s.width = width;
     s.height = height;
     layoutPlayer(s);
@@ -183,11 +187,22 @@ export class InvadersEngine {
     if (s.keys.fire && tryFirePlayer(s)) this.audio.shoot();
     moveBullets(s, stepMs);
 
-    if (marchInvaders(s, stepMs)) this.audio.step(s.stepFrame);
+    if (marchInvaders(s, stepMs)) {
+      this.audio.step(s.stepFrame);
+      // Invaders carve bunkers as they march through them.
+      carveBunkersByInvaders(
+        s.bunkers,
+        s.invaders,
+        GRID.invaderWidth,
+        GRID.invaderHeight,
+        bunkerCellSize(s.width),
+      );
+    }
     maybeEnemyFire(s, stepMs);
     if (updateUfo(s, stepMs) === "spawn") this.audio.ufo();
 
-    this.collideBulletsWithPins();
+    // Rental pins are visual only during game — no circular blockers.
+    this.collideBulletsWithBunkers();
     this.collidePlayerBulletsWithTargets();
     this.collideEnemyBulletsWithPlayer();
     this.checkInvaderDescent();
@@ -198,17 +213,16 @@ export class InvadersEngine {
     }
   }
 
-  private collideBulletsWithPins() {
+  /** Player + enemy bullets destroy bunker blocks and are consumed. */
+  private collideBulletsWithBunkers() {
     const s = this.state;
-    if (s.pins.length === 0) return;
+    if (s.bunkers.length === 0) return;
+    const cell = bunkerCellSize(s.width);
     for (const b of [...s.playerBullets, ...s.enemyBullets]) {
       if (!b.active) continue;
-      for (const pin of s.pins) {
-        if (bulletHitsPin(b, pin)) {
-          b.active = false;
-          spawnParticles(s, b.x, b.y, 4, "#f4dfb4", 1.8);
-          break;
-        }
+      if (damageBunkerAtBullet(s.bunkers, b, cell)) {
+        b.active = false;
+        spawnParticles(s, b.x, b.y, 3, "#5ec8ff", 1.4);
       }
     }
   }
@@ -220,11 +234,23 @@ export class InvadersEngine {
 
       if (
         s.ufo.active &&
-        rectsOverlap(b.x, b.y, 2, 8, s.ufo.x, s.ufo.y, UFO.width, UFO.height)
+        rectsOverlap(
+          b.x,
+          b.y,
+          2,
+          8,
+          s.ufo.x,
+          s.ufo.y,
+          UFO.width,
+          UFO.height,
+        )
       ) {
         b.active = false;
         s.ufo.active = false;
-        s.score += s.ufo.points;
+        // Classic: score from shot-count table at the moment of the hit.
+        const pts = mysteryPointsFor(s.playerShotsFired);
+        s.ufo.points = pts;
+        s.score += pts;
         this.audio.ufoHit();
         spawnParticles(s, s.ufo.x, s.ufo.y, 12, "#5ec8ff", 3);
         continue;
@@ -232,7 +258,9 @@ export class InvadersEngine {
 
       for (const inv of s.invaders) {
         if (!inv.alive) continue;
-        if (bulletHitsInvader(b, inv, GRID.invaderWidth, GRID.invaderHeight)) {
+        if (
+          bulletHitsInvader(b, inv, GRID.invaderWidth, GRID.invaderHeight)
+        ) {
           b.active = false;
           inv.alive = false;
           inv.dying = FX.invaderDeathMs;
@@ -251,7 +279,16 @@ export class InvadersEngine {
     for (const b of s.enemyBullets) {
       if (!b.active) continue;
       if (
-        rectsOverlap(b.x, b.y, 3, 10, s.player.x, s.player.y, PLAYER.width, PLAYER.height)
+        rectsOverlap(
+          b.x,
+          b.y,
+          3,
+          10,
+          s.player.x,
+          s.player.y,
+          PLAYER.width,
+          PLAYER.height,
+        )
       ) {
         b.active = false;
         this.loseLife();
@@ -260,6 +297,7 @@ export class InvadersEngine {
     }
   }
 
+  /** Invaders reaching the player line = instant game over (any lives left). */
   private checkInvaderDescent() {
     const s = this.state;
     const line = s.player.y - PLAYER.height;

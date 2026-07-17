@@ -2,10 +2,10 @@
 
 export const PENN_PHONE_DISPLAY = "215-922-7900";
 export const PENN_PHONE_TEL = "+12159227900";
-/** Primary public desk inbox */
-export const PENN_EMAIL = "info@pennlibertyre.com";
-/** Alternate desk Gmail (legacy contact paths) */
-export const PENN_EMAIL_LEGACY = "Pennlibertyre@gmail.com";
+/** Primary public contact — Co-Founder Operations (site inquiries) */
+export const PENN_EMAIL = "Rayluke@pennlibertyre.com";
+/** Legacy desk inbox (kept for reference; not used as primary CTA) */
+export const PENN_EMAIL_LEGACY = "info@pennlibertyre.com";
 export const PENN_BROKERAGE_LICENSE = "RB066799";
 export const PENN_FOUNDED_YEAR = 2009;
 export const PENN_COPYRIGHT_YEAR = 2009;

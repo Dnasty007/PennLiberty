@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Images, Mail, Phone, Play, Volume2, VolumeX, X } from "lucide-react";
 import type { Rental } from "@/lib/data";
+import { PENN_EMAIL, PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
 
-const PENN_PHONE = "215-922-7900";
-const PENN_PHONE_TEL = "+12159227900";
-const PENN_EMAIL = "info@pennlibertyre.com";
+const PENN_PHONE = PENN_PHONE_DISPLAY;
 
 function inquiryMailto(rental: Rental): string {
   const subject = encodeURIComponent(`Rental inquiry: ${rental.title}`);

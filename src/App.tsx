@@ -789,11 +789,12 @@ export default function App() {
     ? "rounded-full border-black/18 bg-white/88 px-6 py-6 text-base text-black shadow-[0_16px_40px_rgba(12,18,28,0.08)] hover:bg-white"
     : "rounded-full border-white/20 bg-white/[0.05] px-6 py-6 text-base text-white shadow-[0_16px_40px_rgba(0,0,0,0.24)] hover:bg-white/[0.08]";
   const footerClasses = lightMode
-    ? "border-t border-black/12 bg-[#ebe8e1]/80 px-4 py-10 text-[#1a2230] md:px-8"
-    : "border-t border-white/10 px-4 py-10 text-white/80 md:px-8";
-  const footerMuted = lightMode ? "text-black/72" : "text-white/60";
+    ? "border-t border-black/10 px-4 py-10 md:px-8"
+    : "border-t border-white/10 px-4 py-10 md:px-8";
+  /** Light: solid dark ink so footer reads on cream without a fill bar */
+  const footerMuted = lightMode ? "text-black/80" : "text-white/60";
   const footerLink = lightMode
-    ? "font-semibold text-[#0c1220] hover:text-[#1746b8]"
+    ? "font-semibold text-black hover:text-[#1746b8]"
     : "font-medium text-white/85 hover:text-pl-gold";
   const inputClasses = lightMode
     ? "border-black/15 bg-white/70"
@@ -1004,20 +1005,20 @@ export default function App() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="text-sm font-semibold tracking-wide">
-              <span className={lightMode ? "text-[#3d4654]" : "text-[#cdd5e1]"}>PEN</span>
+              <span className={lightMode ? "text-[#2a3140]" : "text-[#cdd5e1]"}>PEN</span>
               <span
                 className={`bg-gradient-to-r bg-clip-text text-transparent ${
-                  lightMode ? "from-[#3d4654] to-[#1746b8]" : "from-[#cdd5e1] to-[#3f86f7]"
+                  lightMode ? "from-[#2a3140] to-[#1746b8]" : "from-[#cdd5e1] to-[#3f86f7]"
                 }`}
               >
                 N
               </span>
               <span className={lightMode ? "text-[#1746b8]" : "text-[#3f86f7]"}> LIBERTY</span>
             </div>
-            <p className={`mt-1.5 text-[13px] font-medium leading-snug ${footerMuted}`}>
+            <p className={`mt-1.5 text-[13px] leading-snug ${footerMuted}`}>
               Philadelphia property management · rentals · multi-family sales
             </p>
-            <p className={`mt-2 text-[12px] font-medium ${footerMuted}`}>
+            <p className={`mt-2 text-[12px] ${footerMuted}`}>
               PA Brokerage License {PENN_BROKERAGE_LICENSE} · Est. {PENN_FOUNDED_YEAR}
             </p>
           </div>
@@ -1028,9 +1029,9 @@ export default function App() {
             <a href={`mailto:${PENN_EMAIL}`} className={footerLink}>
               {PENN_EMAIL}
             </a>
-            <span className={`font-medium ${footerMuted}`}>{PENN_CITY}</span>
+            <span className={footerMuted}>{PENN_CITY}</span>
           </div>
-          <div className={`text-[12px] font-medium ${footerMuted}`}>
+          <div className={`text-[12px] ${footerMuted}`}>
             &copy;{PENN_COPYRIGHT_YEAR} Penn Liberty Real Estate
           </div>
         </div>

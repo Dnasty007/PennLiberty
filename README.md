@@ -8,7 +8,8 @@ management, rentals, and sales). Live at **pennlibertyre.com** (GoDaddy) and **p
 - **React 19 + TypeScript (strict)** on **Vite 7**
 - **Tailwind CSS 3** — quiet-luxury visual language: gold `#d6b06a`, glassmorphism, photo-forward
 - **Leaflet** for the listings map, **EmailJS** for contact/owner forms, **Three.js** for the
-  Rentals-hero Space Invaders Easter egg (desktop only, lazy-loaded)
+  For Owners market-report showcase (lazy-loaded). Rentals-hero arcade Easter egg (desktop):
+  classic Space Invaders + Tetris via a small game-select hub (lazy canvas chunks).
 - No backend — static SPA with hash-free client routing handled in `src/App.tsx`
 
 ## Run locally
@@ -27,9 +28,10 @@ src/
   App.tsx                 # routing, theme, page shell, global swipe nav
   components/             # page sections + UI (RentalsSection, Hero, owners/, ui/)
   components/owners/      # For Owners page bands
-  hooks/                  # useRentalsHeroPhysicsMode (isMobile / physics gating)
+  hooks/                  # useRentalsHeroPhysicsMode, useRentalsArcadeMode
   lib/                    # data.ts (rentals/listings), theme, routing, physics
-  lib/rentalsInvaders3d/  # Three.js mini-game engine (lazy chunk)
+  lib/rentalsInvaders/    # Classic 2D Space Invaders (lazy canvas chunk)
+  lib/rentalsTetris/      # Classic Tetris (lazy canvas chunk)
 docs/
   mobile-redesign-roadmap.md   # mobile strategy + decisions log (keep updated)
 ```
@@ -41,8 +43,8 @@ compact heroes, stacked premium cards, bottom sheets (`RentalDetailSheet`), tap-
 340ms page transition. Primary target width **390px**, supported down to 360px. The full strategy,
 decisions log, and progress live in [docs/mobile-redesign-roadmap.md](docs/mobile-redesign-roadmap.md).
 
-Desktop keeps the richer layer: physics rental pins, the Space Invaders Easter egg (click the
-bottom-right corner of the Rentals hero), collage heroes, and 3D-tilt cards.
+Desktop keeps the richer layer: physics rental pins, the arcade Easter egg (Invaders + Tetris —
+click the bottom-right corner of the Rentals hero), collage heroes, and 3D-tilt cards.
 
 ## Deployment
 

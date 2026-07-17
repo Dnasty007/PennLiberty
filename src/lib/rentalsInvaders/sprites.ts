@@ -1,14 +1,34 @@
 /**
- * Pixel-art sprites drawn procedurally and cached as offscreen canvases.
- * Bitmaps are arrays of strings where any non-space char = a lit pixel.
- * Crisp scaling is handled by the caller (imageSmoothingEnabled = false).
+ * Classic 1978-style Space Invaders pixel sprites.
+ * Bitmaps are arrays of strings where any non-space / non-dot char = lit pixel.
+ * Cached as offscreen canvases; crisp scaling is the caller's job
+ * (imageSmoothingEnabled = false).
  */
 import { COLORS } from "./constants";
 
 type Bitmap = readonly string[];
 
-// Three invader designs, two animation frames each (classic 11×8-ish).
+/** Authentic CRT palette with a light Penn Liberty gold accent. */
+export const SPRITE_COLORS = {
+  /** Classic invader / player green phosphor */
+  green: "#33ff66",
+  /** Soft phosphor white for alternate rows / lives icons */
+  phosphor: "#e8ffe8",
+  /** Mystery ship — warm red with a touch of arcade cyan optional */
+  ufo: "#ff4466",
+  /** Brand gold secondary (bunker highlights, accents) */
+  gold: COLORS.gold,
+  goldLight: COLORS.goldLight,
+  /** Soft bunker green */
+  bunker: "#2ecc71",
+  explosion: "#e8ffe8",
+} as const;
+
+// ── Invaders: squid (top), crab (mid), octopus (bottom) × 2 frames ─────────
+// Shapes match the iconic Taito silhouettes as closely as 11×8 allows.
+
 const INVADERS: Bitmap[][] = [
+  // 0 — Squid (top row, tallest score)
   [
     [
       "..X.....X..",
@@ -31,55 +51,59 @@ const INVADERS: Bitmap[][] = [
       ".X.......X.",
     ],
   ],
+  // 1 — Crab (middle rows)
   [
     [
-      "...XX...",
-      "..XXXX..",
-      ".XXXXXX.",
-      "XX.XX.XX",
-      "XXXXXXXX",
-      ".X.XX.X.",
-      "X......X",
-      ".X....X.",
+      ".X.......X.",
+      "X.X.....X.X",
+      "X.XXXXXXX.X",
+      "XXX.XXX.XXX",
+      ".XXXXXXXXX.",
+      "..XXXXXXX..",
+      "..X.....X..",
+      ".X.......X.",
     ],
     [
-      "...XX...",
-      "..XXXX..",
-      ".XXXXXX.",
-      "XX.XX.XX",
-      "XXXXXXXX",
-      "..X..X..",
-      ".X.XX.X.",
-      "X.X..X.X",
+      ".X.......X.",
+      "X.X.....X.X",
+      "X.XXXXXXX.X",
+      "XXX.XXX.XXX",
+      ".XXXXXXXXX.",
+      "..XXXXXXX..",
+      ".X..XXX..X.",
+      "X.X.....X.X",
     ],
   ],
+  // 2 — Octopus (bottom rows)
   [
     [
-      "....XX....",
-      "...XXXX...",
-      "..XXXXXX..",
-      ".XX.XX.XX.",
-      ".XXXXXXXX.",
-      "...X..X...",
-      "..X.XX.X..",
-      ".X.X..X.X.",
+      "....XXXX....",
+      ".XXXXXXXXXX.",
+      "XXXXXXXXXXXX",
+      "XXX..XX..XXX",
+      "XXXXXXXXXXXX",
+      "..XX....XX..",
+      ".XX.XXXX.XX.",
+      "XX........XX",
     ],
     [
-      "....XX....",
-      "...XXXX...",
-      "..XXXXXX..",
-      ".XX.XX.XX.",
-      ".XXXXXXXX.",
-      "..X.XX.X..",
-      ".X......X.",
-      "X........X",
+      "....XXXX....",
+      ".XXXXXXXXXX.",
+      "XXXXXXXXXXXX",
+      "XXX..XX..XXX",
+      "XXXXXXXXXXXX",
+      "..XX....XX..",
+      ".XX..XX..XX.",
+      "..XX....XX..",
     ],
   ],
 ];
 
+// Classic laser-base turret
 const PLAYER: Bitmap = [
   "......XX......",
   "......XX......",
+  ".....XXXX.....",
   ".....XXXX.....",
   "..XXXXXXXXXX..",
   ".XXXXXXXXXXXX.",
@@ -87,14 +111,37 @@ const PLAYER: Bitmap = [
   "XXXXXXXXXXXXXX",
 ];
 
+// Mystery ship / UFO
 const UFO: Bitmap = [
-  "...XXXXXX...",
-  "..XXXXXXXX..",
-  ".XXXXXXXXXX.",
-  "XX.XX.XX.XXX",
-  "XXXXXXXXXXXX",
-  ".X.XXXX.XX.X",
-  "..X......X..",
+  "....XXXXXX....",
+  "..XXXXXXXXXX..",
+  ".XXXXXXXXXXXX.",
+  "XX.XX.XX.XX.XX",
+  "XXXXXXXXXXXXXX",
+  ".XX..XX..XX..X",
+  "..X........X..",
+];
+
+// Classic invader death sparkle (two frames for a tiny flash)
+const EXPLOSION: Bitmap[] = [
+  [
+    "....X....",
+    ".X..X..X.",
+    "..X...X..",
+    "X..XXX..X",
+    "..X...X..",
+    ".X..X..X.",
+    "....X....",
+  ],
+  [
+    ".X.....X.",
+    "..X.X.X..",
+    "X...X...X",
+    ".XXXXXXX.",
+    "X...X...X",
+    "..X.X.X..",
+    ".X.....X.",
+  ],
 ];
 
 const cache = new Map<string, HTMLCanvasElement>();
@@ -127,16 +174,35 @@ function get(key: string, bitmap: Bitmap, color: string): HTMLCanvasElement {
   return sprite;
 }
 
-export function invaderSprite(design: number, frame: 0 | 1): HTMLCanvasElement {
+/**
+ * Invader by design index (0 squid / 1 crab / 2 octopus) and march frame.
+ * Classic monochrome green; optional color override for tint experiments.
+ */
+export function invaderSprite(
+  design: number,
+  frame: 0 | 1,
+  color: string = SPRITE_COLORS.green,
+): HTMLCanvasElement {
   const safe = INVADERS[design] ? design : 0;
-  const color = safe === 0 ? COLORS.goldLight : safe === 1 ? COLORS.gold : COLORS.goldMid;
-  return get(`inv-${safe}-${frame}`, INVADERS[safe]![frame]!, color);
+  const fr = frame === 1 ? 1 : 0;
+  return get(`inv-${safe}-${fr}-${color}`, INVADERS[safe]![fr]!, color);
 }
 
-export function playerSprite(): HTMLCanvasElement {
-  return get("player", PLAYER, COLORS.goldLight);
+/** Player laser base — classic green phosphor. */
+export function playerSprite(color: string = SPRITE_COLORS.green): HTMLCanvasElement {
+  return get(`player-${color}`, PLAYER, color);
 }
 
-export function ufoSprite(): HTMLCanvasElement {
-  return get("ufo", UFO, COLORS.accent);
+/** Mystery ship — red-ish arcade UFO. */
+export function ufoSprite(color: string = SPRITE_COLORS.ufo): HTMLCanvasElement {
+  return get(`ufo-${color}`, UFO, color);
+}
+
+/** Death sparkle used during invader dying freeze. */
+export function explosionSprite(
+  frame: 0 | 1 = 0,
+  color: string = SPRITE_COLORS.explosion,
+): HTMLCanvasElement {
+  const fr = frame === 1 ? 1 : 0;
+  return get(`boom-${fr}-${color}`, EXPLOSION[fr]!, color);
 }

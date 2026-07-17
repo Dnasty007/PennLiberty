@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ClipboardCheck, Mail, Phone } from "lucide-react";
-import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
+import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL, pennMailto } from "@/lib/brand";
 
 type OwnersHeroProps = {
   lightMode: boolean;
@@ -15,13 +15,10 @@ const ownerProofPoints = [
   { term: "Where", detail: "Block-level", note: "Not flyover playbook management" },
 ] as const;
 
-const OWNERS_MAILTO =
-  "mailto:info@pennlibertyre.com?subject=" +
-  encodeURIComponent("Property owner inquiry") +
-  "&body=" +
-  encodeURIComponent(
-    "Hi Penn Liberty,\n\nI own a property in Philadelphia and would like to talk.\n\nAddress:\nQuestions:\n",
-  );
+const OWNERS_MAILTO = pennMailto(
+  "Property owner inquiry",
+  "Hi Penn Liberty,\n\nI own a property in Philadelphia and would like to talk.\n\nAddress:\nQuestions:\n",
+);
 
 export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: OwnersHeroProps) {
   const topRule = lightMode ? "border-black/10" : "border-white/[0.09]";

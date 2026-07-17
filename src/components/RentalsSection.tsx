@@ -7,12 +7,16 @@ import {
   RentalsHeroPhysics,
   type RentalsHeroPhysicsHandle,
 } from "@/components/RentalsHeroPhysics";
+import { RentalsArcadeHub } from "@/components/RentalsArcadeHub";
+import { RentalsArcadeLauncher } from "@/components/RentalsArcadeLauncher";
+import { RentalsHeroClassicGame } from "@/components/RentalsHeroClassicGame";
 import { RentalsHeroInvadersGame } from "@/components/RentalsHeroInvadersGame";
 import { RentalsHeroStripMobile } from "@/components/RentalsHeroStripMobile";
-import { RentalsInvadersLauncher } from "@/components/RentalsInvadersLauncher";
+import { RentalsHeroTetrisGame } from "@/components/RentalsHeroTetrisGame";
 import { Button } from "@/components/ui/button";
+import { useRentalsArcadeMode } from "@/hooks/useRentalsArcadeMode";
 import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
-import { useRentalsInvadersMode } from "@/hooks/useRentalsInvadersMode";
+import { isClassicShellId } from "@/lib/arcade/catalog";
 import type { PageKey } from "@/lib/data";
 import { rentalMapPinOffsets, rentalPinOffsetsBySrc, type Rental } from "@/lib/data";
 import { staticHeroPinPercents } from "@/lib/rentalHeroPhysics";
@@ -21,9 +25,7 @@ import {
   rentalsHeroCollageOverlays,
   rentalsHeroFramingBySrc,
 } from "@/lib/siteImagery";
-
-const PENN_PHONE_TEL = "+12159227900";
-const PENN_EMAIL = "info@pennlibertyre.com";
+import { PENN_EMAIL, PENN_PHONE_TEL } from "@/lib/brand";
 
 type RentalsSectionProps = {
   /** Navigate to Contact, etc. */
@@ -95,9 +97,15 @@ export function RentalsSection({
   const { usePhysicsPins, useStaticDesktopPins, isMobile } = useRentalsHeroPhysicsMode();
   const reducedMotionDesktopLayout = staticHeroPinPercents(rentals.length);
 
-  /* ── Space Invaders Easter egg (desktop physics hero only) ──────────── */
-  const { active: invadersActive, start: startInvaders, exit: exitInvaders } =
-    useRentalsInvadersMode();
+  /* ── Classic arcade easter egg (desktop physics hero only) ─────────── */
+  const {
+    screen: arcadeScreen,
+    active: arcadeActive,
+    openHub: openArcadeHub,
+    closeAll: closeArcade,
+    play: playArcadeGame,
+    backToHub: backToArcadeHub,
+  } = useRentalsArcadeMode();
   const physicsRef = useRef<RentalsHeroPhysicsHandle>(null);
 
   /* ── Dev pin mode (mobile hero only — desktop uses physics pins) ───── */
@@ -465,7 +473,7 @@ export function RentalsSection({
       >
         <div
           ref={heroRef}
-          data-pl-no-page-swipe={invadersActive ? "" : undefined}
+          data-pl-no-page-swipe={arcadeActive ? "" : undefined}
           className="relative isolate min-h-[420px] overflow-hidden rounded-[26px] border border-[#d6b06a]/18 bg-[#0f1824] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] sm:min-h-[480px] md:min-h-[520px]"
         >
           <span className="sr-only">
@@ -612,7 +620,7 @@ export function RentalsSection({
                   ref={physicsRef}
                   rentals={rentals}
                   onOpenRentalDetails={onOpenRentalDetails}
-                  mode={invadersActive ? "game" : "browse"}
+                  mode={arcadeActive ? "game" : "browse"}
                 />
               ) : null}
 
@@ -661,15 +669,37 @@ export function RentalsSection({
             </>
           )}
 
-          {usePhysicsPins && hasRentals && !invadersActive ? (
-            <RentalsInvadersLauncher onStart={startInvaders} />
+          {usePhysicsPins && hasRentals && !arcadeActive ? (
+            <RentalsArcadeLauncher onOpen={openArcadeHub} />
           ) : null}
 
-          {usePhysicsPins && hasRentals && invadersActive ? (
+          {usePhysicsPins && hasRentals && arcadeScreen === "hub" ? (
+            <RentalsArcadeHub onPlay={playArcadeGame} onQuit={closeArcade} />
+          ) : null}
+
+          {usePhysicsPins && hasRentals && arcadeScreen === "invaders" ? (
             <RentalsHeroInvadersGame
               heroRef={heroRef}
               getPinBodies={() => physicsRef.current?.getBodies() ?? []}
-              onExit={exitInvaders}
+              onExit={backToArcadeHub}
+            />
+          ) : null}
+
+          {usePhysicsPins && hasRentals && arcadeScreen === "tetris" ? (
+            <RentalsHeroTetrisGame
+              heroRef={heroRef}
+              onExit={backToArcadeHub}
+            />
+          ) : null}
+
+          {usePhysicsPins &&
+          hasRentals &&
+          isClassicShellId(arcadeScreen) ? (
+            <RentalsHeroClassicGame
+              key={arcadeScreen}
+              gameId={arcadeScreen}
+              heroRef={heroRef}
+              onExit={backToArcadeHub}
             />
           ) : null}
         </div>

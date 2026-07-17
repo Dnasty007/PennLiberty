@@ -1,31 +1,40 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
-import type { PhysicsBody } from "@/lib/rentalHeroPhysics";
-import { CAPTURED_CODES, KEYS } from "@/lib/rentalsInvaders/constants";
-import type { GameController, HudInfo } from "@/lib/rentalsInvaders/createGame";
-import type { Phase } from "@/lib/rentalsInvaders/types";
+import { CAPTURED_CODES, KEYS } from "@/lib/rentalsTetris/constants";
+import type { GameController, HudInfo } from "@/lib/rentalsTetris/createGame";
+import type { Phase } from "@/lib/rentalsTetris/types";
 
-type RentalsHeroInvadersGameProps = {
+type RentalsHeroTetrisGameProps = {
   heroRef: React.RefObject<HTMLDivElement | null>;
-  getPinBodies: () => PhysicsBody[];
   onExit: () => void;
 };
 
 type Overlay = { phase: Phase; score: number; highScore: number };
 
-const codeAction = (code: string) => {
-  if ((KEYS.left as readonly string[]).includes(code)) return "left" as const;
-  if ((KEYS.right as readonly string[]).includes(code)) return "right" as const;
-  if ((KEYS.fire as readonly string[]).includes(code)) return "fire" as const;
-  if ((KEYS.pause as readonly string[]).includes(code)) return "pause" as const;
+type Action =
+  | "left"
+  | "right"
+  | "soft"
+  | "hard"
+  | "rotCW"
+  | "rotCCW"
+  | "pause";
+
+const codeAction = (code: string): Action | null => {
+  if ((KEYS.left as readonly string[]).includes(code)) return "left";
+  if ((KEYS.right as readonly string[]).includes(code)) return "right";
+  if ((KEYS.soft as readonly string[]).includes(code)) return "soft";
+  if ((KEYS.hard as readonly string[]).includes(code)) return "hard";
+  if ((KEYS.rotCW as readonly string[]).includes(code)) return "rotCW";
+  if ((KEYS.rotCCW as readonly string[]).includes(code)) return "rotCCW";
+  if ((KEYS.pause as readonly string[]).includes(code)) return "pause";
   return null;
 };
 
-export function RentalsHeroInvadersGame({
+export function RentalsHeroTetrisGame({
   heroRef,
-  getPinBodies,
   onExit,
-}: RentalsHeroInvadersGameProps) {
+}: RentalsHeroTetrisGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<GameController | null>(null);
   const [overlay, setOverlay] = useState<Overlay>({
@@ -36,13 +45,6 @@ export function RentalsHeroInvadersGame({
   const [loading, setLoading] = useState(true);
   const [muted, setMuted] = useState(false);
 
-  // Imperative HUD (avoid React re-renders every frame)
-  const scoreRef = useRef<HTMLSpanElement>(null);
-  const waveRef = useRef<HTMLSpanElement>(null);
-  const livesRef = useRef<HTMLSpanElement>(null);
-
-  const pinsRef = useRef(getPinBodies);
-  pinsRef.current = getPinBodies;
   const onExitRef = useRef(onExit);
   onExitRef.current = onExit;
 
@@ -54,25 +56,15 @@ export function RentalsHeroInvadersGame({
     let cancelled = false;
     let controller: GameController | null = null;
 
-    const onHud = (hud: HudInfo) => {
-      if (scoreRef.current) {
-        scoreRef.current.textContent = String(hud.score).padStart(4, "0");
-      }
-      if (waveRef.current) waveRef.current.textContent = String(hud.wave);
-      if (livesRef.current) livesRef.current.textContent = String(hud.lives);
+    const onHud = (_hud: HudInfo) => {
+      /* canvas draws full HUD */
     };
 
-    import("@/lib/rentalsInvaders/createGame")
+    import("@/lib/rentalsTetris/createGame")
       .then((mod) => {
         if (cancelled) return;
         controller = mod.createGame({
           canvas,
-          getPins: () =>
-            pinsRef.current().map((b) => ({
-              x: b.x,
-              y: b.y,
-              radius: b.radius,
-            })),
           onPhaseChange: (phase, info) =>
             setOverlay({
               phase,
@@ -85,27 +77,14 @@ export function RentalsHeroInvadersGame({
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load classic Space Invaders:", err);
+        console.error("Failed to load Tetris:", err);
         if (!cancelled) onExitRef.current();
       });
 
-    const unlockAudio = () => {
-      void controllerRef.current?.unlockAudio();
-    };
-
-    const isUiTarget = (target: EventTarget | null) =>
-      target instanceof Element && Boolean(target.closest("button"));
-
-    const onPointerDown = (e: PointerEvent) => {
-      unlockAudio();
-      if (isUiTarget(e.target)) return;
-      controllerRef.current?.setKey("fire", true);
-    };
-
-    const releaseFire = () => controllerRef.current?.setKey("fire", false);
+    const unlock = () => void controllerRef.current?.unlockAudio();
 
     const onKeyDown = (e: KeyboardEvent) => {
-      unlockAudio();
+      unlock();
       if (e.code === "Escape") {
         e.preventDefault();
         onExitRef.current();
@@ -129,21 +108,11 @@ export function RentalsHeroInvadersGame({
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
-    canvas.addEventListener("pointerdown", onPointerDown);
-    canvas.addEventListener("pointerup", releaseFire);
-    canvas.addEventListener("pointerleave", releaseFire);
-    canvas.addEventListener("pointercancel", releaseFire);
-    window.addEventListener("pointerup", releaseFire);
 
     return () => {
       cancelled = true;
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      canvas.removeEventListener("pointerup", releaseFire);
-      canvas.removeEventListener("pointerleave", releaseFire);
-      canvas.removeEventListener("pointercancel", releaseFire);
-      window.removeEventListener("pointerup", releaseFire);
       controller?.dispose();
       controllerRef.current = null;
     };
@@ -151,33 +120,22 @@ export function RentalsHeroInvadersGame({
 
   const paused = overlay.phase === "paused";
   const over = overlay.phase === "over";
-  // Canvas draws ready/wave text; React only needs pause/over chrome
 
   return (
     <div
       className="absolute inset-0 z-[30] overflow-hidden rounded-[26px]"
       role="application"
-      aria-label="Classic Space Invaders mini game"
+      aria-label="Classic Tetris mini game"
       onPointerDown={() => void controllerRef.current?.unlockAudio()}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* Minimal DOM HUD mirror (canvas also draws full arcade HUD) */}
-      <div className="pointer-events-none absolute inset-0 z-[33] font-mono text-[#33ff66]">
-        <div className="sr-only">
-          SCORE <span ref={scoreRef}>0000</span>
-          WAVE <span ref={waveRef}>1</span>
-          LIVES <span ref={livesRef}>3</span>
-        </div>
-      </div>
-
-      {/* Top-right controls */}
       <div className="absolute right-3 top-3 z-[35] flex items-center gap-2">
         <button
           type="button"
           onClick={() => setMuted(controllerRef.current?.toggleMute() ?? false)}
           aria-label={muted ? "Unmute" : "Mute"}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#33ff66]/30 bg-black/60 text-[#33ff66] backdrop-blur-md transition-colors hover:bg-black/80"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#5ec8ff]/30 bg-black/60 text-[#5ec8ff] backdrop-blur-md transition-colors hover:bg-black/80"
         >
           {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
         </button>
@@ -185,7 +143,7 @@ export function RentalsHeroInvadersGame({
           type="button"
           onClick={() => controllerRef.current?.togglePause()}
           aria-label={paused ? "Resume" : "Pause"}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#33ff66]/30 bg-black/60 text-[#33ff66] backdrop-blur-md transition-colors hover:bg-black/80"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#5ec8ff]/30 bg-black/60 text-[#5ec8ff] backdrop-blur-md transition-colors hover:bg-black/80"
         >
           {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
         </button>
@@ -193,7 +151,7 @@ export function RentalsHeroInvadersGame({
           type="button"
           onClick={onExit}
           aria-label="Back to arcade menu"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#33ff66]/30 bg-black/60 text-[#33ff66] backdrop-blur-md transition-colors hover:bg-black/80"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#5ec8ff]/30 bg-black/60 text-[#5ec8ff] backdrop-blur-md transition-colors hover:bg-black/80"
         >
           <X className="h-4 w-4" />
         </button>
@@ -201,22 +159,22 @@ export function RentalsHeroInvadersGame({
 
       {loading && (
         <div className="absolute inset-0 z-[34] flex items-center justify-center bg-black/50">
-          <p className="animate-pulse font-mono text-sm tracking-[0.3em] text-[#33ff66]">
-            INSERT COIN…
+          <p className="animate-pulse font-mono text-sm tracking-[0.3em] text-[#5ec8ff]">
+            LOADING TETRIS…
           </p>
         </div>
       )}
 
       {paused && (
         <div className="absolute inset-0 z-[34] flex flex-col items-center justify-center gap-4 bg-black/50 backdrop-blur-sm">
-          <p className="font-mono text-lg font-semibold tracking-[0.3em] text-[#33ff66]">
+          <p className="font-mono text-lg font-semibold tracking-[0.3em] text-[#5ec8ff]">
             PAUSED
           </p>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => controllerRef.current?.togglePause()}
-              className="inline-flex items-center gap-2 rounded-full bg-[#33ff66] px-5 py-2.5 text-sm font-semibold text-[#05100a] hover:bg-[#5dff8a]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#5ec8ff] px-5 py-2.5 text-sm font-semibold text-[#051018] hover:bg-[#7dd3fc]"
             >
               <Play className="h-4 w-4" /> Resume
             </button>
@@ -233,19 +191,19 @@ export function RentalsHeroInvadersGame({
 
       {over && (
         <div className="absolute inset-0 z-[34] flex flex-col items-center justify-center gap-3 bg-black/60 backdrop-blur-sm">
-          <p className="font-mono text-3xl font-black tracking-[0.22em] text-[#ff4466] drop-shadow-[0_0_16px_rgba(255,68,102,0.7)]">
+          <p className="font-mono text-3xl font-black tracking-[0.22em] text-[#ff6688]">
             GAME OVER
           </p>
           <p className="font-mono text-sm text-[#e8ffe8]/90">
             SCORE{" "}
-            <span className="font-semibold text-[#33ff66]">
-              {String(overlay.score).padStart(4, "0")}
+            <span className="font-semibold text-[#5ec8ff]">
+              {String(overlay.score).padStart(6, "0")}
             </span>
             {overlay.score >= overlay.highScore && overlay.score > 0 ? (
               <span className="ml-2 text-[#d6b06a]">★ NEW HI-SCORE</span>
             ) : (
               <span className="ml-2 text-white/55">
-                HI {String(overlay.highScore).padStart(4, "0")}
+                HI {String(overlay.highScore).padStart(6, "0")}
               </span>
             )}
           </p>
@@ -253,7 +211,7 @@ export function RentalsHeroInvadersGame({
             <button
               type="button"
               onClick={() => controllerRef.current?.restart()}
-              className="inline-flex items-center gap-2 rounded-full bg-[#33ff66] px-5 py-2.5 text-sm font-semibold text-[#05100a] hover:bg-[#5dff8a]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#5ec8ff] px-5 py-2.5 text-sm font-semibold text-[#051018] hover:bg-[#7dd3fc]"
             >
               <RotateCcw className="h-4 w-4" /> Play again
             </button>

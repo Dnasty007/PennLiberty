@@ -9,6 +9,7 @@ import { OwnersInspections } from "@/components/owners/OwnersInspections";
 import { OwnersMarketReports } from "@/components/owners/OwnersMarketReports";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
 import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
+import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL, pennMailto } from "@/lib/brand";
 
 type OwnersSectionProps = {
   backdropSrc?: string;
@@ -18,13 +19,12 @@ type OwnersSectionProps = {
   subtleText: string;
 };
 
-const OWNERS_PHONE_TEL = "+12159227900";
-const OWNERS_PHONE_DISPLAY = "215-922-7900";
-const OWNERS_MAILTO =
-  "mailto:info@pennlibertyre.com?subject=" +
-  encodeURIComponent("Property owner inquiry") +
-  "&body=" +
-  encodeURIComponent("Hi Penn Liberty,\n\nI own a property in Philadelphia and would like to talk.\n\nAddress:\nQuestions:\n");
+const OWNERS_PHONE_TEL = PENN_PHONE_TEL;
+const OWNERS_PHONE_DISPLAY = PENN_PHONE_DISPLAY;
+const OWNERS_MAILTO = pennMailto(
+  "Property owner inquiry",
+  "Hi Penn Liberty,\n\nI own a property in Philadelphia and would like to talk.\n\nAddress:\nQuestions:\n",
+);
 
 /** Low-friction conversion actions surfaced right under the hero on phones —
  *  the full review form (section 03) is several screens down on mobile. */
