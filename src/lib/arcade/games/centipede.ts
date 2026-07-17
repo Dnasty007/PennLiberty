@@ -165,6 +165,17 @@ export function createGame(opts: CreateClassicOpts): ClassicController {
     }
   };
 
+  const playerCell = () => ({
+    x: Math.round(player.x),
+    y: Math.round(player.y),
+  });
+
+  /** Segment touches ship (player uses smooth floats — must round). */
+  const hitsPlayer = (sx: number, sy: number) => {
+    const p = playerCell();
+    return sx === p.x && sy === p.y;
+  };
+
   const stepCentipedes = () => {
     for (const c of centipedes) {
       if (!c.segs.length) continue;
@@ -178,7 +189,11 @@ export function createGame(opts: CreateClassicOpts): ClassicController {
         ny = head.y + 1;
         nx = head.x;
         c.drop = false;
-        if (ny >= rows - 1) ny = rows - 1;
+        // Reached past the bottom of the field → invasion: lose a life
+        if (ny >= rows) {
+          killPlayer();
+          return;
+        }
       }
       // move body
       for (let i = c.segs.length - 1; i > 0; i--) {
@@ -186,16 +201,21 @@ export function createGame(opts: CreateClassicOpts): ClassicController {
       }
       c.segs[0] = { x: nx, y: ny };
 
-      // hit player?
+      // Any segment on the bottom row of the playfield also costs a life
+      // (classic “they got through” — no endless side-scroll on the floor)
       for (const s of c.segs) {
-        if (s.x === player.x && s.y === player.y) {
+        if (s.y >= rows - 1) {
+          killPlayer();
+          return;
+        }
+        if (hitsPlayer(s.x, s.y)) {
           killPlayer();
           return;
         }
       }
     }
     centipedes = centipedes.filter((c) => c.segs.length > 0);
-    if (centipedes.length === 0) {
+    if (centipedes.length === 0 && phase === "playing") {
       wave += 1;
       score += 200;
       maybeHs();
