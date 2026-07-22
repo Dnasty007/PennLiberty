@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Play, X, ClipboardCheck } from "lucide-react";
+import { Play, X, ClipboardCheck, Maximize2 } from "lucide-react";
 import {
   formatRuntime,
   getFeaturedOwnerVideo,
@@ -8,6 +8,43 @@ import {
   type OwnerVideo,
 } from "@/lib/ownerVideos";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
+
+/** iOS Safari uses webkitEnterFullscreen on the <video>; desktop/Android use Fullscreen API. */
+type VideoWithWebkit = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitExitFullscreen?: () => void;
+  webkitDisplayingFullscreen?: boolean;
+  webkitSupportsFullscreen?: boolean;
+};
+
+async function enterVideoFullscreen(video: HTMLVideoElement): Promise<void> {
+  const v = video as VideoWithWebkit;
+
+  // Prefer native video fullscreen (required on iOS)
+  if (typeof v.webkitEnterFullscreen === "function") {
+    try {
+      // Must run from a user gesture; may throw if video not ready
+      v.webkitEnterFullscreen();
+      return;
+    } catch {
+      /* fall through */
+    }
+  }
+
+  if (typeof v.requestFullscreen === "function") {
+    await v.requestFullscreen();
+    return;
+  }
+
+  const anyV = v as HTMLVideoElement & { webkitRequestFullscreen?: () => void; msRequestFullscreen?: () => void };
+  if (typeof anyV.webkitRequestFullscreen === "function") {
+    anyV.webkitRequestFullscreen();
+    return;
+  }
+  if (typeof anyV.msRequestFullscreen === "function") {
+    anyV.msRequestFullscreen();
+  }
+}
 
 type OwnersVideoLibraryProps = {
   lightMode: boolean;
@@ -100,6 +137,8 @@ function OwnerVideoModal({
   const videoRef = useRef<HTMLVideoElement>(null);
   const titleId = useId();
   const [ended, setEnded] = useState(false);
+  const [fsBusy, setFsBusy] = useState(false);
+  const [fsError, setFsError] = useState<string | null>(null);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -116,12 +155,39 @@ function OwnerVideoModal({
 
   useEffect(() => {
     setEnded(false);
+    setFsError(null);
     const el = videoRef.current;
     if (!el) return;
+    // iOS needs the legacy attribute for inline + native fullscreen paths
+    el.setAttribute("playsinline", "true");
+    el.setAttribute("webkit-playsinline", "true");
+    el.setAttribute("x-webkit-airplay", "allow");
     el.load();
     const play = el.play();
     if (play) void play.catch(() => {});
   }, [video.src]);
+
+  const goFullscreen = useCallback(async () => {
+    const el = videoRef.current;
+    if (!el || fsBusy) return;
+    setFsBusy(true);
+    setFsError(null);
+    try {
+      // iOS requires the video to be playing (or have metadata) before webkitEnterFullscreen
+      if (el.paused) {
+        try {
+          await el.play();
+        } catch {
+          /* user may need to tap play first */
+        }
+      }
+      await enterVideoFullscreen(el);
+    } catch {
+      setFsError("Fullscreen isn’t available yet — tap play, then Full screen again.");
+    } finally {
+      setFsBusy(false);
+    }
+  }, [fsBusy]);
 
   const goReview = () => {
     onClose();
@@ -135,7 +201,7 @@ function OwnerVideoModal({
 
   return createPortal(
     <div
-      className="pl-overlay-enter fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-6"
+      className="fixed inset-0 z-[80] flex items-stretch justify-center p-0 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -143,12 +209,13 @@ function OwnerVideoModal({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
         aria-label="Close video"
         onClick={onClose}
       />
+      {/* No transform on panel — transforms break iOS/Android native video fullscreen */}
       <div
-        className={`pl-sheet-enter relative z-[1] flex max-h-[min(100dvh,920px)] w-full max-w-3xl flex-col overflow-hidden rounded-t-[24px] border shadow-2xl sm:rounded-[24px] ${panel}`}
+        className={`relative z-[1] flex max-h-[100dvh] w-full max-w-3xl flex-col border shadow-2xl sm:max-h-[min(100dvh,920px)] sm:rounded-[24px] ${panel} rounded-none sm:overflow-hidden`}
       >
         <div className="flex items-start justify-between gap-3 border-b border-black/10 px-4 py-3 dark:border-white/10 sm:px-5">
           <div className="min-w-0">
@@ -159,36 +226,68 @@ function OwnerVideoModal({
               {video.title}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-black/[0.04] transition hover:bg-black/[0.08] dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void goFullscreen()}
+              disabled={fsBusy}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-black/[0.04] px-3 text-xs font-semibold transition hover:bg-black/[0.08] disabled:opacity-60 dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
+              aria-label="Full screen"
+            >
+              <Maximize2 className="h-3.5 w-3.5" aria-hidden />
+              <span className="sm:inline">Full screen</span>
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-black/[0.04] transition hover:bg-black/[0.08] dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="bg-black">
+        {/*
+          Video shell: no overflow:hidden / transform ancestors.
+          playsInline keeps in-modal playback; Full screen button uses webkitEnterFullscreen on iOS.
+        */}
+        <div className="relative bg-black">
           <video
             ref={videoRef}
             key={video.src}
-            className="aspect-video w-full"
+            className="aspect-video w-full max-h-[min(56dvh,480px)] object-contain sm:max-h-none"
             controls
             playsInline
             poster={video.poster}
-            preload="metadata"
+            preload="auto"
             onEnded={() => setEnded(true)}
+            onDoubleClick={() => void goFullscreen()}
           >
             <source src={video.src} type="video/mp4" />
           </video>
+          {/* Large mobile affordance over the player corner */}
+          <button
+            type="button"
+            onClick={() => void goFullscreen()}
+            className="absolute bottom-12 right-3 z-[2] flex h-11 w-11 items-center justify-center rounded-full bg-[#d6b06a] text-[#08111f] shadow-lg sm:hidden"
+            aria-label="Enter full screen"
+          >
+            <Maximize2 className="h-5 w-5" aria-hidden />
+          </button>
         </div>
+
+        {fsError ? (
+          <p className="px-4 pt-2 text-xs text-[#a67c32] sm:px-5" role="status">
+            {fsError}
+          </p>
+        ) : null}
 
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <p className={`text-sm leading-relaxed ${ended ? "opacity-100" : "opacity-80"}`}>
             {ended
               ? "Ready to talk about your property?"
-              : "Short process explainers for owners under management."}
+              : "Tap Full screen for phone landscape / true full screen."}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <a
