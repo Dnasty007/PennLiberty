@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Play, X, ClipboardCheck, Maximize2 } from "lucide-react";
+import { Play, X, ClipboardCheck, Maximize2, ChevronUp } from "lucide-react";
 import {
   formatRuntime,
   getFeaturedOwnerVideo,
   getGridOwnerVideos,
+  getMobilePreviewVideos,
   type OwnerVideo,
 } from "@/lib/ownerVideos";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
@@ -398,12 +399,116 @@ function OwnerVideoModal({
   );
 }
 
+function MoreVideosSheet({
+  videos,
+  lightMode,
+  mutedText,
+  subtleText,
+  onPlay,
+  onClose,
+}: {
+  videos: OwnerVideo[];
+  lightMode: boolean;
+  mutedText: string;
+  subtleText: string;
+  onPlay: (v: OwnerVideo) => void;
+  onClose: () => void;
+}) {
+  const titleId = useId();
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  const sheet = lightMode
+    ? "border-black/12 bg-[#f7f5f0] text-black"
+    : "border-white/12 bg-[#0a1526] text-white";
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[75] flex items-end justify-center sm:items-center sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      data-pl-no-page-swipe
+    >
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        aria-label="Close more videos"
+        onClick={onClose}
+      />
+      <div
+        className={`relative z-[1] flex max-h-[min(88dvh,720px)] w-full max-w-lg flex-col rounded-t-[24px] border shadow-2xl sm:rounded-[24px] ${sheet}`}
+      >
+        <div className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3.5 dark:border-white/10 sm:px-5">
+          <div className="min-w-0">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#a67c32] dark:text-[#dcb672]">
+              Owner info library
+            </div>
+            <h2 id={titleId} className="mt-0.5 text-base font-semibold sm:text-lg">
+              More videos
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-black/[0.04] transition hover:bg-black/[0.08] dark:border-white/15 dark:bg-white/[0.06]"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <ul className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5">
+          {videos.map((v) => (
+            <li key={v.id}>
+              <VideoCard
+                video={v}
+                lightMode={lightMode}
+                mutedText={mutedText}
+                subtleText={subtleText}
+                onPlay={(vid) => {
+                  onClose();
+                  // Let sheet unmount before player mounts
+                  window.setTimeout(() => onPlay(vid), 60);
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+
+        <div className="border-t border-black/10 px-4 py-3 dark:border-white/10 sm:px-5">
+          <p className={`text-center text-xs ${subtleText}`}>
+            {videos.length} more · about one minute each
+          </p>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersVideoLibraryProps) {
   const featured = getFeaturedOwnerVideo();
   const grid = getGridOwnerVideos();
+  const { preview: mobilePreview, more: mobileMore } = getMobilePreviewVideos();
   const [active, setActive] = useState<OwnerVideo | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
 
-  const open = useCallback((v: OwnerVideo) => setActive(v), []);
+  const open = useCallback((v: OwnerVideo) => {
+    setMoreOpen(false);
+    setActive(v);
+  }, []);
   const close = useCallback(() => setActive(null), []);
 
   const shell = lightMode
@@ -411,6 +516,9 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
     : "border-white/[0.10] bg-[linear-gradient(150deg,rgba(18,32,54,0.5),rgba(7,13,26,0.36))] shadow-[inset_0_0_0_1px_rgba(214,176,106,0.08)]";
   const eyebrow = lightMode ? "text-[#99773d]" : "text-[#dcb672]";
   const h2c = lightMode ? "text-black" : "text-white";
+  const moreBtn = lightMode
+    ? "border-black/12 bg-white/80 text-black hover:border-[#d6b06a]/45 hover:bg-white"
+    : "border-white/15 bg-white/[0.06] text-white hover:border-[#d6b06a]/40 hover:bg-white/[0.1]";
 
   return (
     <section
@@ -435,7 +543,38 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
           </p>
         </div>
 
-        <div className="mt-7 md:mt-9">
+        {/* Mobile: first 3 only — keeps the page short as the library grows */}
+        <ul className="mt-7 space-y-3 md:hidden">
+          {mobilePreview.map((v, i) => (
+            <li key={v.id}>
+              <VideoCard
+                video={v}
+                lightMode={lightMode}
+                mutedText={mutedText}
+                subtleText={subtleText}
+                featured={i === 0}
+                onPlay={open}
+              />
+            </li>
+          ))}
+        </ul>
+
+        {mobileMore.length > 0 ? (
+          <div className="mt-4 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMoreOpen(true)}
+              className={`flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3.5 text-sm font-semibold transition ${moreBtn}`}
+            >
+              <ChevronUp className="h-4 w-4 text-[#d6b06a]" aria-hidden />
+              More videos
+              <span className={`tabular-nums ${subtleText}`}>({mobileMore.length})</span>
+            </button>
+          </div>
+        ) : null}
+
+        {/* Desktop / tablet: full shelf (featured + grid) */}
+        <div className="mt-9 hidden md:block">
           <VideoCard
             video={featured}
             lightMode={lightMode}
@@ -446,7 +585,7 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
           />
         </div>
 
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+        <ul className="mt-4 hidden gap-3 md:grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
           {grid.map((v) => (
             <li key={v.id}>
               <VideoCard
@@ -478,6 +617,17 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
           </button>
         </div>
       </div>
+
+      {moreOpen && mobileMore.length > 0 ? (
+        <MoreVideosSheet
+          videos={mobileMore}
+          lightMode={lightMode}
+          mutedText={mutedText}
+          subtleText={subtleText}
+          onPlay={open}
+          onClose={() => setMoreOpen(false)}
+        />
+      ) : null}
 
       {active ? <OwnerVideoModal video={active} lightMode={lightMode} onClose={close} /> : null}
     </section>

@@ -77,19 +77,35 @@ export const ownerVideos: OwnerVideo[] = [
   },
 ];
 
+/** How many videos show on the mobile For Owners band before “More videos”. */
+export const OWNER_VIDEOS_MOBILE_PREVIEW = 3;
+
 export function formatRuntime(sec: number): string {
   const m = Math.floor(sec / 60);
   const s = Math.round(sec % 60);
   return m > 0 ? `${m}:${s.toString().padStart(2, "0")}` : `0:${s.toString().padStart(2, "0")}`;
 }
 
+export function getSortedOwnerVideos(): OwnerVideo[] {
+  return [...ownerVideos].sort((a, b) => a.order - b.order);
+}
+
 export function getFeaturedOwnerVideo(): OwnerVideo {
-  return ownerVideos.find((v) => v.featured) ?? ownerVideos[0];
+  return ownerVideos.find((v) => v.featured) ?? getSortedOwnerVideos()[0];
 }
 
 export function getGridOwnerVideos(): OwnerVideo[] {
   const featured = getFeaturedOwnerVideo();
-  return ownerVideos
-    .filter((v) => v.id !== featured.id)
-    .sort((a, b) => a.order - b.order);
+  return getSortedOwnerVideos().filter((v) => v.id !== featured.id);
+}
+
+/** Mobile band: first N by order. Rest go in “More videos” sheet. */
+export function getMobilePreviewVideos(
+  limit = OWNER_VIDEOS_MOBILE_PREVIEW,
+): { preview: OwnerVideo[]; more: OwnerVideo[] } {
+  const sorted = getSortedOwnerVideos();
+  return {
+    preview: sorted.slice(0, limit),
+    more: sorted.slice(limit),
+  };
 }
