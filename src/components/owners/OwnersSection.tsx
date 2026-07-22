@@ -8,6 +8,7 @@ import { OwnersCoverageBand } from "@/components/owners/OwnersCoverageBand";
 import { OwnersInspections } from "@/components/owners/OwnersInspections";
 import { OwnersMarketReports } from "@/components/owners/OwnersMarketReports";
 import { OwnersOperateBand } from "@/components/owners/OwnersOperateBand";
+import { OwnersVideoLibrary } from "@/components/owners/OwnersVideoLibrary";
 import { ownersCardBackdropImageClass } from "@/lib/siteImagery";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL, pennMailto } from "@/lib/brand";
 
@@ -140,6 +141,12 @@ export function OwnersSection({
             subtleText={subtleText}
             onPresetPropertyReviewInterest={presetInterestForCards}
           />
+          {/* Videos after paths; Property desk (05) closes the page */}
+          <OwnersVideoLibrary lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersOperateBand lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersMarketReports lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
+          <OwnersInspections lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
           <OwnersCTA
             lightMode={lightMode}
             mutedText={mutedText}
@@ -147,10 +154,6 @@ export function OwnersSection({
             reviewInterestPreset={reviewInterestPreset}
             onConsumeReviewPreset={consumeReviewPreset}
           />
-          <OwnersOperateBand lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
-          <OwnersCoverageBand editorialHeroSrc={editorialHeroSrc} lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
-          <OwnersMarketReports lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
-          <OwnersInspections lightMode={lightMode} mutedText={mutedText} subtleText={subtleText} />
         </div>
       </div>
     </section>

@@ -94,6 +94,17 @@ export function OwnersHero({ lightMode, mutedText, subtleText, trailing }: Owner
               <Mail className="h-4 w-4 text-pl-gold" aria-hidden />
               Email us
             </a>
+            <button
+              type="button"
+              onClick={() =>
+                document.getElementById("owner-videos")?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+              className={`text-sm font-semibold underline-offset-[3px] transition hover:underline ${
+                lightMode ? "text-[#885a10]" : "text-[#e8cc8a]"
+              }`}
+            >
+              Watch how we work →
+            </button>
           </div>
         </header>
 
