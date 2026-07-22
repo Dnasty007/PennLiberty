@@ -10,111 +10,86 @@ import {
 } from "@/lib/ownerVideos";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
 
-/** iOS/iPadOS Safari — native expand needs webkitEnterFullscreen + video not trapped in nested fixed shells. */
+/** iOS/iPadOS Safari video APIs */
 type VideoWithWebkit = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void;
   webkitExitFullscreen?: () => void;
   webkitDisplayingFullscreen?: boolean;
-  webkitSupportsFullscreen?: boolean;
 };
 
 function isAppleTouchDevice(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent;
   if (/iPad|iPhone|iPod/.test(ua)) return true;
-  // iPadOS reports as Mac but has touch
   return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
 }
 
-/**
- * True system fullscreen (the desktop “two arrows” experience).
- * On iOS: reparent <video> to <body> so Safari’s expand control + webkitEnterFullscreen work,
- * then enter native fullscreen. Restore on exit.
- */
-async function enterVideoFullscreen(video: HTMLVideoElement): Promise<void> {
-  const v = video as VideoWithWebkit;
-  const placeholder = document.createComment("pl-video-fs-slot");
-  const homeParent = video.parentElement;
-  const homeNext = video.nextSibling;
-
-  const restore = () => {
-    video.removeEventListener("webkitendfullscreen", onWebkitEnd);
-    document.removeEventListener("fullscreenchange", onFsChange);
-    if (placeholder.parentNode) {
-      placeholder.parentNode.insertBefore(video, placeholder);
-      placeholder.parentNode.removeChild(placeholder);
-    } else if (homeParent) {
-      homeParent.insertBefore(video, homeNext);
+/** Exit browser / iOS system fullscreen if active (no-op otherwise). */
+async function exitAnyFullscreen(video: HTMLVideoElement | null): Promise<void> {
+  const v = video as VideoWithWebkit | null;
+  try {
+    if (v?.webkitDisplayingFullscreen && typeof v.webkitExitFullscreen === "function") {
+      v.webkitExitFullscreen();
     }
-    video.classList.remove("pl-video-native-fs");
-    video.style.removeProperty("position");
-    video.style.removeProperty("inset");
-    video.style.removeProperty("width");
-    video.style.removeProperty("height");
-    video.style.removeProperty("max-width");
-    video.style.removeProperty("max-height");
-    video.style.removeProperty("z-index");
-    video.style.removeProperty("background");
-    video.style.removeProperty("object-fit");
-  };
-
-  const onWebkitEnd = () => restore();
-  const onFsChange = () => {
-    if (!document.fullscreenElement) restore();
-  };
-
-  // Lift out of modal (fixed/overflow ancestors break iOS native fullscreen + expand arrows)
-  if (homeParent) {
-    homeParent.insertBefore(placeholder, video);
-    document.body.appendChild(video);
-    video.classList.add("pl-video-native-fs");
-    video.style.position = "fixed";
-    video.style.inset = "0";
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.maxWidth = "100%";
-    video.style.maxHeight = "100%";
-    video.style.zIndex = "2147483646";
-    video.style.background = "#000";
-    video.style.objectFit = "contain";
+  } catch {
+    /* ignore */
   }
+  try {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      await document.exitFullscreen();
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
-  video.addEventListener("webkitendfullscreen", onWebkitEnd);
-  document.addEventListener("fullscreenchange", onFsChange);
-
-  if (video.paused) {
+/**
+ * Prefer fullscreen on the *stage* (keeps our X visible on Android/desktop).
+ * iOS often only supports webkitEnterFullscreen on the video element — after Done,
+ * user returns to our stage which still has the Close control.
+ */
+async function enterStageOrVideoFullscreen(
+  stage: HTMLElement | null,
+  video: HTMLVideoElement | null,
+): Promise<void> {
+  if (video?.paused) {
     try {
       await video.play();
     } catch {
-      /* continue — some browsers still allow FS */
+      /* continue */
     }
   }
 
-  try {
-    if (typeof v.webkitEnterFullscreen === "function") {
-      v.webkitEnterFullscreen();
-      return;
-    }
-    if (typeof video.requestFullscreen === "function") {
-      await video.requestFullscreen();
-      return;
-    }
-    const anyV = video as HTMLVideoElement & {
+  const v = video as VideoWithWebkit | null;
+
+  // 1) Fullscreen the stage shell (X stays on screen) — Chrome/Android/desktop
+  if (stage) {
+    const anyStage = stage as HTMLElement & {
+      requestFullscreen?: () => Promise<void>;
       webkitRequestFullscreen?: () => void;
-      msRequestFullscreen?: () => void;
     };
-    if (typeof anyV.webkitRequestFullscreen === "function") {
-      anyV.webkitRequestFullscreen();
-      return;
+    try {
+      if (typeof anyStage.requestFullscreen === "function") {
+        await anyStage.requestFullscreen();
+        return;
+      }
+      if (typeof anyStage.webkitRequestFullscreen === "function") {
+        anyStage.webkitRequestFullscreen();
+        return;
+      }
+    } catch {
+      /* try video path */
     }
-    if (typeof anyV.msRequestFullscreen === "function") {
-      anyV.msRequestFullscreen();
-      return;
-    }
-    // No API — leave reparented full-viewport video as fallback (user can close via page)
-  } catch {
-    restore();
-    throw new Error("fullscreen-failed");
+  }
+
+  // 2) iOS system player (Done returns to our stage + X)
+  if (v && typeof v.webkitEnterFullscreen === "function") {
+    v.webkitEnterFullscreen();
+    return;
+  }
+
+  if (video && typeof video.requestFullscreen === "function") {
+    await video.requestFullscreen();
   }
 }
 
@@ -199,7 +174,6 @@ function VideoCard({
 
 function OwnerVideoModal({
   video,
-  lightMode,
   onClose,
 }: {
   video: OwnerVideo;
@@ -207,191 +181,185 @@ function OwnerVideoModal({
   onClose: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const [ended, setEnded] = useState(false);
   const [fsBusy, setFsBusy] = useState(false);
-  const [fsError, setFsError] = useState<string | null>(null);
   const appleTouch = isAppleTouchDevice();
+
+  /** Always leave system FS, pause, and return to the library (never stuck full-screen). */
+  const closeToLibrary = useCallback(async () => {
+    const el = videoRef.current;
+    try {
+      el?.pause();
+    } catch {
+      /* ignore */
+    }
+    await exitAnyFullscreen(el);
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") void closeToLibrary();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose]);
+  }, [closeToLibrary]);
+
+  // When user leaves iOS/system fullscreen via Done, stay on our stage (X still visible)
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const onWebkitEnd = () => {
+      // Ensure video is still playable in our stage with controls + Close
+      try {
+        el.setAttribute("playsinline", "true");
+        el.setAttribute("webkit-playsinline", "true");
+      } catch {
+        /* ignore */
+      }
+    };
+    el.addEventListener("webkitendfullscreen", onWebkitEnd);
+    return () => el.removeEventListener("webkitendfullscreen", onWebkitEnd);
+  }, [video.src]);
 
   useEffect(() => {
     setEnded(false);
-    setFsError(null);
     const el = videoRef.current;
     if (!el) return;
-    let cancelled = false;
-
-    (async () => {
-      // iOS/iPad: no playsinline → Safari uses its real full-screen player (same as desktop expand).
-      // Desktop/Android keep playsinline for in-modal playback + Fullscreen API.
-      if (appleTouch) {
-        el.removeAttribute("playsinline");
-        el.removeAttribute("webkit-playsinline");
-      } else {
-        el.setAttribute("playsinline", "true");
-        el.setAttribute("webkit-playsinline", "true");
-      }
-      el.setAttribute("x-webkit-airplay", "allow");
-      el.load();
-
-      try {
-        await el.play();
-      } catch {
-        return;
-      }
-      if (cancelled) return;
-
-      // iPhone/iPad: enter system full-screen immediately so “two arrows” state is the default
-      if (appleTouch) {
-        try {
-          await enterVideoFullscreen(el);
-        } catch {
-          /* user can still tap Full screen */
-        }
-      }
-    })();
+    // Always playsInline in *our* stage so Close (X) stays under our control.
+    // System expand is opt-in via Expand / native arrows.
+    el.setAttribute("playsinline", "true");
+    el.setAttribute("webkit-playsinline", "true");
+    el.setAttribute("x-webkit-airplay", "allow");
+    el.load();
+    const play = el.play();
+    if (play) void play.catch(() => {});
 
     return () => {
-      cancelled = true;
+      // Never leave a stuck system-fullscreen session if the modal unmounts
+      void exitAnyFullscreen(el);
+      try {
+        el.pause();
+      } catch {
+        /* ignore */
+      }
     };
-  }, [video.src, appleTouch]);
+  }, [video.src]);
 
   const goFullscreen = useCallback(async () => {
-    const el = videoRef.current;
-    if (!el || fsBusy) return;
+    if (fsBusy) return;
     setFsBusy(true);
-    setFsError(null);
     try {
-      await enterVideoFullscreen(el);
+      await enterStageOrVideoFullscreen(stageRef.current, videoRef.current);
     } catch {
-      setFsError("Couldn’t enter full screen — tap play, then Full screen again.");
+      /* stage is already full-viewport; ignore */
     } finally {
       setFsBusy(false);
     }
   }, [fsBusy]);
 
   const goReview = () => {
-    onClose();
-    window.setTimeout(scrollToPropertyReview, 80);
+    void closeToLibrary().then(() => {
+      window.setTimeout(scrollToPropertyReview, 80);
+    });
   };
-
-  const panel = lightMode
-    ? "border-black/15 bg-[#f7f5f0] text-black"
-    : "border-white/12 bg-[#0a1526] text-white";
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[80] flex flex-col bg-black sm:items-center sm:justify-center sm:bg-transparent sm:p-6"
+      ref={stageRef}
+      className="fixed inset-0 z-[90] flex flex-col bg-black"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       data-pl-no-page-swipe
     >
-      {/* Desktop dim only — mobile is already full black stage */}
-      <button
-        type="button"
-        className="absolute inset-0 hidden bg-black/75 sm:block"
-        aria-label="Close video"
-        onClick={onClose}
-      />
-
+      {/* Always-on chrome: never lose the way back to the library */}
       <div
-        className={`relative z-[1] flex h-full w-full flex-col sm:h-auto sm:max-h-[min(100dvh,920px)] sm:max-w-3xl sm:rounded-[24px] sm:border sm:shadow-2xl ${panel} sm:bg-clip-padding`}
+        className="pointer-events-none absolute inset-x-0 top-0 z-[95] flex items-start justify-between gap-3 bg-gradient-to-b from-black/85 via-black/40 to-transparent px-3 pb-10 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4"
       >
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 bg-black/90 px-4 py-3 text-white sm:border-black/10 sm:bg-transparent sm:px-5 sm:text-inherit dark:sm:border-white/10">
-          <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#dcb672]">
-              Owner info · {video.id}
-            </div>
-            <h2 id={titleId} className="mt-0.5 truncate text-base font-semibold sm:text-lg">
-              {video.title}
-            </h2>
+        <div className="pointer-events-none min-w-0 pt-1">
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#dcb672]">
+            Owner info · {video.id}
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void goFullscreen()}
-              disabled={fsBusy}
-              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#d6b06a] px-3.5 text-xs font-semibold text-[#08111f] shadow-md transition hover:brightness-105 disabled:opacity-60"
-              aria-label="Full screen"
-            >
-              <Maximize2 className="h-4 w-4" aria-hidden />
-              Full screen
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 transition hover:bg-white/15 sm:border-black/10 sm:bg-black/[0.04] dark:sm:border-white/15 dark:sm:bg-white/[0.06]"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <h2 id={titleId} className="truncate text-sm font-semibold text-white sm:text-base">
+            {video.title}
+          </h2>
         </div>
-
-        {/*
-          Mobile: video fills remaining viewport (true full-stage).
-          iOS expand arrows: video is promoted to body on touch so Safari native FS works.
-        */}
-        <div className="relative flex min-h-0 flex-1 items-center justify-center bg-black sm:flex-none">
-          <video
-            ref={videoRef}
-            key={video.src}
-            className="h-full w-full max-h-[100dvh] object-contain sm:aspect-video sm:h-auto sm:max-h-[min(70dvh,560px)]"
-            controls
-            // Desktop/Android keep inline; iOS attributes set in effect (no playsInline)
-            playsInline={!appleTouch}
-            poster={video.poster}
-            preload="auto"
-            onEnded={() => setEnded(true)}
-            onDoubleClick={() => void goFullscreen()}
+        <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => void goFullscreen()}
+            disabled={fsBusy}
+            className="inline-flex h-11 items-center gap-1.5 rounded-full bg-white/15 px-3.5 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-white/25 disabled:opacity-60"
+            aria-label="Full screen"
           >
-            <source src={video.src} type="video/mp4" />
-          </video>
+            <Maximize2 className="h-4 w-4" aria-hidden />
+            <span className="hidden xs:inline sm:inline">Expand</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void closeToLibrary()}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#d6b06a] text-[#08111f] shadow-[0_8px_24px_rgba(0,0,0,0.45)] transition hover:brightness-105 active:scale-95"
+            aria-label="Close and back to videos"
+          >
+            <X className="h-6 w-6" strokeWidth={2.5} />
+          </button>
         </div>
+      </div>
 
-        {fsError ? (
-          <p className="bg-black px-4 py-2 text-xs text-[#e8cc8a] sm:bg-transparent" role="status">
-            {fsError}
-          </p>
-        ) : null}
+      <div className="relative flex min-h-0 flex-1 items-center justify-center">
+        <video
+          ref={videoRef}
+          key={video.src}
+          className="h-full w-full object-contain"
+          controls
+          playsInline
+          poster={video.poster}
+          preload="auto"
+          onEnded={() => setEnded(true)}
+          onDoubleClick={() => void goFullscreen()}
+        >
+          <source src={video.src} type="video/mp4" />
+        </video>
+      </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/10 bg-black/95 px-4 py-4 text-white sm:flex-row sm:items-center sm:justify-between sm:border-black/10 sm:bg-transparent sm:px-5 sm:text-inherit dark:sm:border-white/10">
-          <p className={`text-sm leading-relaxed ${ended ? "opacity-100" : "opacity-80"}`}>
-            {ended
-              ? "Ready to talk about your property?"
-              : appleTouch
-                ? "Tap Full screen (or the expand arrows) for the system full-screen player."
-                : "Use Full screen or the player expand control for full screen."}
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              href={`tel:${PENN_PHONE_TEL}`}
-              className="rounded-full border border-white/25 px-3.5 py-2 text-xs font-semibold transition hover:border-[#d6b06a]/50 sm:border-black/12 dark:sm:border-white/15"
-            >
-              {PENN_PHONE_DISPLAY}
-            </a>
-            <button
-              type="button"
-              onClick={goReview}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#d6b06a] px-4 py-2 text-xs font-semibold text-[#08111f] shadow-[0_10px_24px_rgba(214,176,106,0.28)] transition hover:brightness-105"
-            >
-              <ClipboardCheck className="h-3.5 w-3.5" aria-hidden />
-              Free property review
-            </button>
-          </div>
+      <div className="z-[95] flex flex-col gap-3 border-t border-white/10 bg-black/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-white sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <p className={`text-sm leading-relaxed ${ended ? "opacity-100" : "opacity-80"}`}>
+          {ended
+            ? "Ready to talk about your property?"
+            : appleTouch
+              ? "Done / Close (X) returns to the video list. Expand uses the system full-screen player."
+              : "Close (X) returns to the video list anytime."}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => void closeToLibrary()}
+            className="rounded-full border border-white/30 px-4 py-2.5 text-xs font-semibold transition hover:border-white/60"
+          >
+            Back to videos
+          </button>
+          <a
+            href={`tel:${PENN_PHONE_TEL}`}
+            className="rounded-full border border-white/25 px-3.5 py-2 text-xs font-semibold transition hover:border-[#d6b06a]/50"
+          >
+            {PENN_PHONE_DISPLAY}
+          </a>
+          <button
+            type="button"
+            onClick={goReview}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#d6b06a] px-4 py-2 text-xs font-semibold text-[#08111f] transition hover:brightness-105"
+          >
+            <ClipboardCheck className="h-3.5 w-3.5" aria-hidden />
+            Free property review
+          </button>
         </div>
       </div>
     </div>,
