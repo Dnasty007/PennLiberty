@@ -6,7 +6,6 @@ import {
   getFeaturedOwnerVideo,
   getGridOwnerVideos,
   getMobilePreviewVideos,
-  getSortedOwnerVideos,
   type OwnerVideo,
 } from "@/lib/ownerVideos";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
@@ -425,7 +424,7 @@ function MoreVideosSheet({
               Owner info library
             </div>
             <h2 id={titleId} className="mt-0.5 text-base font-semibold sm:text-lg">
-              All videos
+              More videos
             </h2>
           </div>
           <button
@@ -458,7 +457,7 @@ function MoreVideosSheet({
 
         <div className="border-t border-black/10 px-4 py-3 dark:border-white/10 sm:px-5">
           <p className={`text-center text-xs ${subtleText}`}>
-            {videos.length} videos · about one minute each
+            {videos.length} more · about one minute each
           </p>
         </div>
       </div>
@@ -470,8 +469,7 @@ function MoreVideosSheet({
 export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersVideoLibraryProps) {
   const featured = getFeaturedOwnerVideo();
   const grid = getGridOwnerVideos();
-  const allVideos = getSortedOwnerVideos();
-  const { preview: mobilePreview } = getMobilePreviewVideos();
+  const { preview: mobilePreview, more: mobileMore } = getMobilePreviewVideos();
   const [active, setActive] = useState<OwnerVideo | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -529,7 +527,7 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
           ))}
         </ul>
 
-        {allVideos.length > mobilePreview.length ? (
+        {mobileMore.length > 0 ? (
           <div className="mt-4 md:hidden">
             <button
               type="button"
@@ -538,7 +536,7 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
             >
               <ChevronUp className="h-4 w-4 text-[#d6b06a]" aria-hidden />
               More videos
-              <span className={`tabular-nums ${subtleText}`}>({allVideos.length})</span>
+              <span className={`tabular-nums ${subtleText}`}>({mobileMore.length})</span>
             </button>
           </div>
         ) : null}
@@ -588,9 +586,9 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
         </div>
       </div>
 
-      {moreOpen && allVideos.length > 0 ? (
+      {moreOpen && mobileMore.length > 0 ? (
         <MoreVideosSheet
-          videos={allVideos}
+          videos={mobileMore}
           lightMode={lightMode}
           mutedText={mutedText}
           subtleText={subtleText}
