@@ -99,13 +99,17 @@ export function getGridOwnerVideos(): OwnerVideo[] {
   return getSortedOwnerVideos().filter((v) => v.id !== featured.id);
 }
 
-/** Mobile band: first N by order. Rest go in “More videos” sheet. */
+/**
+ * Mobile band: first N by order on the page.
+ * “More videos” opens a sheet with the full catalog (all videos), not only the overflow.
+ */
 export function getMobilePreviewVideos(
   limit = OWNER_VIDEOS_MOBILE_PREVIEW,
-): { preview: OwnerVideo[]; more: OwnerVideo[] } {
+): { preview: OwnerVideo[]; more: OwnerVideo[]; all: OwnerVideo[] } {
   const sorted = getSortedOwnerVideos();
   return {
     preview: sorted.slice(0, limit),
     more: sorted.slice(limit),
+    all: sorted,
   };
 }
