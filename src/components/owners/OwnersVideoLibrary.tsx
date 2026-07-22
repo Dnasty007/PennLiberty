@@ -9,7 +9,7 @@ import {
 } from "@/lib/ownerVideos";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
 
-/** iOS Safari uses webkitEnterFullscreen on the <video>; desktop/Android use Fullscreen API. */
+/** iOS/iPadOS Safari — native expand needs webkitEnterFullscreen + video not trapped in nested fixed shells. */
 type VideoWithWebkit = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void;
   webkitExitFullscreen?: () => void;
@@ -17,32 +17,103 @@ type VideoWithWebkit = HTMLVideoElement & {
   webkitSupportsFullscreen?: boolean;
 };
 
+function isAppleTouchDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  if (/iPad|iPhone|iPod/.test(ua)) return true;
+  // iPadOS reports as Mac but has touch
+  return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+}
+
+/**
+ * True system fullscreen (the desktop “two arrows” experience).
+ * On iOS: reparent <video> to <body> so Safari’s expand control + webkitEnterFullscreen work,
+ * then enter native fullscreen. Restore on exit.
+ */
 async function enterVideoFullscreen(video: HTMLVideoElement): Promise<void> {
   const v = video as VideoWithWebkit;
+  const placeholder = document.createComment("pl-video-fs-slot");
+  const homeParent = video.parentElement;
+  const homeNext = video.nextSibling;
 
-  // Prefer native video fullscreen (required on iOS)
-  if (typeof v.webkitEnterFullscreen === "function") {
+  const restore = () => {
+    video.removeEventListener("webkitendfullscreen", onWebkitEnd);
+    document.removeEventListener("fullscreenchange", onFsChange);
+    if (placeholder.parentNode) {
+      placeholder.parentNode.insertBefore(video, placeholder);
+      placeholder.parentNode.removeChild(placeholder);
+    } else if (homeParent) {
+      homeParent.insertBefore(video, homeNext);
+    }
+    video.classList.remove("pl-video-native-fs");
+    video.style.removeProperty("position");
+    video.style.removeProperty("inset");
+    video.style.removeProperty("width");
+    video.style.removeProperty("height");
+    video.style.removeProperty("max-width");
+    video.style.removeProperty("max-height");
+    video.style.removeProperty("z-index");
+    video.style.removeProperty("background");
+    video.style.removeProperty("object-fit");
+  };
+
+  const onWebkitEnd = () => restore();
+  const onFsChange = () => {
+    if (!document.fullscreenElement) restore();
+  };
+
+  // Lift out of modal (fixed/overflow ancestors break iOS native fullscreen + expand arrows)
+  if (homeParent) {
+    homeParent.insertBefore(placeholder, video);
+    document.body.appendChild(video);
+    video.classList.add("pl-video-native-fs");
+    video.style.position = "fixed";
+    video.style.inset = "0";
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.maxWidth = "100%";
+    video.style.maxHeight = "100%";
+    video.style.zIndex = "2147483646";
+    video.style.background = "#000";
+    video.style.objectFit = "contain";
+  }
+
+  video.addEventListener("webkitendfullscreen", onWebkitEnd);
+  document.addEventListener("fullscreenchange", onFsChange);
+
+  if (video.paused) {
     try {
-      // Must run from a user gesture; may throw if video not ready
-      v.webkitEnterFullscreen();
-      return;
+      await video.play();
     } catch {
-      /* fall through */
+      /* continue — some browsers still allow FS */
     }
   }
 
-  if (typeof v.requestFullscreen === "function") {
-    await v.requestFullscreen();
-    return;
-  }
-
-  const anyV = v as HTMLVideoElement & { webkitRequestFullscreen?: () => void; msRequestFullscreen?: () => void };
-  if (typeof anyV.webkitRequestFullscreen === "function") {
-    anyV.webkitRequestFullscreen();
-    return;
-  }
-  if (typeof anyV.msRequestFullscreen === "function") {
-    anyV.msRequestFullscreen();
+  try {
+    if (typeof v.webkitEnterFullscreen === "function") {
+      v.webkitEnterFullscreen();
+      return;
+    }
+    if (typeof video.requestFullscreen === "function") {
+      await video.requestFullscreen();
+      return;
+    }
+    const anyV = video as HTMLVideoElement & {
+      webkitRequestFullscreen?: () => void;
+      msRequestFullscreen?: () => void;
+    };
+    if (typeof anyV.webkitRequestFullscreen === "function") {
+      anyV.webkitRequestFullscreen();
+      return;
+    }
+    if (typeof anyV.msRequestFullscreen === "function") {
+      anyV.msRequestFullscreen();
+      return;
+    }
+    // No API — leave reparented full-viewport video as fallback (user can close via page)
+  } catch {
+    restore();
+    throw new Error("fullscreen-failed");
   }
 }
 
@@ -139,6 +210,7 @@ function OwnerVideoModal({
   const [ended, setEnded] = useState(false);
   const [fsBusy, setFsBusy] = useState(false);
   const [fsError, setFsError] = useState<string | null>(null);
+  const appleTouch = isAppleTouchDevice();
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -158,14 +230,42 @@ function OwnerVideoModal({
     setFsError(null);
     const el = videoRef.current;
     if (!el) return;
-    // iOS needs the legacy attribute for inline + native fullscreen paths
-    el.setAttribute("playsinline", "true");
-    el.setAttribute("webkit-playsinline", "true");
-    el.setAttribute("x-webkit-airplay", "allow");
-    el.load();
-    const play = el.play();
-    if (play) void play.catch(() => {});
-  }, [video.src]);
+    let cancelled = false;
+
+    (async () => {
+      // iOS/iPad: no playsinline → Safari uses its real full-screen player (same as desktop expand).
+      // Desktop/Android keep playsinline for in-modal playback + Fullscreen API.
+      if (appleTouch) {
+        el.removeAttribute("playsinline");
+        el.removeAttribute("webkit-playsinline");
+      } else {
+        el.setAttribute("playsinline", "true");
+        el.setAttribute("webkit-playsinline", "true");
+      }
+      el.setAttribute("x-webkit-airplay", "allow");
+      el.load();
+
+      try {
+        await el.play();
+      } catch {
+        return;
+      }
+      if (cancelled) return;
+
+      // iPhone/iPad: enter system full-screen immediately so “two arrows” state is the default
+      if (appleTouch) {
+        try {
+          await enterVideoFullscreen(el);
+        } catch {
+          /* user can still tap Full screen */
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [video.src, appleTouch]);
 
   const goFullscreen = useCallback(async () => {
     const el = videoRef.current;
@@ -173,17 +273,9 @@ function OwnerVideoModal({
     setFsBusy(true);
     setFsError(null);
     try {
-      // iOS requires the video to be playing (or have metadata) before webkitEnterFullscreen
-      if (el.paused) {
-        try {
-          await el.play();
-        } catch {
-          /* user may need to tap play first */
-        }
-      }
       await enterVideoFullscreen(el);
     } catch {
-      setFsError("Fullscreen isn’t available yet — tap play, then Full screen again.");
+      setFsError("Couldn’t enter full screen — tap play, then Full screen again.");
     } finally {
       setFsBusy(false);
     }
@@ -191,7 +283,6 @@ function OwnerVideoModal({
 
   const goReview = () => {
     onClose();
-    // Allow modal unmount before scroll
     window.setTimeout(scrollToPropertyReview, 80);
   };
 
@@ -201,25 +292,26 @@ function OwnerVideoModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[80] flex items-stretch justify-center p-0 sm:items-center sm:p-6"
+      className="fixed inset-0 z-[80] flex flex-col bg-black sm:items-center sm:justify-center sm:bg-transparent sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       data-pl-no-page-swipe
     >
+      {/* Desktop dim only — mobile is already full black stage */}
       <button
         type="button"
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+        className="absolute inset-0 hidden bg-black/75 sm:block"
         aria-label="Close video"
         onClick={onClose}
       />
-      {/* No transform on panel — transforms break iOS/Android native video fullscreen */}
+
       <div
-        className={`relative z-[1] flex max-h-[100dvh] w-full max-w-3xl flex-col border shadow-2xl sm:max-h-[min(100dvh,920px)] sm:rounded-[24px] ${panel} rounded-none sm:overflow-hidden`}
+        className={`relative z-[1] flex h-full w-full flex-col sm:h-auto sm:max-h-[min(100dvh,920px)] sm:max-w-3xl sm:rounded-[24px] sm:border sm:shadow-2xl ${panel} sm:bg-clip-padding`}
       >
-        <div className="flex items-start justify-between gap-3 border-b border-black/10 px-4 py-3 dark:border-white/10 sm:px-5">
+        <div className="flex items-start justify-between gap-3 border-b border-white/10 bg-black/90 px-4 py-3 text-white sm:border-black/10 sm:bg-transparent sm:px-5 sm:text-inherit dark:sm:border-white/10">
           <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#a67c32] dark:text-[#dcb672]">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#dcb672]">
               Owner info · {video.id}
             </div>
             <h2 id={titleId} className="mt-0.5 truncate text-base font-semibold sm:text-lg">
@@ -231,16 +323,16 @@ function OwnerVideoModal({
               type="button"
               onClick={() => void goFullscreen()}
               disabled={fsBusy}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-black/[0.04] px-3 text-xs font-semibold transition hover:bg-black/[0.08] disabled:opacity-60 dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
+              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#d6b06a] px-3.5 text-xs font-semibold text-[#08111f] shadow-md transition hover:brightness-105 disabled:opacity-60"
               aria-label="Full screen"
             >
-              <Maximize2 className="h-3.5 w-3.5" aria-hidden />
-              <span className="sm:inline">Full screen</span>
+              <Maximize2 className="h-4 w-4" aria-hidden />
+              Full screen
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-black/[0.04] transition hover:bg-black/[0.08] dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 transition hover:bg-white/15 sm:border-black/10 sm:bg-black/[0.04] dark:sm:border-white/15 dark:sm:bg-white/[0.06]"
               aria-label="Close"
             >
               <X className="h-4 w-4" />
@@ -249,16 +341,17 @@ function OwnerVideoModal({
         </div>
 
         {/*
-          Video shell: no overflow:hidden / transform ancestors.
-          playsInline keeps in-modal playback; Full screen button uses webkitEnterFullscreen on iOS.
+          Mobile: video fills remaining viewport (true full-stage).
+          iOS expand arrows: video is promoted to body on touch so Safari native FS works.
         */}
-        <div className="relative bg-black">
+        <div className="relative flex min-h-0 flex-1 items-center justify-center bg-black sm:flex-none">
           <video
             ref={videoRef}
             key={video.src}
-            className="aspect-video w-full max-h-[min(56dvh,480px)] object-contain sm:max-h-none"
+            className="h-full w-full max-h-[100dvh] object-contain sm:aspect-video sm:h-auto sm:max-h-[min(70dvh,560px)]"
             controls
-            playsInline
+            // Desktop/Android keep inline; iOS attributes set in effect (no playsInline)
+            playsInline={!appleTouch}
             poster={video.poster}
             preload="auto"
             onEnded={() => setEnded(true)}
@@ -266,33 +359,26 @@ function OwnerVideoModal({
           >
             <source src={video.src} type="video/mp4" />
           </video>
-          {/* Large mobile affordance over the player corner */}
-          <button
-            type="button"
-            onClick={() => void goFullscreen()}
-            className="absolute bottom-12 right-3 z-[2] flex h-11 w-11 items-center justify-center rounded-full bg-[#d6b06a] text-[#08111f] shadow-lg sm:hidden"
-            aria-label="Enter full screen"
-          >
-            <Maximize2 className="h-5 w-5" aria-hidden />
-          </button>
         </div>
 
         {fsError ? (
-          <p className="px-4 pt-2 text-xs text-[#a67c32] sm:px-5" role="status">
+          <p className="bg-black px-4 py-2 text-xs text-[#e8cc8a] sm:bg-transparent" role="status">
             {fsError}
           </p>
         ) : null}
 
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="flex flex-col gap-3 border-t border-white/10 bg-black/95 px-4 py-4 text-white sm:flex-row sm:items-center sm:justify-between sm:border-black/10 sm:bg-transparent sm:px-5 sm:text-inherit dark:sm:border-white/10">
           <p className={`text-sm leading-relaxed ${ended ? "opacity-100" : "opacity-80"}`}>
             {ended
               ? "Ready to talk about your property?"
-              : "Tap Full screen for phone landscape / true full screen."}
+              : appleTouch
+                ? "Tap Full screen (or the expand arrows) for the system full-screen player."
+                : "Use Full screen or the player expand control for full screen."}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <a
               href={`tel:${PENN_PHONE_TEL}`}
-              className="rounded-full border border-black/12 px-3.5 py-2 text-xs font-semibold transition hover:border-[#d6b06a]/50 dark:border-white/15"
+              className="rounded-full border border-white/25 px-3.5 py-2 text-xs font-semibold transition hover:border-[#d6b06a]/50 sm:border-black/12 dark:sm:border-white/15"
             >
               {PENN_PHONE_DISPLAY}
             </a>
