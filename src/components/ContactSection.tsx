@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Clock, Mail, MapPinned, MessageSquare, Phone, Send } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -7,37 +7,6 @@ import type { PageKey } from "@/lib/data";
 
 import { PENN_EMAIL, PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
 import { normalizeVisitorEmail, sendWebsiteLead } from "@/lib/emailjs";
-
-const PENN_CONTACT_SUBJECT_DEFAULT = "Penn Liberty: website inquiry";
-
-/** Shared with deep links — subject + starter body cue many mail handlers to open Compose, not the inbox listing. */
-function penWebsiteMailtoHref(draft: string, name?: string): string {
-  const signOff = name?.trim() ? `\n\nThanks,\n${name.trim()}` : "\n\nThanks,\n";
-  const body =
-    draft.trim().length > 0
-      ? `${draft.trim()}${signOff}\n\nSent from pennlibertyre.com/contact`
-      : `Hi Penn Liberty,\n\n${signOff}\n`;
-  return (
-    `mailto:${PENN_EMAIL}?subject=${encodeURIComponent(PENN_CONTACT_SUBJECT_DEFAULT)}` +
-    `&body=${encodeURIComponent(body)}`
-  );
-}
-
-function gmailWebComposeHref(draft: string, name?: string): string {
-  const signOff = name?.trim() ? `\n\nThanks,\n${name.trim()}` : "\n\nThanks,\n";
-  const body =
-    draft.trim().length > 0
-      ? `${draft.trim()}${signOff}\n\nSent from pennlibertyre.com/contact`
-      : `Hi Penn Liberty,\n\n${signOff}\n`;
-  const q = new URLSearchParams({
-    view: "cm",
-    fs: "1",
-    to: PENN_EMAIL,
-    su: PENN_CONTACT_SUBJECT_DEFAULT,
-    body,
-  });
-  return `https://mail.google.com/mail/?${q}`;
-}
 
 type ContactBootstrap = { draft?: string; focusCompose?: boolean };
 
@@ -133,15 +102,6 @@ export function ContactSection({
       }, 260);
     }
   }, []);
-
-  const mailtoHrefQuick = useMemo(
-    () => penWebsiteMailtoHref(noteDraft, contactName),
-    [noteDraft, contactName],
-  );
-  const gmailComposeHrefMemo = useMemo(
-    () => gmailWebComposeHref(noteDraft, contactName),
-    [noteDraft, contactName],
-  );
 
   function chromeRow({ subtitle, title, children }: { subtitle?: string; title: string; children: ReactNode }) {
     return (
@@ -261,31 +221,12 @@ export function ContactSection({
               subtitle: "Email",
               title: PENN_EMAIL,
               children: (
-                <div className="flex max-w-md flex-col gap-3">
-                  <a
-                    href={mailtoHrefQuick}
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-semibold transition sm:w-auto md:justify-start md:rounded-[22px] md:py-5 ${
-                      lightMode
-                        ? "border border-[#d6b06a]/45 bg-[rgba(214,176,106,0.12)] text-[#08111f] hover:bg-[rgba(214,176,106,0.2)]"
-                        : "border border-[#d6b06a]/35 bg-[#d6b06a]/10 text-[#f4dfb4] hover:bg-[#d6b06a]/14"
-                    }`}
-                  >
-                    <Mail className="h-4 w-4" aria-hidden />
-                    Open compose in mail app
-                  </a>
-                  <a
-                    href={gmailComposeHrefMemo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-[13px] font-medium underline decoration-[0.06em] underline-offset-[3px] ${lightMode ? "text-black/72 hover:text-black" : "text-white/[0.68] hover:text-white"}`}
-                  >
-                    Use Gmail in the browser instead (opens compose in a new tab)
-                  </a>
-                  <p className={`hidden text-[12px] leading-relaxed md:block ${mutedText}`}>
-                    Bare mailto links can land on Gmail’s inbox depending on Chrome settings. We pass subject and a
-                    starter message so handlers open a draft when they can.
-                  </p>
-                </div>
+                <p className={`flex items-start gap-3 text-sm leading-relaxed md:text-[0.9375rem] ${mutedText}`}>
+                  <Mail className="mt-1 h-[18px] w-[18px] shrink-0 text-[#d6b06a]" aria-hidden />
+                  <span>
+                    Use the form on this page — messages go straight to our desk at {PENN_EMAIL}.
+                  </span>
+                </p>
               ),
             })}
             {chromeRow({
