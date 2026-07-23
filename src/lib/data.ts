@@ -680,7 +680,7 @@ export const teamPrincipals: readonly TeamPerson[] = [
     role: "Co-Founder · Operations",
     bio: "Co-Founder of Penn Liberty. Leads day-to-day operations — property management, owner service, vendor coordination, and the systems that keep the firm running.",
     phone: "267-686-1510",
-    emails: ["Rayluke@pennlibertyre.com"],
+    emails: ["info@pennlibertyre.com"],
   },
 ] as const;
 
