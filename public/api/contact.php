@@ -58,13 +58,29 @@ if ($data === [] && $raw !== '' && isset($raw[0]) && ($raw[0] === '{' || $raw[0]
   }
 }
 
-$name    = trim((string)($data['name'] ?? ''));
-$email   = trim((string)($data['email'] ?? ''));
-$phone   = trim((string)($data['phone'] ?? 'N/A'));
-$address = trim((string)($data['address'] ?? 'N/A'));
+$safe = static function (string $v): string {
+  return str_replace(["\r", "\n"], ' ', $v);
+};
+
+// Normalize email: trim, strip invisible chars / NBSP, extract from "Name <addr@x.com>"
+$normalizeEmail = static function (string $email): string {
+  $email = trim($email);
+  // NBSP, zero-width, BOM — common from mobile/autofill
+  $email = preg_replace('/[\x{00A0}\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', '', $email) ?? $email;
+  $email = trim($email);
+  if (preg_match('/<([^>]+@[^>]+)>/', $email, $m)) {
+    $email = trim($m[1]);
+  }
+  return str_replace(["\r", "\n", ' '], '', $email);
+};
+
+$name    = $safe(trim((string)($data['name'] ?? '')));
+$email   = $normalizeEmail((string)($data['email'] ?? ''));
+$phone   = $safe(trim((string)($data['phone'] ?? 'N/A')));
+$address = $safe(trim((string)($data['address'] ?? 'N/A')));
 $message = trim((string)($data['message'] ?? ''));
-$title   = trim((string)($data['title'] ?? 'Website inquiry'));
-$time    = trim((string)($data['time'] ?? date('c')));
+$title   = $safe(trim((string)($data['title'] ?? 'Website inquiry')));
+$time    = $safe(trim((string)($data['time'] ?? date('c'))));
 
 if ($name === '' || $email === '' || $message === '') {
   http_response_code(400);
@@ -81,22 +97,18 @@ if ($name === '' || $email === '' || $message === '') {
   exit;
 }
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+// Practical check (filter_var is overly strict on some hosts / autofilled addresses)
+$emailOk = (bool)preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)
+  || (bool)filter_var($email, FILTER_VALIDATE_EMAIL);
+
+if (!$emailOk) {
   http_response_code(400);
-  echo json_encode(['ok' => false, 'error' => 'Invalid email address']);
+  echo json_encode([
+    'ok' => false,
+    'error' => 'Invalid email address — use a normal address like name@gmail.com',
+  ]);
   exit;
 }
-
-$safe = static function (string $v): string {
-  return str_replace(["\r", "\n"], ' ', $v);
-};
-
-$name    = $safe($name);
-$email   = $safe($email);
-$phone   = $safe($phone);
-$address = $safe($address);
-$title   = $safe($title);
-$time    = $safe($time);
 
 $lead = [
   'title'   => $title,

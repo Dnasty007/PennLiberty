@@ -6,7 +6,7 @@ import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
 import type { PageKey } from "@/lib/data";
 
 import { PENN_EMAIL, PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
-import { sendWebsiteLead } from "@/lib/emailjs";
+import { normalizeVisitorEmail, sendWebsiteLead } from "@/lib/emailjs";
 
 const PENN_CONTACT_SUBJECT_DEFAULT = "Penn Liberty: website inquiry";
 
@@ -82,13 +82,19 @@ export function ContactSection({
 
   const sendMessage = async () => {
     if (!noteDraft.trim() || !contactName.trim() || !contactEmail.trim()) return;
+    const cleanEmail = normalizeVisitorEmail(contactEmail);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+      setSendStatus("error");
+      setSendError("Please enter a valid email like name@gmail.com");
+      return;
+    }
     setSendStatus("sending");
     setSendError(null);
     try {
       await sendWebsiteLead({
         title: "Contact Page",
         name: contactName.trim(),
-        email: contactEmail.trim(),
+        email: cleanEmail,
         phone: contactPhone.trim() || "N/A",
         address: "N/A",
         message: noteDraft.trim(),
