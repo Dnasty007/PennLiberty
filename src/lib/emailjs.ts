@@ -1,12 +1,15 @@
 /**
- * Website lead delivery → company desk (info@) via GoDaddy PHP.
- * EmailJS kept only as a quiet last-resort fallback.
+ * Website lead delivery → company desk (info@).
+ *
+ * Primary: EmailJS (Gmail connected as info@) — same path as dashboard Test It.
+ * Fallback: GoDaddy PHP (/api/contact.php) if EmailJS fails.
  */
 import emailjs from "@emailjs/browser";
 import { PENN_EMAIL } from "@/lib/brand";
 
 export const EMAILJS_SERVICE_ID = "Owner_Email_Website";
-export const EMAILJS_TEMPLATE_ID = "template_mol56qf";
+/** Current EmailJS Contact Us template (recreated after old mol56qf was deleted). */
+export const EMAILJS_TEMPLATE_ID = "template_7ru8po5";
 export const EMAILJS_PUBLIC_KEY = "ykKMeoPCgTNLT5di1";
 
 export type WebsiteLeadPayload = {
@@ -52,6 +55,27 @@ function errText(err: unknown): string {
   return "unknown error";
 }
 
+async function sendViaEmailJs(payload: WebsiteLeadPayload): Promise<void> {
+  const email = normalizeVisitorEmail(payload.email);
+  await emailjs.send(
+    EMAILJS_SERVICE_ID,
+    EMAILJS_TEMPLATE_ID,
+    {
+      title: payload.title,
+      name: payload.name.trim(),
+      email,
+      phone: payload.phone.trim() || "N/A",
+      address: payload.address.trim() || "N/A",
+      message: payload.message.trim(),
+      time: payload.time,
+      to_email: PENN_EMAIL,
+      to: PENN_EMAIL,
+      reply_to: email,
+    },
+    EMAILJS_PUBLIC_KEY,
+  );
+}
+
 async function sendViaPhp(payload: WebsiteLeadPayload): Promise<void> {
   const endpoint = `${window.location.origin}/api/contact.php`;
 
@@ -87,39 +111,26 @@ async function sendViaPhp(payload: WebsiteLeadPayload): Promise<void> {
   }
 }
 
-async function sendViaEmailJs(payload: WebsiteLeadPayload): Promise<void> {
-  await emailjs.send(
-    EMAILJS_SERVICE_ID,
-    EMAILJS_TEMPLATE_ID,
-    {
-      ...payload,
-      email: normalizeVisitorEmail(payload.email),
-      to_email: PENN_EMAIL,
-      to: PENN_EMAIL,
-      reply_to: normalizeVisitorEmail(payload.email),
-    },
-    EMAILJS_PUBLIC_KEY,
-  );
-}
-
 /** Send a lead to the company desk (info@). */
 export async function sendWebsiteLead(payload: WebsiteLeadPayload): Promise<void> {
   let lastError = "unknown error";
 
-  try {
-    await sendViaPhp(payload);
-    return;
-  } catch (phpErr) {
-    lastError = errText(phpErr);
-    console.warn("PHP contact mail failed:", phpErr);
-  }
-
+  // Primary: EmailJS (dashboard Test It path — now working with info@)
   try {
     await sendViaEmailJs(payload);
     return;
   } catch (ejErr) {
-    lastError = `${lastError} | EmailJS: ${errText(ejErr)}`;
-    console.warn("EmailJS fallback failed:", ejErr);
+    lastError = errText(ejErr);
+    console.warn("EmailJS send failed:", ejErr);
+  }
+
+  // Fallback: site PHP
+  try {
+    await sendViaPhp(payload);
+    return;
+  } catch (phpErr) {
+    lastError = `${lastError} | PHP: ${errText(phpErr)}`;
+    console.warn("PHP contact mail failed:", phpErr);
   }
 
   throw new LeadDeliveryError(
