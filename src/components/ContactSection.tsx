@@ -143,9 +143,14 @@ export function ContactSection({
                 <span className="block text-xs text-[#d6b06a]">{PENN_PHONE_DISPLAY}</span>
               </span>
             </a>
-            <a
-              href={mailtoHrefQuick}
-              className={`flex w-full items-center gap-3.5 rounded-[18px] border px-4 py-3.5 transition ${
+            <button
+              type="button"
+              onClick={() => {
+                const ta = document.getElementById("contact-note-draft");
+                ta?.scrollIntoView({ behavior: "smooth", block: "center" });
+                window.setTimeout(() => (ta as HTMLTextAreaElement | null)?.focus({ preventScroll: true }), 120);
+              }}
+              className={`flex w-full items-center gap-3.5 rounded-[18px] border px-4 py-3.5 text-left transition ${
                 lightMode
                   ? "border-black/[0.08] bg-black/[0.03] active:bg-black/[0.06]"
                   : "border-white/[0.09] bg-white/[0.04] active:bg-white/[0.08]"
@@ -155,10 +160,10 @@ export function ContactSection({
                 <Mail className={`h-4 w-4 ${lightMode ? "text-black/55" : "text-white/55"}`} />
               </span>
               <span>
-                <span className={`block text-sm font-semibold ${lightMode ? "text-black/90" : "text-white"}`}>Email the desk</span>
-                <span className={`block text-xs ${lightMode ? "text-black/55" : "text-white/50"}`}>Opens a prefilled draft</span>
+                <span className={`block text-sm font-semibold ${lightMode ? "text-black/90" : "text-white"}`}>Message the desk</span>
+                <span className={`block text-xs ${lightMode ? "text-black/55" : "text-white/50"}`}>Jump to the form below</span>
               </span>
-            </a>
+            </button>
           </div>
         </div>
       ) : (
