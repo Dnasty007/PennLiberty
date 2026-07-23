@@ -1,37 +1,5 @@
 [
   {
-    "id": 3,
-    "slug": "2542-cecil-b-moore-ave-2",
-    "title": "2542 Cecil B. Moore Ave",
-    "price": "$1,950/mo",
-    "address": "2542 Cecil B. Moore Ave, Philadelphia, PA 19121",
-    "beds": 4,
-    "baths": 3,
-    "sqft": 1472,
-    "meta": "4 bed · 3 bath · Available 04/20/26",
-    "area": "Brewerytown",
-    "image": "/branding/liberty-head-grey.png",
-    "gallery": [
-      "/branding/liberty-head-grey.png"
-    ],
-    "propertyType": "Residential Lease",
-    "status": "Active",
-    "mlsNumber": "PAPH2609626",
-    "brokerage": "Penn Liberty Real Estate",
-    "dateAvailable": "04/20/26",
-    "securityDeposit": "$2,300",
-    "description": "Four bedrooms and three full baths with in-unit washer and dryer. All-new hardwood floors, fresh paint, and a modern kitchen with upgraded cabinets and appliances. Oversized rear deck with skyline views. Bi-level interior row/townhouse (1915) in Brewerytown with central A/C, full basement, and on-street parking.",
-    "highlights": [
-      "4 bedrooms · 3 full baths · ~1,472 sq ft",
-      "Washer & dryer · new hardwood floors · freshly painted",
-      "Modern kitchen — upgraded cabinets & appliances",
-      "Oversized rear deck with skyline view",
-      "Central A/C · natural gas · on-street parking",
-      "12–24 month lease · $2,300 security deposit",
-      "Brewerytown · near Girard Ave corridor"
-    ]
-  },
-  {
     "id": 4,
     "slug": "1540-n-15th-st-3f-rear",
     "title": "1540 North 15th Street - 3R",
