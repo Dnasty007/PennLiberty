@@ -1,10 +1,8 @@
 /**
  * Website lead delivery → company desk (info@).
  *
- * Order:
- * 1. Same-origin PHP on GoDaddy (/api/contact.php)
- * 2. FormSubmit → info@ (may need one-time Activate link in info@)
- * 3. EmailJS fallback (only if template still exists)
+ * Primary: same-origin GoDaddy PHP (/api/contact.php) — reliable, no 3rd-party activate.
+ * Fallback: EmailJS only if PHP fails (template may be missing).
  */
 import emailjs from "@emailjs/browser";
 import { PENN_EMAIL } from "@/lib/brand";
@@ -24,23 +22,34 @@ export type WebsiteLeadPayload = {
 };
 
 export class LeadDeliveryError extends Error {
-  constructor(
-    message: string,
-    readonly code: "activation" | "failed" = "failed",
-  ) {
+  constructor(message: string) {
     super(message);
     this.name = "LeadDeliveryError";
   }
 }
 
+/** Deliver via GoDaddy PHP mail → info@. */
 async function sendViaPhp(payload: WebsiteLeadPayload): Promise<void> {
-  const res = await fetch("/api/contact.php", {
+  // Prefer absolute URL so /contact and other routes always hit the real file
+  const endpoint = `${window.location.origin}/api/contact.php`;
+
+  const body = new URLSearchParams({
+    title: payload.title,
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone,
+    address: payload.address,
+    message: payload.message,
+    time: payload.time,
+  });
+
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
       Accept: "application/json",
     },
-    body: JSON.stringify(payload),
+    body: body.toString(),
   });
 
   const text = await res.text();
@@ -48,59 +57,13 @@ async function sendViaPhp(payload: WebsiteLeadPayload): Promise<void> {
   try {
     data = text ? (JSON.parse(text) as typeof data) : {};
   } catch {
-    throw new Error(`PHP endpoint returned non-JSON (${res.status})`);
-  }
-
-  if (!res.ok || !data.ok) {
-    throw new Error(data.error || `PHP mail HTTP ${res.status}`);
-  }
-}
-
-async function sendViaFormSubmit(payload: WebsiteLeadPayload): Promise<void> {
-  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(PENN_EMAIL)}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      _subject: `Penn Liberty website: ${payload.title}`,
-      _template: "table",
-      _captcha: false,
-      _replyto: payload.email,
-      name: payload.name,
-      email: payload.email,
-      phone: payload.phone,
-      address: payload.address,
-      message: payload.message,
-      time: payload.time,
-      source: payload.title,
-    }),
-  });
-
-  const text = await res.text();
-  let data: { success?: string | boolean; message?: string } = {};
-  try {
-    data = text ? (JSON.parse(text) as typeof data) : {};
-  } catch {
-    /* non-JSON */
-  }
-
-  const msg = (data.message || "").toLowerCase();
-  const needsActivation =
-    msg.includes("activation") ||
-    msg.includes("activate form") ||
-    msg.includes("activate");
-
-  if (needsActivation) {
-    throw new LeadDeliveryError(
-      `Almost there — open ${PENN_EMAIL}, find the FormSubmit “Activate Form” email (check Spam), click the link once, then press Send Message again.`,
-      "activation",
+    throw new Error(
+      `Mail server returned unexpected response (${res.status}). Please email ${PENN_EMAIL} directly.`,
     );
   }
 
-  if (!res.ok || data.success === false || data.success === "false") {
-    throw new Error(data.message || `FormSubmit HTTP ${res.status}`);
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || `Mail server error (${res.status})`);
   }
 }
 
@@ -120,35 +83,21 @@ async function sendViaEmailJs(payload: WebsiteLeadPayload): Promise<void> {
 
 /** Send a lead to the company desk (info@). */
 export async function sendWebsiteLead(payload: WebsiteLeadPayload): Promise<void> {
-  const errors: string[] = [];
-
   try {
     await sendViaPhp(payload);
     return;
-  } catch (err) {
-    errors.push(`PHP: ${err instanceof Error ? err.message : String(err)}`);
-  }
-
-  try {
-    await sendViaFormSubmit(payload);
-    return;
-  } catch (err) {
-    // Activation is actionable — stop here so the UI can show the steps
-    if (err instanceof LeadDeliveryError && err.code === "activation") {
-      throw err;
-    }
-    errors.push(`FormSubmit: ${err instanceof Error ? err.message : String(err)}`);
+  } catch (phpErr) {
+    console.warn("PHP contact mail failed:", phpErr);
   }
 
   try {
     await sendViaEmailJs(payload);
     return;
-  } catch (err) {
-    errors.push(`EmailJS: ${err instanceof Error ? err.message : String(err)}`);
+  } catch (ejErr) {
+    console.warn("EmailJS fallback failed:", ejErr);
   }
 
   throw new LeadDeliveryError(
     `Could not send right now. Please email ${PENN_EMAIL} or call 215-922-7900.`,
-    "failed",
   );
 }

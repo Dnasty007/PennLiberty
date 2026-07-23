@@ -17,10 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   exit;
 }
 
+// Accept JSON body or standard form POST
 $raw = file_get_contents('php://input');
 $data = json_decode($raw ?: '', true);
-if (!is_array($data)) {
+if (!is_array($data) || $data === []) {
   $data = $_POST;
+}
+if (!is_array($data)) {
+  $data = [];
 }
 
 $name    = trim((string)($data['name'] ?? ''));
