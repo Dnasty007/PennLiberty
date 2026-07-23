@@ -84,40 +84,5 @@
       "Steps from Temple University main campus",
       "$2,100 security deposit \u00b7 $50 application fee"
     ]
-  },
-  {
-    "id": 7,
-    "slug": "2633-kensington-ave-1c",
-    "title": "2633 Kensington Ave, Unit 1C \u2014 Storefront",
-    "price": "$1,150/mo",
-    "address": "2633 Kensington Ave, Unit 1C, Philadelphia, PA 19125",
-    "beds": 0,
-    "baths": 0,
-    "meta": "$1,150/mo \u00b7 Storefront \u00b7 Kensington",
-    "area": "Kensington",
-    "image": "/Rentals/2633-kensington-ave-1c/cover-1.png",
-    "gallery": [
-      "/Rentals/2633-kensington-ave-1c/cover-1.png",
-      "/Rentals/2633-kensington-ave-1c/cover-2.png",
-      "/Rentals/2633-kensington-ave-1c/IMG_5797.jpg",
-      "/Rentals/2633-kensington-ave-1c/IMG_7380.jpg",
-      "/Rentals/2633-kensington-ave-1c/IMG_7381.jpg",
-      "/Rentals/2633-kensington-ave-1c/IMG_7382.jpg"
-    ],
-    "propertyType": "Commercial Lease",
-    "status": "Available",
-    "brokerage": "Penn Liberty Real Estate",
-    "dateAvailable": "05/29/26",
-    "securityDeposit": "$1,150",
-    "applicationFee": "$50",
-    "description": "Storefront retail space at Unit 1C, 2633 Kensington Avenue in the 19125 corridor \u2014 $1,150 per month. Contact Penn Liberty for square footage, permitted uses, showing times, and application details.",
-    "highlights": [
-      "Storefront \u00b7 Unit 1C",
-      "$1,150/mo",
-      "Kensington \u00b7 Philadelphia 19125",
-      "Available 05/29/26",
-      "$1,150 security deposit \u00b7 $50 application fee",
-      "Same building as our Unit 3 listing \u2014 contact office to tour"
-    ]
   }
 ]
