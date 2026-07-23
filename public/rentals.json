@@ -8,7 +8,7 @@
     "beds": 1,
     "baths": 1,
     "sqft": 450,
-    "meta": "Unit 3R · 1 bed · 1 bath · ~450 sq ft · Temple area",
+    "meta": "Unit 3R \u00b7 1 bed \u00b7 1 bath \u00b7 ~450 sq ft \u00b7 Temple area",
     "area": "Temple University",
     "image": "/Rentals/1540-n-15th-st-3f-rear/IMG_5960.JPEG",
     "gallery": [
@@ -40,29 +40,34 @@
     "dateAvailable": "11/05/25",
     "securityDeposit": "$1,900",
     "applicationFee": "$50",
-    "description": "Unit 3R at 1540 North 15th Street — third-floor rear one-bedroom, one-bath apartment blocks from Temple University. Steps from the Broad Street Line, campus buildings, and neighborhood restaurants. Large kitchen opens to a cozy living room with hardwood floors. Gas stove, full-size refrigerator, and generous cabinet and counter space. Corner building with abundant windows; bedroom at the rear with closet space and room to furnish comfortably.",
+    "description": "Unit 3R at 1540 North 15th Street \u2014 third-floor rear one-bedroom, one-bath apartment blocks from Temple University. Steps from the Broad Street Line, campus buildings, and neighborhood restaurants. Large kitchen opens to a cozy living room with hardwood floors. Gas stove, full-size refrigerator, and generous cabinet and counter space. Corner building with abundant windows; bedroom at the rear with closet space and room to furnish comfortably.",
     "highlights": [
-      "Unit 3R · 1 bedroom · 1 bath · ~450 sq ft",
-      "Third floor rear · hardwood floors",
-      "Gas stove · full-size refrigerator",
-      "Corner building · bright, windowed rooms",
-      "Blocks from Temple U · near Broad St. Line",
-      "$1,900 security deposit · $50 application fee"
+      "Unit 3R \u00b7 1 bedroom \u00b7 1 bath \u00b7 ~450 sq ft",
+      "Third floor rear \u00b7 hardwood floors",
+      "Gas stove \u00b7 full-size refrigerator",
+      "Corner building \u00b7 bright, windowed rooms",
+      "Blocks from Temple U \u00b7 near Broad St. Line",
+      "$1,900 security deposit \u00b7 $50 application fee"
     ]
   },
   {
     "id": 5,
     "slug": "1711-n-gratz-st-2f",
-    "title": "1711 N Gratz St, Unit 2F",
+    "title": "1711 N Gratz St - 2F",
     "price": "$1,100/mo",
-    "address": "1711 N Gratz St, Unit 2F, Philadelphia, PA 19121",
+    "address": "1711 N Gratz St, Philadelphia, PA 19121",
     "beds": 2,
     "baths": 1,
-    "meta": "2 bed · 1 bath · Temple University area",
+    "meta": "2 bed \u00b7 1 bath \u00b7 Temple University area",
     "area": "Temple University",
-    "image": "/branding/liberty-head-grey.png",
+    "image": "/Rentals/1711-n-gratz-st-2f/gratz-2f-01.jpg",
     "gallery": [
-      "/branding/liberty-head-grey.png"
+      "/Rentals/1711-n-gratz-st-2f/gratz-2f-01.jpg",
+      "/Rentals/1711-n-gratz-st-2f/gratz-2f-02.jpg",
+      "/Rentals/1711-n-gratz-st-2f/gratz-2f-03.jpg",
+      "/Rentals/1711-n-gratz-st-2f/gratz-2f-04.jpg",
+      "/Rentals/1711-n-gratz-st-2f/gratz-2f-06.jpg",
+      "/Rentals/1711-n-gratz-st-2f/gratz-2f-07.jpg"
     ],
     "propertyType": "Residential Lease",
     "status": "Available",
@@ -71,24 +76,24 @@
     "applicationFee": "$50",
     "description": "Second-floor two-bedroom, one-bath apartment just off Temple University's main campus. Enter into a kitchen with a full-size refrigerator, electric stove, range hood, and eat-in dining space. Central air, gas heat, and in-unit laundry.",
     "highlights": [
-      "2 bedrooms · 1 bath · 2nd floor",
-      "Eat-in kitchen · full-size refrigerator",
-      "Electric stove · range hood",
-      "Central A/C · gas heat",
+      "2 bedrooms \u00b7 1 bath \u00b7 2nd floor",
+      "Eat-in kitchen \u00b7 full-size refrigerator",
+      "Electric stove \u00b7 range hood",
+      "Central A/C \u00b7 gas heat",
       "In-unit laundry",
       "Steps from Temple University main campus",
-      "$2,100 security deposit · $50 application fee"
+      "$2,100 security deposit \u00b7 $50 application fee"
     ]
   },
   {
     "id": 7,
     "slug": "2633-kensington-ave-1c",
-    "title": "2633 Kensington Ave, Unit 1C — Storefront",
+    "title": "2633 Kensington Ave, Unit 1C \u2014 Storefront",
     "price": "$1,150/mo",
     "address": "2633 Kensington Ave, Unit 1C, Philadelphia, PA 19125",
     "beds": 0,
     "baths": 0,
-    "meta": "$1,150/mo · Storefront · Kensington",
+    "meta": "$1,150/mo \u00b7 Storefront \u00b7 Kensington",
     "area": "Kensington",
     "image": "/Rentals/2633-kensington-ave-1c/cover-1.png",
     "gallery": [
@@ -105,14 +110,14 @@
     "dateAvailable": "05/29/26",
     "securityDeposit": "$1,150",
     "applicationFee": "$50",
-    "description": "Storefront retail space at Unit 1C, 2633 Kensington Avenue in the 19125 corridor — $1,150 per month. Contact Penn Liberty for square footage, permitted uses, showing times, and application details.",
+    "description": "Storefront retail space at Unit 1C, 2633 Kensington Avenue in the 19125 corridor \u2014 $1,150 per month. Contact Penn Liberty for square footage, permitted uses, showing times, and application details.",
     "highlights": [
-      "Storefront · Unit 1C",
+      "Storefront \u00b7 Unit 1C",
       "$1,150/mo",
-      "Kensington · Philadelphia 19125",
+      "Kensington \u00b7 Philadelphia 19125",
       "Available 05/29/26",
-      "$1,150 security deposit · $50 application fee",
-      "Same building as our Unit 3 listing — contact office to tour"
+      "$1,150 security deposit \u00b7 $50 application fee",
+      "Same building as our Unit 3 listing \u2014 contact office to tour"
     ]
   }
 ]
