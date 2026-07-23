@@ -1,5 +1,5 @@
 import { Suspense, lazy, useState } from "react";
-import emailjs from "@emailjs/browser";
+import { sendWebsiteLead } from "@/lib/emailjs";
 import {
   BookOpen,
   Camera,
@@ -25,10 +25,6 @@ const InspectionBrochureViewer = lazy(
 );
 
 const BROCHURE_PDF = "/owners/inspection-program.pdf";
-
-const EMAILJS_SERVICE_ID = "Owner_Email_Website";
-const EMAILJS_TEMPLATE_ID = "template_mol56qf";
-const EMAILJS_PUBLIC_KEY = "ykKMeoPCgTNLT5di1";
 
 const deliverables = [
   {
@@ -105,23 +101,18 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
 
     setStatus("sending");
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          title: "Inspection Program Enrollment",
-          name: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          address:
-            filledAddresses.length > 1
-              ? filledAddresses.map((a, i) => `${i + 1}. ${a}`).join("  |  ")
-              : filledAddresses[0] ?? "",
-          message: `Inspection Program opt-in — ${propertyType}; cadence: ${cadence}; ${filledAddresses.length} propert${filledAddresses.length === 1 ? "y" : "ies"}.`,
-          time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
-        },
-        EMAILJS_PUBLIC_KEY,
-      );
+      await sendWebsiteLead({
+        title: "Inspection Program Enrollment",
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        address:
+          filledAddresses.length > 1
+            ? filledAddresses.map((a, i) => `${i + 1}. ${a}`).join("  |  ")
+            : filledAddresses[0] ?? "",
+        message: `Inspection Program opt-in — ${propertyType}; cadence: ${cadence}; ${filledAddresses.length} propert${filledAddresses.length === 1 ? "y" : "ies"}.`,
+        time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+      });
       setStatus("success");
       setName("");
       setEmail("");

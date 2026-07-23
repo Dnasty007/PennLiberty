@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { SectionDivider } from "@/components/owners/SectionDivider";
-
-const EMAILJS_SERVICE_ID  = "Owner_Email_Website";
-const EMAILJS_TEMPLATE_ID = "template_mol56qf";
-const EMAILJS_PUBLIC_KEY  = "ykKMeoPCgTNLT5di1";
+import { sendWebsiteLead } from "@/lib/emailjs";
 
 const interestOptions = [
   "I want help managing",
@@ -63,20 +59,15 @@ export function OwnersCTA({
     setStatus("sending");
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          title:   "Property Review Request",
-          name:    name.trim(),
-          email:   email.trim(),
-          phone:   phone.trim(),
-          address: property.trim(),
-          message: interest,
-          time:    new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
-        },
-        EMAILJS_PUBLIC_KEY,
-      );
+      await sendWebsiteLead({
+        title: "Property Review Request",
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        address: property.trim(),
+        message: interest,
+        time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+      });
 
       setStatus("success");
       setName("");

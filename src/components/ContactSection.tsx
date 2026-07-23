@@ -1,5 +1,4 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Clock, Mail, MapPinned, MessageSquare, Phone, Send } from "lucide-react";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -7,10 +6,7 @@ import { useRentalsHeroPhysicsMode } from "@/hooks/useRentalsHeroPhysicsMode";
 import type { PageKey } from "@/lib/data";
 
 import { PENN_EMAIL, PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
-
-const EMAILJS_SERVICE_ID  = "Owner_Email_Website";
-const EMAILJS_TEMPLATE_ID = "template_mol56qf";
-const EMAILJS_PUBLIC_KEY  = "ykKMeoPCgTNLT5di1";
+import { sendWebsiteLead } from "@/lib/emailjs";
 
 const PENN_CONTACT_SUBJECT_DEFAULT = "Penn Liberty: website inquiry";
 
@@ -87,20 +83,15 @@ export function ContactSection({
     if (!noteDraft.trim() || !contactName.trim() || !contactEmail.trim()) return;
     setSendStatus("sending");
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          title:   "Contact Page",
-          name:    contactName.trim(),
-          email:   contactEmail.trim(),
-          phone:   contactPhone.trim() || "N/A",
-          address: "N/A",
-          message: noteDraft.trim(),
-          time:    new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
-        },
-        EMAILJS_PUBLIC_KEY,
-      );
+      await sendWebsiteLead({
+        title: "Contact Page",
+        name: contactName.trim(),
+        email: contactEmail.trim(),
+        phone: contactPhone.trim() || "N/A",
+        address: "N/A",
+        message: noteDraft.trim(),
+        time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+      });
       setSendStatus("success");
       setNoteDraft("");
       setContactName("");

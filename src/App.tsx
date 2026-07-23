@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import emailjs from "@emailjs/browser";
+
 import { ArrowUp } from "lucide-react";
 import { Header } from "@/components/Header";
 import { DevImageEditor } from "@/components/DevImageEditor";
@@ -53,10 +53,7 @@ import {
   PENN_PHONE_DISPLAY,
   PENN_PHONE_TEL,
 } from "@/lib/brand";
-
-const EMAILJS_SERVICE_ID = "Owner_Email_Website";
-const EMAILJS_TEMPLATE_ID = "template_mol56qf";
-const EMAILJS_PUBLIC_KEY = "ykKMeoPCgTNLT5di1";
+import { sendWebsiteLead } from "@/lib/emailjs";
 
 const PAGE_DOCUMENT_TITLES: Record<PageKey, string> = {
   home: "Penn Liberty | Philadelphia Property Management & Rentals",
@@ -517,25 +514,15 @@ export default function App() {
     setRentalApplicationStatus("sending");
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          title: "Rental Application Request",
-          name: contact.name,
-          email: contact.email,
-          phone: contact.phone,
-          address: rental.address,
-          message: [
-            rental.title,
-            rental.price,
-            rental.meta,
-            rental.area,
-          ].join(" · "),
-          time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
-        },
-        EMAILJS_PUBLIC_KEY,
-      );
+      await sendWebsiteLead({
+        title: "Rental Application Request",
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        address: rental.address,
+        message: [rental.title, rental.price, rental.meta, rental.area].join(" · "),
+        time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+      });
 
       const listingUrl = rental.applicationUrl?.trim();
       const globalUrl = import.meta.env.VITE_BUILDIUM_RENTAL_APPLICATION_URL?.trim() || undefined;
