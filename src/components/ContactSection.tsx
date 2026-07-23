@@ -77,11 +77,13 @@ export function ContactSection({
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [sendError, setSendError] = useState<string | null>(null);
   const { isMobile } = useRentalsHeroPhysicsMode();
 
   const sendMessage = async () => {
     if (!noteDraft.trim() || !contactName.trim() || !contactEmail.trim()) return;
     setSendStatus("sending");
+    setSendError(null);
     try {
       await sendWebsiteLead({
         title: "Contact Page",
@@ -97,8 +99,13 @@ export function ContactSection({
       setContactName("");
       setContactEmail("");
       setContactPhone("");
-    } catch {
+    } catch (err) {
       setSendStatus("error");
+      setSendError(
+        err instanceof Error && err.message
+          ? err.message
+          : `Something went wrong. Please call us at ${PENN_PHONE_DISPLAY}.`,
+      );
     }
   };
 
@@ -383,12 +390,16 @@ export function ContactSection({
                 </label>
 
                 {sendStatus === "error" && (
-                  <p className="text-[12px] text-red-500">
-                    Something went wrong. Please{" "}
-                    <a href={`tel:${PENN_PHONE_TEL}`} className="font-semibold underline">
-                      call us at {PENN_PHONE_DISPLAY}
-                    </a>
-                    .
+                  <p className="text-[12px] leading-relaxed text-red-500">
+                    {sendError ?? (
+                      <>
+                        Something went wrong. Please{" "}
+                        <a href={`tel:${PENN_PHONE_TEL}`} className="font-semibold underline">
+                          call us at {PENN_PHONE_DISPLAY}
+                        </a>
+                        .
+                      </>
+                    )}
                   </p>
                 )}
 
