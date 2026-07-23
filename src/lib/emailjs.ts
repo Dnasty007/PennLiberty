@@ -1,8 +1,6 @@
 /**
- * Website lead delivery → company desk (info@).
- *
- * Primary: same-origin GoDaddy PHP (/api/contact.php) — reliable, no 3rd-party activate.
- * Fallback: EmailJS only if PHP fails (template may be missing).
+ * Website lead delivery → company desk (info@) via GoDaddy PHP.
+ * EmailJS kept only as a quiet last-resort fallback.
  */
 import emailjs from "@emailjs/browser";
 import { PENN_EMAIL } from "@/lib/brand";
@@ -28,32 +26,21 @@ export class LeadDeliveryError extends Error {
   }
 }
 
-/** Deliver via GoDaddy PHP mail → info@. */
 async function sendViaPhp(payload: WebsiteLeadPayload): Promise<void> {
-  // Prefer absolute URL so /contact and other routes always hit the real file
   const endpoint = `${window.location.origin}/api/contact.php`;
 
-  const body = new URLSearchParams({
-    title: payload.title,
-    name: payload.name,
-    email: payload.email,
-    phone: payload.phone,
-    address: payload.address,
-    message: payload.message,
-    time: payload.time,
-  });
-
+  // Send as JSON — our PHP parses this reliably (form-urlencoded+charset is flaky on some hosts)
   const res = await fetch(endpoint, {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: body.toString(),
+    body: JSON.stringify(payload),
   });
 
   const text = await res.text();
-  let data: { ok?: boolean; error?: string } = {};
+  let data: { ok?: boolean; error?: string; mail?: boolean; saved?: boolean } = {};
   try {
     data = text ? (JSON.parse(text) as typeof data) : {};
   } catch {
@@ -83,10 +70,13 @@ async function sendViaEmailJs(payload: WebsiteLeadPayload): Promise<void> {
 
 /** Send a lead to the company desk (info@). */
 export async function sendWebsiteLead(payload: WebsiteLeadPayload): Promise<void> {
+  let lastError = "unknown error";
+
   try {
     await sendViaPhp(payload);
     return;
   } catch (phpErr) {
+    lastError = phpErr instanceof Error ? phpErr.message : String(phpErr);
     console.warn("PHP contact mail failed:", phpErr);
   }
 
@@ -94,10 +84,12 @@ export async function sendWebsiteLead(payload: WebsiteLeadPayload): Promise<void
     await sendViaEmailJs(payload);
     return;
   } catch (ejErr) {
+    const ejMsg = ejErr instanceof Error ? ejErr.message : String(ejErr);
     console.warn("EmailJS fallback failed:", ejErr);
+    lastError = `${lastError} | EmailJS: ${ejMsg}`;
   }
 
   throw new LeadDeliveryError(
-    `Could not send right now. Please email ${PENN_EMAIL} or call 215-922-7900.`,
+    `Could not send (${lastError}). Please email ${PENN_EMAIL} or call 215-922-7900.`,
   );
 }
