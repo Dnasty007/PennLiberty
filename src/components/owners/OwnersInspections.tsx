@@ -70,9 +70,11 @@ const inspectionKinds = [
 ];
 const cadenceOptions = ["Every 3 months", "Every 6 months"] as const;
 
+/** One building/property row. Unit mode: many unit #s on the same address. */
 type EnrollmentLine = {
   address: string;
-  unit: string;
+  /** Unit numbers for this address (Unit $55 mode). House mode ignores. */
+  units: string[];
   /** Known units for this managed property (from portfolio match). */
   knownUnits: string[];
 };
@@ -83,7 +85,7 @@ type OwnersInspectionsProps = {
   subtleText: string;
 };
 
-const emptyLine = (): EnrollmentLine => ({ address: "", unit: "", knownUnits: [] });
+const emptyLine = (): EnrollmentLine => ({ address: "", units: [""], knownUnits: [] });
 
 export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersInspectionsProps) {
   const [formOpen, setFormOpen] = useState(false);
@@ -106,27 +108,66 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
   const emailEmpty = email.trim().length === 0;
   const phoneEmpty = phone.trim().length === 0;
 
-  const validLines = lines.filter((l) => {
+  /** Flatten to billable inspection lines (one per unit or per house). */
+  const billableLines: { address: string; unit?: string }[] = [];
+  for (const l of lines) {
     const addr = l.address.trim();
-    if (!addr) return false;
-    if (isUnit && !l.unit.trim()) return false;
-    return true;
-  });
+    if (!addr) continue;
+    if (isUnit) {
+      for (const u of l.units) {
+        const unit = u.trim();
+        if (unit) billableLines.push({ address: addr, unit });
+      }
+    } else {
+      billableLines.push({ address: addr });
+    }
+  }
+
   const linesIncomplete =
     lines.length === 0 ||
     lines.some((l) => {
-      const addr = l.address.trim();
-      if (!addr) return true;
-      if (isUnit && !l.unit.trim()) return true;
+      if (!l.address.trim()) return true;
+      if (isUnit) {
+        const filled = l.units.map((u) => u.trim()).filter(Boolean);
+        return filled.length === 0;
+      }
       return false;
     });
-  const isValid = !nameEmpty && !emailEmpty && !phoneEmpty && !linesIncomplete && validLines.length > 0;
+  const isValid =
+    !nameEmpty && !emailEmpty && !phoneEmpty && !linesIncomplete && billableLines.length > 0;
 
   const updateLine = (index: number, patch: Partial<EnrollmentLine>) =>
     setLines((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
-  const addLine = () => setLines((prev) => (prev.length < 24 ? [...prev, emptyLine()] : prev));
-  const removeLine = (index: number) =>
+  const addPropertyLine = () =>
+    setLines((prev) => (prev.length < 24 ? [...prev, emptyLine()] : prev));
+  const removePropertyLine = (index: number) =>
     setLines((prev) => (prev.length <= 1 ? [emptyLine()] : prev.filter((_, i) => i !== index)));
+
+  const addUnit = (lineIndex: number) => {
+    setLines((prev) =>
+      prev.map((row, i) =>
+        i === lineIndex && row.units.length < 40 ? { ...row, units: [...row.units, ""] } : row,
+      ),
+    );
+  };
+  const updateUnit = (lineIndex: number, unitIndex: number, value: string) => {
+    setLines((prev) =>
+      prev.map((row, i) => {
+        if (i !== lineIndex) return row;
+        const units = row.units.map((u, j) => (j === unitIndex ? value : u));
+        return { ...row, units };
+      }),
+    );
+  };
+  const removeUnit = (lineIndex: number, unitIndex: number) => {
+    setLines((prev) =>
+      prev.map((row, i) => {
+        if (i !== lineIndex) return row;
+        if (row.units.length <= 1) return { ...row, units: [""] };
+        return { ...row, units: row.units.filter((_, j) => j !== unitIndex) };
+      }),
+    );
+  };
 
   const onManagedSelect = (index: number, prop: ManagedProperty) => {
     updateLine(index, {
@@ -145,10 +186,17 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
 
   const setKindAndResetUnits = (next: "unit" | "house") => {
     setKind(next);
-    // Keep addresses; clear unit numbers when switching to house
     if (next === "house") {
       setLines((prev) =>
-        prev.map((l) => ({ address: l.address, unit: "", knownUnits: l.knownUnits })),
+        prev.map((l) => ({ address: l.address, units: [""], knownUnits: l.knownUnits })),
+      );
+    } else {
+      setLines((prev) =>
+        prev.map((l) => ({
+          address: l.address,
+          units: l.units.some((u) => u.trim()) ? l.units : [""],
+          knownUnits: l.knownUnits,
+        })),
       );
     }
   };
@@ -159,23 +207,20 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
       return;
     }
 
-    const cycleTotal = validLines.length * feeEach;
-    const lineText = validLines
+    const cycleTotal = billableLines.length * feeEach;
+    const lineText = billableLines
       .map((l, i) => {
-        const addr = l.address.trim();
         if (isUnit) {
-          return `${i + 1}) ${addr} | Unit ${l.unit.trim()} | Unit $${feeEach}`;
+          return `${i + 1}) ${l.address} | Unit ${l.unit} | Unit $${feeEach}`;
         }
-        return `${i + 1}) ${addr} | House $${feeEach}`;
+        return `${i + 1}) ${l.address} | House $${feeEach}`;
       })
       .join("\n");
 
-    const addressField = validLines
-      .map((l, i) => {
-        const addr = l.address.trim();
-        const u = l.unit.trim();
-        return isUnit ? `${i + 1}. ${addr} — Unit ${u}` : `${i + 1}. ${addr}`;
-      })
+    const addressField = billableLines
+      .map((l, i) =>
+        isUnit ? `${i + 1}. ${l.address} — Unit ${l.unit}` : `${i + 1}. ${l.address}`,
+      )
       .join("  |  ");
 
     setStatus("sending");
@@ -187,7 +232,7 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
         phone: phone.trim(),
         address: addressField,
         message: [
-          `Inspection Program opt-in — ${kindLabel}; cadence: ${cadence}; ${validLines.length} line${validLines.length === 1 ? "" : "s"}.`,
+          `Inspection Program opt-in — ${kindLabel}; cadence: ${cadence}; ${billableLines.length} line${billableLines.length === 1 ? "" : "s"}.`,
           `Fee each: $${feeEach}; cycle estimate: $${cycleTotal} per visit cycle.`,
           "Lines:",
           lineText,
@@ -468,92 +513,139 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
 
                   <p className={`text-[12px] leading-relaxed ${footInk}`}>
                     {isUnit
-                      ? "Type street #, direction (West or W), then about half the street name (e.g. 1425 W Er… or 1425 West Eri…). Pick a managed match, then unit #."
+                      ? "Type street #, direction (West or W), then about half the street name. Pick the building, then add each unit # (use + Unit for 1F, 1R, 3F… on the same address)."
                       : "Type street #, direction (full or N/E/S/W), then about half the street name — we only suggest properties we already manage."}
                   </p>
 
-                  <div className="grid gap-1.5">
-                    {attempted && linesIncomplete && fieldLabel(isUnit ? "Address and unit for each line" : "Property address")}
+                  <div className="grid gap-3">
+                    {attempted &&
+                      linesIncomplete &&
+                      fieldLabel(isUnit ? "Address and at least one unit #" : "Property address")}
                     {lines.map((line, i) => {
                       const addrBad = attempted && !line.address.trim();
-                      const unitBad = attempted && isUnit && !line.unit.trim();
-                      const unitListId = `insp-units-${i}`;
+                      const filledUnits = line.units.map((u) => u.trim()).filter(Boolean);
+                      const unitsMissing = attempted && isUnit && filledUnits.length === 0;
                       return (
-                        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-                          <div className={`min-w-0 flex-1 ${isUnit ? "sm:flex-[1.6]" : ""}`}>
-                            <ManagedAddressAutocomplete
-                              value={line.address}
-                              ownerEmail={email}
-                              lightMode={lightMode}
-                              onChange={(v) => onAddressTyped(i, v)}
-                              onSelectManaged={(p) => onManagedSelect(i, p)}
-                              placeholder={
-                                isUnit
-                                  ? i === 0
-                                    ? "Start typing managed building address…"
-                                    : `Managed address for unit line #${i + 1}`
-                                  : i === 0
-                                    ? "Start typing managed property address…"
-                                    : `Managed property #${i + 1}`
-                              }
-                              className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${addrBad ? inputError : inputBase}`}
-                            />
-                          </div>
-                          {isUnit && (
-                            <div className="w-full sm:w-[8.5rem] sm:shrink-0">
-                              <Input
-                                value={line.unit}
-                                list={line.knownUnits.length ? unitListId : undefined}
-                                onChange={(e) => updateLine(i, { unit: e.target.value })}
-                                placeholder={line.knownUnits.length ? "Pick unit #" : "Unit # (1F)"}
-                                aria-label={`Unit number for line ${i + 1}`}
-                                className={`h-10 ${unitBad ? inputError : inputBase}`}
+                        <div
+                          key={i}
+                          className={`grid gap-2 rounded-xl border p-3 ${
+                            lightMode ? "border-black/10 bg-white/50" : "border-white/10 bg-white/[0.03]"
+                          }`}
+                        >
+                          <div className="flex items-stretch gap-2">
+                            <div className="min-w-0 flex-1">
+                              <ManagedAddressAutocomplete
+                                value={line.address}
+                                ownerEmail={email}
+                                lightMode={lightMode}
+                                onChange={(v) => onAddressTyped(i, v)}
+                                onSelectManaged={(p) => onManagedSelect(i, p)}
+                                placeholder={
+                                  isUnit
+                                    ? "Building address (managed)…"
+                                    : i === 0
+                                      ? "Property address (managed)…"
+                                      : `Property #${i + 1}`
+                                }
+                                className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${addrBad ? inputError : inputBase}`}
                               />
-                              {line.knownUnits.length > 0 && (
-                                <datalist id={unitListId}>
-                                  {line.knownUnits.map((u) => (
-                                    <option key={u} value={u} />
-                                  ))}
-                                </datalist>
-                              )}
                             </div>
-                          )}
-                          {lines.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeLine(i)}
-                              aria-label={`Remove line ${i + 1}`}
-                              className={`inline-flex h-10 w-full items-center justify-center rounded-md border transition sm:w-11 sm:shrink-0 ${
-                                lightMode
-                                  ? "border-black/12 bg-black/[0.03] text-black/50 hover:bg-black/[0.06] hover:text-black"
-                                  : "border-white/[0.12] bg-white/[0.04] text-white/50 hover:bg-white/[0.09] hover:text-white"
-                              }`}
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
+                            {lines.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removePropertyLine(i)}
+                                aria-label={`Remove property ${i + 1}`}
+                                className={`inline-flex h-10 w-11 shrink-0 items-center justify-center rounded-md border transition ${
+                                  lightMode
+                                    ? "border-black/12 bg-black/[0.03] text-black/50 hover:bg-black/[0.06] hover:text-black"
+                                    : "border-white/[0.12] bg-white/[0.04] text-white/50 hover:bg-white/[0.09] hover:text-white"
+                                }`}
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+
+                          {isUnit && (
+                            <div className="grid gap-1.5">
+                              {unitsMissing && (
+                                <span className="text-[12px] font-medium text-red-500">
+                                  * Add at least one unit number
+                                </span>
+                              )}
+                              {line.units.map((unitVal, ui) => {
+                                const unitListId = `insp-units-${i}-${ui}`;
+                                const unitBad = attempted && !unitVal.trim() && filledUnits.length === 0;
+                                return (
+                                  <div key={ui} className="flex items-stretch gap-2">
+                                    <div className="min-w-0 flex-1 sm:max-w-[12rem]">
+                                      <Input
+                                        value={unitVal}
+                                        list={line.knownUnits.length ? unitListId : undefined}
+                                        onChange={(e) => updateUnit(i, ui, e.target.value)}
+                                        placeholder={
+                                          line.knownUnits.length ? "Unit # (pick or type)" : "Unit # (1F)"
+                                        }
+                                        aria-label={`Unit ${ui + 1} for property ${i + 1}`}
+                                        className={`h-10 ${unitBad ? inputError : inputBase}`}
+                                      />
+                                      {line.knownUnits.length > 0 && (
+                                        <datalist id={unitListId}>
+                                          {line.knownUnits.map((u) => (
+                                            <option key={u} value={u} />
+                                          ))}
+                                        </datalist>
+                                      )}
+                                    </div>
+                                    {line.units.length > 1 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => removeUnit(i, ui)}
+                                        aria-label={`Remove unit ${ui + 1}`}
+                                        className={`inline-flex h-10 w-11 shrink-0 items-center justify-center rounded-md border transition ${
+                                          lightMode
+                                            ? "border-black/12 bg-black/[0.03] text-black/50 hover:bg-black/[0.06]"
+                                            : "border-white/[0.12] bg-white/[0.04] text-white/50 hover:bg-white/[0.09]"
+                                        }`}
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                              <button
+                                type="button"
+                                onClick={() => addUnit(i)}
+                                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d6b06a]/35 bg-[#d6b06a]/10 px-3 py-1.5 text-[12px] font-semibold text-[#d6b06a] transition hover:bg-[#d6b06a]/18"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                Add unit
+                              </button>
+                            </div>
                           )}
                         </div>
                       );
                     })}
                     <button
                       type="button"
-                      onClick={addLine}
+                      onClick={addPropertyLine}
                       className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d6b06a]/35 bg-[#d6b06a]/10 px-3.5 py-2 text-[13px] font-semibold text-[#d6b06a] transition hover:bg-[#d6b06a]/18"
                     >
                       <Plus className="h-3.5 w-3.5" />
-                      {isUnit ? "Add another unit" : "Add another property"}
+                      {isUnit ? "Add another building" : "Add another property"}
                     </button>
-                    {validLines.length > 0 && (
+                    {billableLines.length > 0 && (
                       <p className={`text-[12px] ${footInk}`}>
-                        {validLines.length}{" "}
+                        {billableLines.length}{" "}
                         {isUnit
-                          ? validLines.length === 1
+                          ? billableLines.length === 1
                             ? "unit"
                             : "units"
-                          : validLines.length === 1
+                          : billableLines.length === 1
                             ? "property"
                             : "properties"}{" "}
-                        · ${feeEach} each · ~${validLines.length * feeEach} per visit cycle
+                        · ${feeEach} each · ~${billableLines.length * feeEach} per visit cycle
                       </p>
                     )}
                   </div>
