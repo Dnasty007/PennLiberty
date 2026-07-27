@@ -65,6 +65,17 @@ export const ownerVideos: OwnerVideo[] = [
     order: 4,
   },
   {
+    id: "09",
+    slug: "tax-rental-license-notice",
+    title: "Tax & rental license notices",
+    blurb: "Why tax clearance blocks licensing — and what owners need to complete.",
+    runtimeSec: 66,
+    audience: ["owners", "ops"],
+    src: `${BASE}/09-tax-rental-license-notice.mp4`,
+    poster: `${BASE}/posters/09-tax-rental-license-notice.jpg`,
+    order: 5,
+  },
+  {
     id: "05",
     slug: "inspection-program",
     title: "Property Inspection Program",
@@ -74,17 +85,7 @@ export const ownerVideos: OwnerVideo[] = [
     audience: ["owners", "ops"],
     src: `${BASE}/05-inspection-program.mp4`,
     poster: `${BASE}/posters/05-inspection-program.jpg`,
-    order: 5,
-  },
-  {
-    id: "09",
-    slug: "tax-rental-license-notice",
-    title: "Tax & rental license notices",
-    blurb: "Why tax clearance blocks licensing — and what owners need to complete.",
-    runtimeSec: 66,
-    audience: ["owners", "ops"],
-    src: `${BASE}/09-tax-rental-license-notice.mp4`,
-    poster: `${BASE}/posters/09-tax-rental-license-notice.jpg`,
+    /** After main shelf (desktop 5 / mobile 3) — opens under More videos */
     order: 6,
   },
 ];
