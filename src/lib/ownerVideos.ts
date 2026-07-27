@@ -65,6 +65,18 @@ export const ownerVideos: OwnerVideo[] = [
     order: 4,
   },
   {
+    id: "05",
+    slug: "inspection-program",
+    title: "Property Inspection Program",
+    blurb:
+      "Photo-documented condition reports every 3–6 months — $55/unit or $75/house, on your schedule.",
+    runtimeSec: 66,
+    audience: ["owners", "ops"],
+    src: `${BASE}/05-inspection-program.mp4`,
+    poster: `${BASE}/posters/05-inspection-program.jpg`,
+    order: 5,
+  },
+  {
     id: "09",
     slug: "tax-rental-license-notice",
     title: "Tax & rental license notices",
@@ -73,7 +85,7 @@ export const ownerVideos: OwnerVideo[] = [
     audience: ["owners", "ops"],
     src: `${BASE}/09-tax-rental-license-notice.mp4`,
     poster: `${BASE}/posters/09-tax-rental-license-notice.jpg`,
-    order: 5,
+    order: 6,
   },
 ];
 
