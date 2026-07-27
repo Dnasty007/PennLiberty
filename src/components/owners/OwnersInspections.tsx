@@ -59,8 +59,14 @@ const deliverables = [
   },
 ] as const;
 
-const propertyTypes = ["Unit — $55 per visit", "House — $75 per visit"] as const;
+/** Unit = $55/door (needs unit #). House = $75 full property (no unit). */
+const inspectionKinds = [
+  { id: "unit" as const, label: "Unit — $55 per visit", fee: 55 },
+  { id: "house" as const, label: "House — $75 per visit", fee: 75 },
+];
 const cadenceOptions = ["Every 3 months", "Every 6 months"] as const;
+
+type EnrollmentLine = { address: string; unit: string };
 
 type OwnersInspectionsProps = {
   lightMode: boolean;
@@ -68,36 +74,83 @@ type OwnersInspectionsProps = {
   subtleText: string;
 };
 
+const emptyLine = (): EnrollmentLine => ({ address: "", unit: "" });
+
 export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersInspectionsProps) {
   const [formOpen, setFormOpen] = useState(false);
   const [brochureOpen, setBrochureOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [addresses, setAddresses] = useState<string[]>([""]);
-  const [propertyType, setPropertyType] = useState<string>(propertyTypes[0]);
+  /** unit = apartment/door; house = full SFH / whole property */
+  const [kind, setKind] = useState<"unit" | "house">("unit");
+  const [lines, setLines] = useState<EnrollmentLine[]>([emptyLine()]);
   const [cadence, setCadence] = useState<string>(cadenceOptions[0]);
   const [attempted, setAttempted] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
+  const isUnit = kind === "unit";
+  const feeEach = isUnit ? 55 : 75;
+  const kindLabel = isUnit ? "Unit — $55 per visit" : "House — $75 per visit";
+
   const nameEmpty = name.trim().length === 0;
   const emailEmpty = email.trim().length === 0;
   const phoneEmpty = phone.trim().length === 0;
-  const filledAddresses = addresses.map((a) => a.trim()).filter(Boolean);
-  const propertyEmpty = filledAddresses.length === 0;
-  const isValid = !nameEmpty && !emailEmpty && !phoneEmpty && !propertyEmpty;
 
-  const updateAddress = (index: number, val: string) =>
-    setAddresses((prev) => prev.map((a, i) => (i === index ? val : a)));
-  const addAddress = () => setAddresses((prev) => (prev.length < 12 ? [...prev, ""] : prev));
-  const removeAddress = (index: number) =>
-    setAddresses((prev) => prev.filter((_, i) => i !== index));
+  const validLines = lines.filter((l) => {
+    const addr = l.address.trim();
+    if (!addr) return false;
+    if (isUnit && !l.unit.trim()) return false;
+    return true;
+  });
+  const linesIncomplete =
+    lines.length === 0 ||
+    lines.some((l) => {
+      const addr = l.address.trim();
+      if (!addr) return true;
+      if (isUnit && !l.unit.trim()) return true;
+      return false;
+    });
+  const isValid = !nameEmpty && !emailEmpty && !phoneEmpty && !linesIncomplete && validLines.length > 0;
+
+  const updateLine = (index: number, patch: Partial<EnrollmentLine>) =>
+    setLines((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  const addLine = () => setLines((prev) => (prev.length < 24 ? [...prev, emptyLine()] : prev));
+  const removeLine = (index: number) =>
+    setLines((prev) => (prev.length <= 1 ? [emptyLine()] : prev.filter((_, i) => i !== index)));
+
+  const setKindAndResetUnits = (next: "unit" | "house") => {
+    setKind(next);
+    // Keep addresses; clear unit numbers when switching to house
+    if (next === "house") {
+      setLines((prev) => prev.map((l) => ({ address: l.address, unit: "" })));
+    }
+  };
 
   const submit = async () => {
     if (!isValid) {
       setAttempted(true);
       return;
     }
+
+    const cycleTotal = validLines.length * feeEach;
+    const lineText = validLines
+      .map((l, i) => {
+        const addr = l.address.trim();
+        if (isUnit) {
+          return `${i + 1}) ${addr} | Unit ${l.unit.trim()} | Unit $${feeEach}`;
+        }
+        return `${i + 1}) ${addr} | House $${feeEach}`;
+      })
+      .join("\n");
+
+    const addressField = validLines
+      .map((l, i) => {
+        const addr = l.address.trim();
+        const u = l.unit.trim();
+        return isUnit ? `${i + 1}. ${addr} — Unit ${u}` : `${i + 1}. ${addr}`;
+      })
+      .join("  |  ");
 
     setStatus("sending");
     try {
@@ -106,19 +159,21 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        address:
-          filledAddresses.length > 1
-            ? filledAddresses.map((a, i) => `${i + 1}. ${a}`).join("  |  ")
-            : filledAddresses[0] ?? "",
-        message: `Inspection Program opt-in — ${propertyType}; cadence: ${cadence}; ${filledAddresses.length} propert${filledAddresses.length === 1 ? "y" : "ies"}.`,
+        address: addressField,
+        message: [
+          `Inspection Program opt-in — ${kindLabel}; cadence: ${cadence}; ${validLines.length} line${validLines.length === 1 ? "" : "s"}.`,
+          `Fee each: $${feeEach}; cycle estimate: $${cycleTotal} per visit cycle.`,
+          "Lines:",
+          lineText,
+        ].join("\n"),
         time: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
       });
       setStatus("success");
       setName("");
       setEmail("");
       setPhone("");
-      setAddresses([""]);
-      setPropertyType(propertyTypes[0]);
+      setLines([emptyLine()]);
+      setKind("unit");
       setCadence(cadenceOptions[0]);
       setAttempted(false);
     } catch {
@@ -353,57 +408,28 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
                     />
                   </div>
 
-                  <div className="grid gap-1.5">
-                    {attempted && propertyEmpty && fieldLabel("Property address")}
-                    {addresses.map((addr, i) => (
-                      <div key={i} className="flex items-stretch gap-2">
-                        <div className="min-w-0 flex-1">
-                          <AddressAutocomplete
-                            value={addr}
-                            onChange={(v) => updateAddress(i, v)}
-                            placeholder={i === 0 ? "Property address" : `Property address #${i + 1}`}
-                            className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${attempted && propertyEmpty ? inputError : inputBase}`}
-                          />
-                        </div>
-                        {addresses.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeAddress(i)}
-                            aria-label={`Remove property ${i + 1}`}
-                            className={`inline-flex w-11 shrink-0 items-center justify-center rounded-md border transition ${
-                              lightMode
-                                ? "border-black/12 bg-black/[0.03] text-black/50 hover:bg-black/[0.06] hover:text-black"
-                                : "border-white/[0.12] bg-white/[0.04] text-white/50 hover:bg-white/[0.09] hover:text-white"
-                            }`}
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={addAddress}
-                      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d6b06a]/35 bg-[#d6b06a]/10 px-3.5 py-2 text-[13px] font-semibold text-[#d6b06a] transition hover:bg-[#d6b06a]/18"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      Add another property
-                    </button>
-                  </div>
-
+                  {/* Type + cadence first — drives whether unit # is required */}
                   <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-3">
                     <div className="grid gap-1">
-                      <span className={`text-[11px] font-medium uppercase tracking-[0.14em] ${selectLabel}`}>Property type</span>
-                      <select value={propertyType} onChange={(e) => setPropertyType(e.target.value)} className={selectBase}>
-                        {propertyTypes.map((option) => (
-                          <option key={option} value={option} className={optionClass}>
-                            {option}
+                      <span className={`text-[11px] font-medium uppercase tracking-[0.14em] ${selectLabel}`}>
+                        Inspection type
+                      </span>
+                      <select
+                        value={kind}
+                        onChange={(e) => setKindAndResetUnits(e.target.value as "unit" | "house")}
+                        className={selectBase}
+                      >
+                        {inspectionKinds.map((option) => (
+                          <option key={option.id} value={option.id} className={optionClass}>
+                            {option.label}
                           </option>
                         ))}
                       </select>
                     </div>
                     <div className="grid gap-1">
-                      <span className={`text-[11px] font-medium uppercase tracking-[0.14em] ${selectLabel}`}>Inspection cadence</span>
+                      <span className={`text-[11px] font-medium uppercase tracking-[0.14em] ${selectLabel}`}>
+                        Inspection cadence
+                      </span>
                       <select value={cadence} onChange={(e) => setCadence(e.target.value)} className={selectBase}>
                         {cadenceOptions.map((option) => (
                           <option key={option} value={option} className={optionClass}>
@@ -412,6 +438,86 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
                         ))}
                       </select>
                     </div>
+                  </div>
+
+                  <p className={`text-[12px] leading-relaxed ${footInk}`}>
+                    {isUnit
+                      ? "Unit enrollments: enter the building address and the unit number for each door (e.g. 1F, 1R, 3F). Add a line for every unit you want on the program."
+                      : "House enrollments: full single-family / whole-property walkthrough — address only, no unit number."}
+                  </p>
+
+                  <div className="grid gap-1.5">
+                    {attempted && linesIncomplete && fieldLabel(isUnit ? "Address and unit for each line" : "Property address")}
+                    {lines.map((line, i) => {
+                      const addrBad = attempted && !line.address.trim();
+                      const unitBad = attempted && isUnit && !line.unit.trim();
+                      return (
+                        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                          <div className={`min-w-0 flex-1 ${isUnit ? "sm:flex-[1.6]" : ""}`}>
+                            <AddressAutocomplete
+                              value={line.address}
+                              onChange={(v) => updateLine(i, { address: v })}
+                              placeholder={
+                                isUnit
+                                  ? i === 0
+                                    ? "Building / property address"
+                                    : `Address for unit line #${i + 1}`
+                                  : i === 0
+                                    ? "Property address"
+                                    : `Property address #${i + 1}`
+                              }
+                              className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${addrBad ? inputError : inputBase}`}
+                            />
+                          </div>
+                          {isUnit && (
+                            <div className="w-full sm:w-[7.5rem] sm:shrink-0">
+                              <Input
+                                value={line.unit}
+                                onChange={(e) => updateLine(i, { unit: e.target.value })}
+                                placeholder="Unit # (1F)"
+                                aria-label={`Unit number for line ${i + 1}`}
+                                className={`h-10 ${unitBad ? inputError : inputBase}`}
+                              />
+                            </div>
+                          )}
+                          {lines.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeLine(i)}
+                              aria-label={`Remove line ${i + 1}`}
+                              className={`inline-flex h-10 w-full items-center justify-center rounded-md border transition sm:w-11 sm:shrink-0 ${
+                                lightMode
+                                  ? "border-black/12 bg-black/[0.03] text-black/50 hover:bg-black/[0.06] hover:text-black"
+                                  : "border-white/[0.12] bg-white/[0.04] text-white/50 hover:bg-white/[0.09] hover:text-white"
+                              }`}
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={addLine}
+                      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d6b06a]/35 bg-[#d6b06a]/10 px-3.5 py-2 text-[13px] font-semibold text-[#d6b06a] transition hover:bg-[#d6b06a]/18"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {isUnit ? "Add another unit" : "Add another property"}
+                    </button>
+                    {validLines.length > 0 && (
+                      <p className={`text-[12px] ${footInk}`}>
+                        {validLines.length}{" "}
+                        {isUnit
+                          ? validLines.length === 1
+                            ? "unit"
+                            : "units"
+                          : validLines.length === 1
+                            ? "property"
+                            : "properties"}{" "}
+                        · ${feeEach} each · ~${validLines.length * feeEach} per visit cycle
+                      </p>
+                    )}
                   </div>
 
                   {status === "error" && (
