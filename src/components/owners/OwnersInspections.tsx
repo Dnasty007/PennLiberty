@@ -16,9 +16,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { ManagedAddressAutocomplete } from "@/components/ManagedAddressAutocomplete";
 import { GlassCard, listingsRailChromeClass } from "@/components/GlassCard";
 import { SectionDivider } from "@/components/owners/SectionDivider";
+import {
+  type ManagedProperty,
+  findManagedByFormatted,
+} from "@/lib/managedPortfolio";
 
 const InspectionBrochureViewer = lazy(
   () => import("@/components/owners/InspectionBrochureViewer"),
@@ -66,7 +70,12 @@ const inspectionKinds = [
 ];
 const cadenceOptions = ["Every 3 months", "Every 6 months"] as const;
 
-type EnrollmentLine = { address: string; unit: string };
+type EnrollmentLine = {
+  address: string;
+  unit: string;
+  /** Known units for this managed property (from portfolio match). */
+  knownUnits: string[];
+};
 
 type OwnersInspectionsProps = {
   lightMode: boolean;
@@ -74,7 +83,7 @@ type OwnersInspectionsProps = {
   subtleText: string;
 };
 
-const emptyLine = (): EnrollmentLine => ({ address: "", unit: "" });
+const emptyLine = (): EnrollmentLine => ({ address: "", unit: "", knownUnits: [] });
 
 export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersInspectionsProps) {
   const [formOpen, setFormOpen] = useState(false);
@@ -119,11 +128,28 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
   const removeLine = (index: number) =>
     setLines((prev) => (prev.length <= 1 ? [emptyLine()] : prev.filter((_, i) => i !== index)));
 
+  const onManagedSelect = (index: number, prop: ManagedProperty) => {
+    updateLine(index, {
+      address: prop.formatted,
+      knownUnits: prop.units.filter((u) => u.toLowerCase() !== "office"),
+    });
+  };
+
+  const onAddressTyped = (index: number, value: string) => {
+    const hit = findManagedByFormatted(value);
+    updateLine(index, {
+      address: value,
+      knownUnits: hit ? hit.units.filter((u) => u.toLowerCase() !== "office") : [],
+    });
+  };
+
   const setKindAndResetUnits = (next: "unit" | "house") => {
     setKind(next);
     // Keep addresses; clear unit numbers when switching to house
     if (next === "house") {
-      setLines((prev) => prev.map((l) => ({ address: l.address, unit: "" })));
+      setLines((prev) =>
+        prev.map((l) => ({ address: l.address, unit: "", knownUnits: l.knownUnits })),
+      );
     }
   };
 
@@ -442,8 +468,8 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
 
                   <p className={`text-[12px] leading-relaxed ${footInk}`}>
                     {isUnit
-                      ? "Unit enrollments: enter the building address and the unit number for each door (e.g. 1F, 1R, 3F). Add a line for every unit you want on the program."
-                      : "House enrollments: full single-family / whole-property walkthrough — address only, no unit number."}
+                      ? "Start typing a managed address (about halfway) — we auto-suggest properties we already manage. Then pick the unit # for each door."
+                      : "Start typing a managed address — we auto-complete houses we already manage. Add a line for each full property."}
                   </p>
 
                   <div className="grid gap-1.5">
@@ -451,33 +477,45 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
                     {lines.map((line, i) => {
                       const addrBad = attempted && !line.address.trim();
                       const unitBad = attempted && isUnit && !line.unit.trim();
+                      const unitListId = `insp-units-${i}`;
                       return (
                         <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
                           <div className={`min-w-0 flex-1 ${isUnit ? "sm:flex-[1.6]" : ""}`}>
-                            <AddressAutocomplete
+                            <ManagedAddressAutocomplete
                               value={line.address}
-                              onChange={(v) => updateLine(i, { address: v })}
+                              ownerEmail={email}
+                              lightMode={lightMode}
+                              onChange={(v) => onAddressTyped(i, v)}
+                              onSelectManaged={(p) => onManagedSelect(i, p)}
                               placeholder={
                                 isUnit
                                   ? i === 0
-                                    ? "Building / property address"
-                                    : `Address for unit line #${i + 1}`
+                                    ? "Start typing managed building address…"
+                                    : `Managed address for unit line #${i + 1}`
                                   : i === 0
-                                    ? "Property address"
-                                    : `Property address #${i + 1}`
+                                    ? "Start typing managed property address…"
+                                    : `Managed property #${i + 1}`
                               }
                               className={`flex h-10 w-full rounded-md border px-3 text-sm ring-offset-background transition-colors ${addrBad ? inputError : inputBase}`}
                             />
                           </div>
                           {isUnit && (
-                            <div className="w-full sm:w-[7.5rem] sm:shrink-0">
+                            <div className="w-full sm:w-[8.5rem] sm:shrink-0">
                               <Input
                                 value={line.unit}
+                                list={line.knownUnits.length ? unitListId : undefined}
                                 onChange={(e) => updateLine(i, { unit: e.target.value })}
-                                placeholder="Unit # (1F)"
+                                placeholder={line.knownUnits.length ? "Pick unit #" : "Unit # (1F)"}
                                 aria-label={`Unit number for line ${i + 1}`}
                                 className={`h-10 ${unitBad ? inputError : inputBase}`}
                               />
+                              {line.knownUnits.length > 0 && (
+                                <datalist id={unitListId}>
+                                  {line.knownUnits.map((u) => (
+                                    <option key={u} value={u} />
+                                  ))}
+                                </datalist>
+                              )}
                             </div>
                           )}
                           {lines.length > 1 && (

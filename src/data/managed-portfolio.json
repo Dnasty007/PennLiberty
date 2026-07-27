@@ -1,0 +1,1866 @@
+{
+  "asOf": "2026-07-25",
+  "source": "PennLiberty-Brain/50 Properties properties.json + Unit_details.csv",
+  "count": 100,
+  "properties": [
+    {
+      "id": "700698",
+      "street": "1000 North Randolph Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19123",
+      "formatted": "1000 North Randolph Street, Philadelphia, PA 19123",
+      "units": [
+        "2"
+      ],
+      "unitCount": 1,
+      "subType": "Multi-Family",
+      "ownerName": "GREGORY SAMOIL",
+      "ownerEmails": [
+        "gregory.samoil@gmail.com"
+      ],
+      "search": "1000 north randolph street philadelphia pa 19123"
+    },
+    {
+      "id": "453731",
+      "street": "1009 West Cumberland Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19133",
+      "formatted": "1009 West Cumberland Street, Philadelphia, PA 19133",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon D. Caceres",
+      "ownerEmails": [
+        "ray.caceres@netzero.net"
+      ],
+      "search": "1009 west cumberland street philadelphia pa 19133"
+    },
+    {
+      "id": "398510",
+      "street": "1011 North Marshall Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19123",
+      "formatted": "1011 North Marshall Street, Philadelphia, PA 19123",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Industrial",
+      "ownerName": "Amy Kim",
+      "ownerEmails": [
+        "amykim7307@gmail.com"
+      ],
+      "search": "1011 north marshall street philadelphia pa 19123"
+    },
+    {
+      "id": "420610",
+      "street": "1013 North Marshall Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19123",
+      "formatted": "1013 North Marshall Street, Philadelphia, PA 19123",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Office",
+      "ownerName": "Amy Kim",
+      "ownerEmails": [
+        "amykim7307@gmail.com"
+      ],
+      "search": "1013 north marshall street philadelphia pa 19123"
+    },
+    {
+      "id": "484928",
+      "street": "1015 North Marshall Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19123",
+      "formatted": "1015 North Marshall Street, Philadelphia, PA 19123",
+      "units": [],
+      "unitCount": 1,
+      "subType": "Office",
+      "ownerName": "Wallace W. Oliveira; Yulenny Brito; Dummy Dummy",
+      "ownerEmails": [
+        "mrwallaceoliveira@outlook.com",
+        "yulennybrito@outlook.com"
+      ],
+      "search": "1015 north marshall street philadelphia pa 19123"
+    },
+    {
+      "id": "457392",
+      "street": "1018 Fitzwater Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19147",
+      "formatted": "1018 Fitzwater Street, Philadelphia, PA 19147",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Single-Family",
+      "ownerName": "Qin Yang",
+      "ownerEmails": [
+        "cindychen.panda@gmail.com"
+      ],
+      "search": "1018 fitzwater street philadelphia pa 19147"
+    },
+    {
+      "id": "171302",
+      "street": "1020 N. 4th St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19123",
+      "formatted": "1020 N. 4th St, Philadelphia, PA 19123",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Multi-Family",
+      "ownerName": "Helen Ruth",
+      "ownerEmails": [
+        "ruthhelen866@gmail.com"
+      ],
+      "search": "1020 north 4th street philadelphia pa 19123"
+    },
+    {
+      "id": "118994",
+      "street": "1036 Fillmore St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "1036 Fillmore St, Philadelphia, PA 19124",
+      "units": [
+        "1F",
+        "1M",
+        "1R",
+        "2F",
+        "2R"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "Wallace Oliveira",
+      "ownerEmails": [
+        "ihomeresolutions@gmail.com"
+      ],
+      "search": "1036 fillmore street philadelphia pa 19124"
+    },
+    {
+      "id": "442958",
+      "street": "1221 Kenwyn Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "1221 Kenwyn Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Wilfredo Rodriguez",
+      "ownerEmails": [
+        "wilrod08@gmail.com"
+      ],
+      "search": "1221 kenwyn street philadelphia pa 19124"
+    },
+    {
+      "id": "557486",
+      "street": "1233 North Alden Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19131",
+      "formatted": "1233 North Alden Street, Philadelphia, PA 19131",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Alfonso Clark",
+      "ownerEmails": [
+        "alclarkdds@hotmail.com"
+      ],
+      "search": "1233 north alden street philadelphia pa 19131"
+    },
+    {
+      "id": "655476",
+      "street": "1252 West Sergeant Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19133",
+      "formatted": "1252 West Sergeant Street, Philadelphia, PA 19133",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Joseph Avril",
+      "ownerEmails": [
+        "joeavril@verizon.net"
+      ],
+      "search": "1252 west sergeant street philadelphia pa 19133"
+    },
+    {
+      "id": "575205",
+      "street": "1259 North Frazier Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19131",
+      "formatted": "1259 North Frazier Street, Philadelphia, PA 19131",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Alfonso Clark - Frazier",
+      "ownerEmails": [
+        "alclarkdds@hotmail.com"
+      ],
+      "search": "1259 north frazier street philadelphia pa 19131"
+    },
+    {
+      "id": "650544",
+      "street": "1270 North Newkirk Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19121",
+      "formatted": "1270 North Newkirk Street, Philadelphia, PA 19121",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon Chaulisant",
+      "ownerEmails": [
+        "rchaulisant@yahoo.com"
+      ],
+      "search": "1270 north newkirk street philadelphia pa 19121"
+    },
+    {
+      "id": "634252",
+      "street": "13 West 21st Street",
+      "city": "Chester",
+      "state": "PA",
+      "zip": "19013",
+      "formatted": "13 West 21st Street, Chester, PA 19013",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Tatiana Santiago",
+      "ownerEmails": [
+        "tatianamsantiago@gmail.com"
+      ],
+      "search": "13 west 21st street chester pa 19013"
+    },
+    {
+      "id": "523016",
+      "street": "1412 East Lycoming Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "1412 East Lycoming Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Monika Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "1412 east lycoming street philadelphia pa 19124"
+    },
+    {
+      "id": "607968",
+      "street": "1425 West Erie Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "formatted": "1425 West Erie Avenue, Philadelphia, PA 19140",
+      "units": [
+        "1F",
+        "1R",
+        "2F",
+        "2R",
+        "3F",
+        "3R",
+        "office"
+      ],
+      "unitCount": 7,
+      "subType": "Office",
+      "ownerName": "Ramon D. Caceres",
+      "ownerEmails": [
+        "ray.caceres@netzero.net"
+      ],
+      "search": "1425 west erie avenue philadelphia pa 19140"
+    },
+    {
+      "id": "404087",
+      "street": "1433 West Venango Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "formatted": "1433 West Venango Street, Philadelphia, PA 19140",
+      "units": [
+        "1",
+        "2",
+        "3"
+      ],
+      "unitCount": 3,
+      "subType": "Multi-Family",
+      "ownerName": "BGC Investments",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "1433 west venango street philadelphia pa 19140"
+    },
+    {
+      "id": "490389",
+      "street": "1506 North 54th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19131",
+      "formatted": "1506 North 54th Street, Philadelphia, PA 19131",
+      "units": [
+        "1",
+        "2"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "CAMA SDIRA LLC FBO JOE H. NGOV IRA",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "1506 north 54th street philadelphia pa 19131"
+    },
+    {
+      "id": "372747",
+      "street": "1540 North 15th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19121",
+      "formatted": "1540 North 15th Street, Philadelphia, PA 19121",
+      "units": [
+        "1F",
+        "2F",
+        "2R",
+        "3F",
+        "3R"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "Kenn Asset Management Co",
+      "ownerEmails": [
+        "djohnson1540@comcast.net"
+      ],
+      "search": "1540 north 15th street philadelphia pa 19121"
+    },
+    {
+      "id": "117905",
+      "street": "1600 North 7th St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19122",
+      "formatted": "1600 North 7th St, Philadelphia, PA 19122",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "CAMA SDIRA LLC FBO JOE H. NGOV IRA",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "1600 north 7th street philadelphia pa 19122"
+    },
+    {
+      "id": "171853",
+      "street": "1626 N. 6th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19122",
+      "formatted": "1626 N. 6th Street, Philadelphia, PA 19122",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "CAMA SDIRA LLC FBO JOE H. NGOV IRA",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "1626 north 6th street philadelphia pa 19122"
+    },
+    {
+      "id": "565815",
+      "street": "1704 West Diamond street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19121",
+      "formatted": "1704 West Diamond street, Philadelphia, PA 19121",
+      "units": [
+        "1F",
+        "2F",
+        "3F"
+      ],
+      "unitCount": 3,
+      "subType": "Multi-Family",
+      "ownerName": "Independent Vo LLC.",
+      "ownerEmails": [
+        "independentvo2022@gmail.com"
+      ],
+      "search": "1704 west diamond street philadelphia pa 19121"
+    },
+    {
+      "id": "598120",
+      "street": "1711 North Gratz Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19121",
+      "formatted": "1711 North Gratz Street, Philadelphia, PA 19121",
+      "units": [
+        "1F",
+        "2F",
+        "3F"
+      ],
+      "unitCount": 3,
+      "subType": "Multi-Family",
+      "ownerName": "Independent Vo LLC.",
+      "ownerEmails": [
+        "independentvo2022@gmail.com"
+      ],
+      "search": "1711 north gratz street philadelphia pa 19121"
+    },
+    {
+      "id": "494676",
+      "street": "1765 Bridge Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "1765 Bridge Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Condo/Townhome",
+      "ownerName": "Yelin Jimenez",
+      "ownerEmails": [
+        "yelinjimenez1212@gmail.com"
+      ],
+      "search": "1765 bridge street philadelphia pa 19124"
+    },
+    {
+      "id": "439904",
+      "street": "1805 West Venango Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "formatted": "1805 West Venango Street, Philadelphia, PA 19140",
+      "units": [
+        "1F",
+        "2F",
+        "3F",
+        "2F - vacant"
+      ],
+      "unitCount": 4,
+      "subType": "Multi-Family",
+      "ownerName": "Eugene Coulter Jr.",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "1805 west venango street philadelphia pa 19140"
+    },
+    {
+      "id": "402022",
+      "street": "1823 Olive Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19130",
+      "formatted": "1823 Olive Street, Philadelphia, PA 19130",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Eugene Coulter Jr.",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "1823 olive street philadelphia pa 19130"
+    },
+    {
+      "id": "524501",
+      "street": "1851 East Lippincott Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "1851 East Lippincott Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "PSWH LLC.",
+      "ownerEmails": [
+        "whecht14@gmail.com"
+      ],
+      "search": "1851 east lippincott street philadelphia pa 19134"
+    },
+    {
+      "id": "522853",
+      "street": "1854 East Wishart Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "1854 East Wishart Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "PSWH LLC.",
+      "ownerEmails": [
+        "whecht14@gmail.com"
+      ],
+      "search": "1854 east wishart street philadelphia pa 19134"
+    },
+    {
+      "id": "523037",
+      "street": "1858 East Cornwall Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "1858 East Cornwall Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Pawel Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "1858 east cornwall street philadelphia pa 19134"
+    },
+    {
+      "id": "689018",
+      "street": "187 East 18th Street",
+      "city": "Chester",
+      "state": "PA",
+      "zip": "19013",
+      "formatted": "187 East 18th Street, Chester, PA 19013",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Marlon Barrera",
+      "ownerEmails": [
+        "marlonbarrera88@gmail.com"
+      ],
+      "search": "187 east 18th street chester pa 19013"
+    },
+    {
+      "id": "489559",
+      "street": "1900 East York Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19125",
+      "formatted": "1900 East York Street, Philadelphia, PA 19125",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "JJ Son & York LLC",
+      "ownerEmails": [
+        "amykim7307@gmail.com"
+      ],
+      "search": "1900 east york street philadelphia pa 19125"
+    },
+    {
+      "id": "489564",
+      "street": "1902 East York Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19125",
+      "formatted": "1902 East York Street, Philadelphia, PA 19125",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "JJ Son & York LLC",
+      "ownerEmails": [
+        "amykim7307@gmail.com"
+      ],
+      "search": "1902 east york street philadelphia pa 19125"
+    },
+    {
+      "id": "402043",
+      "street": "1906 North 22nd Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19121",
+      "formatted": "1906 North 22nd Street, Philadelphia, PA 19121",
+      "units": [
+        "1R",
+        "2F",
+        "2R",
+        "1Front",
+        "3rd Floor"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "CBA INVESTMENTS LLC",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "1906 north 22nd street philadelphia pa 19121"
+    },
+    {
+      "id": "523014",
+      "street": "1925 Penfield Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19138",
+      "formatted": "1925 Penfield Street, Philadelphia, PA 19138",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Monika Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "1925 penfield street philadelphia pa 19138"
+    },
+    {
+      "id": "506443",
+      "street": "205 Berbro Avenue",
+      "city": "Upper Darby",
+      "state": "PA",
+      "zip": "19082",
+      "formatted": "205 Berbro Avenue, Upper Darby, PA 19082",
+      "units": [
+        "2"
+      ],
+      "unitCount": 1,
+      "subType": "Multi-Family",
+      "ownerName": "Adelfi Burgos",
+      "ownerEmails": [
+        "rosarealtypa@gmail.com"
+      ],
+      "search": "205 berbro avenue upper darby pa 19082"
+    },
+    {
+      "id": "523035",
+      "street": "2054 Bellmore Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "2054 Bellmore Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "PSWH LLC.",
+      "ownerEmails": [
+        "whecht14@gmail.com"
+      ],
+      "search": "2054 bellmore street philadelphia pa 19134"
+    },
+    {
+      "id": "116806",
+      "street": "2149 Anchor St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "2149 Anchor St, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Olawale Ogbe",
+      "ownerEmails": [
+        "wale_ogbe@hotmail.com"
+      ],
+      "search": "2149 anchor street philadelphia pa 19124"
+    },
+    {
+      "id": "367363",
+      "street": "2209 North Bouvier Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19132",
+      "formatted": "2209 North Bouvier Street, Philadelphia, PA 19132",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Bayview 806 LLC",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "2209 north bouvier street philadelphia pa 19132"
+    },
+    {
+      "id": "457413",
+      "street": "2210 South 23rd Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19145",
+      "formatted": "2210 South 23rd Street, Philadelphia, PA 19145",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ming Kong Chan",
+      "ownerEmails": [
+        "jackiechanming1972@gmail.com"
+      ],
+      "search": "2210 south 23rd street philadelphia pa 19145"
+    },
+    {
+      "id": "668880",
+      "street": "2225 North Lawrence Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19133",
+      "formatted": "2225 North Lawrence Street, Philadelphia, PA 19133",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon D. Caceres",
+      "ownerEmails": [
+        "ray.caceres@netzero.net"
+      ],
+      "search": "2225 north lawrence street philadelphia pa 19133"
+    },
+    {
+      "id": "429616",
+      "street": "2229 West Dauphin Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19132",
+      "formatted": "2229 West Dauphin Street, Philadelphia, PA 19132",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "First In Management LLC",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "2229 west dauphin street philadelphia pa 19132"
+    },
+    {
+      "id": "539710",
+      "street": "2236 North Delhi Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19133",
+      "formatted": "2236 North Delhi Street, Philadelphia, PA 19133",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "",
+      "ownerEmails": [],
+      "search": "2236 north delhi street philadelphia pa 19133"
+    },
+    {
+      "id": "489541",
+      "street": "2331 Jasper Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19125",
+      "formatted": "2331 Jasper Street, Philadelphia, PA 19125",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "K&H Property LLC",
+      "ownerEmails": [
+        "thebigkim@gmail.com"
+      ],
+      "search": "2331 jasper street philadelphia pa 19125"
+    },
+    {
+      "id": "454532",
+      "street": "2516 North 16th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19132",
+      "formatted": "2516 North 16th Street, Philadelphia, PA 19132",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Skye Blue LLC",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "2516 north 16th street philadelphia pa 19132"
+    },
+    {
+      "id": "692936",
+      "street": "2542 Cecil B. Moore Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19121",
+      "formatted": "2542 Cecil B. Moore Avenue, Philadelphia, PA 19121",
+      "units": [
+        "1",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Condo/Townhome",
+      "ownerName": "Billy Coulter; COULTER CO",
+      "ownerEmails": [
+        "william16662@gmail.com",
+        "william16662@gmail.com"
+      ],
+      "search": "2542 cecil b moore avenue philadelphia pa 19121"
+    },
+    {
+      "id": "620610",
+      "street": "2633 Kensington Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19125",
+      "formatted": "2633 Kensington Avenue, Philadelphia, PA 19125",
+      "units": [
+        "1A",
+        "1C",
+        "2A",
+        "2B",
+        "3F"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "3444 Emerald St LLC",
+      "ownerEmails": [
+        "3444emeraldst@gmail.com"
+      ],
+      "search": "2633 kensington avenue philadelphia pa 19125"
+    },
+    {
+      "id": "469206",
+      "street": "2701 South 7th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19148",
+      "formatted": "2701 South 7th Street, Philadelphia, PA 19148",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "2701 South Seventh St LLC",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "2701 south 7th street philadelphia pa 19148"
+    },
+    {
+      "id": "637469",
+      "street": "2853 Benner Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19149",
+      "formatted": "2853 Benner Street, Philadelphia, PA 19149",
+      "units": [
+        "2"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon Caceres Sr",
+      "ownerEmails": [
+        "ramon.caceres45@gmail.com"
+      ],
+      "search": "2853 benner street philadelphia pa 19149"
+    },
+    {
+      "id": "521906",
+      "street": "2864 Ruth Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "2864 Ruth Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Urszula Marzena Stankiewicz",
+      "ownerEmails": [
+        "urszulams88@gmail.com"
+      ],
+      "search": "2864 ruth street philadelphia pa 19134"
+    },
+    {
+      "id": "523050",
+      "street": "2935 Weikel Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "2935 Weikel Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Monika Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "2935 weikel street philadelphia pa 19134"
+    },
+    {
+      "id": "521982",
+      "street": "3006 Ruth Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3006 Ruth Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Bradley Smith",
+      "ownerEmails": [
+        "bradley.noble.smith@gmail.com"
+      ],
+      "search": "3006 ruth street philadelphia pa 19134"
+    },
+    {
+      "id": "457402",
+      "street": "3011 Disston Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19149",
+      "formatted": "3011 Disston Street, Philadelphia, PA 19149",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Biping Zhou",
+      "ownerEmails": [
+        "bipingzhou@gmail.com"
+      ],
+      "search": "3011 disston street philadelphia pa 19149"
+    },
+    {
+      "id": "118741",
+      "street": "3016 A St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3016 A St, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Wallace Oliveira",
+      "ownerEmails": [
+        "ihomeresolutions@gmail.com"
+      ],
+      "search": "3016 a street philadelphia pa 19134"
+    },
+    {
+      "id": "296239",
+      "street": "302 East Sanger Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19120",
+      "formatted": "302 East Sanger Street, Philadelphia, PA 19120",
+      "units": [
+        "1",
+        "2"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Marta Bivins",
+      "ownerEmails": [
+        "mabivins@yahoo.com"
+      ],
+      "search": "302 east sanger street philadelphia pa 19120"
+    },
+    {
+      "id": "521948",
+      "street": "3025 Weikel Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3025 Weikel Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Urszula Marzena Stankiewicz",
+      "ownerEmails": [
+        "urszulams88@gmail.com"
+      ],
+      "search": "3025 weikel street philadelphia pa 19134"
+    },
+    {
+      "id": "662942",
+      "street": "303-305 Sharon Avenue",
+      "city": "Sharon Hill",
+      "state": "PA",
+      "zip": "19079",
+      "formatted": "303-305 Sharon Avenue, Sharon Hill, PA 19079",
+      "units": [
+        "A",
+        "B",
+        "C",
+        "D - rented by owner",
+        "E - rented by owner"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "Greater Bibleway Temple",
+      "ownerEmails": [
+        "bishopbfp@hotmail.com"
+      ],
+      "search": "303 305 sharon avenue sharon hill pa 19079"
+    },
+    {
+      "id": "523047",
+      "street": "3109 Janney St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3109 Janney St, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Monika Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "3109 janney street philadelphia pa 19134"
+    },
+    {
+      "id": "521757",
+      "street": "3176 Amber Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3176 Amber Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Urszula Marzena Stankiewicz",
+      "ownerEmails": [
+        "urszulams88@gmail.com"
+      ],
+      "search": "3176 amber street philadelphia pa 19134"
+    },
+    {
+      "id": "522988",
+      "street": "3230 Tilton Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3230 Tilton Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Pawel Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "3230 tilton street philadelphia pa 19134"
+    },
+    {
+      "id": "522989",
+      "street": "3240 Tilton Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3240 Tilton Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Pawel Stankiewicz",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "3240 tilton street philadelphia pa 19134"
+    },
+    {
+      "id": "494547",
+      "street": "3241 Tampa Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3241 Tampa Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Condo/Townhome",
+      "ownerName": "Yelin Jimenez",
+      "ownerEmails": [
+        "yelinjimenez1212@gmail.com"
+      ],
+      "search": "3241 tampa street philadelphia pa 19134"
+    },
+    {
+      "id": "523020",
+      "street": "3329 Jasper Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3329 Jasper Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "PSWH LLC.",
+      "ownerEmails": [
+        "whecht14@gmail.com"
+      ],
+      "search": "3329 jasper street philadelphia pa 19134"
+    },
+    {
+      "id": "645403",
+      "street": "3372 Amber Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3372 Amber Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon D. Caceres",
+      "ownerEmails": [
+        "ray.caceres@netzero.net"
+      ],
+      "search": "3372 amber street philadelphia pa 19134"
+    },
+    {
+      "id": "567558",
+      "street": "3444 Emerald Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3444 Emerald Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ashley Stettler",
+      "ownerEmails": [
+        "ashleystettler@gmail.com"
+      ],
+      "search": "3444 emerald street philadelphia pa 19134"
+    },
+    {
+      "id": "485222",
+      "street": "3455 Helen Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3455 Helen Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Eric M. Sonntag",
+      "ownerEmails": [
+        "eric@ericsonntag.com"
+      ],
+      "search": "3455 helen street philadelphia pa 19134"
+    },
+    {
+      "id": "524502",
+      "street": "3477 Jasper Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "3477 Jasper Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "PSWH LLC.",
+      "ownerEmails": [
+        "whecht14@gmail.com"
+      ],
+      "search": "3477 jasper street philadelphia pa 19134"
+    },
+    {
+      "id": "119060",
+      "street": "3665 Old York Rd",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "formatted": "3665 Old York Rd, Philadelphia, PA 19140",
+      "units": [
+        "2F",
+        "2R",
+        "3F",
+        "store"
+      ],
+      "unitCount": 4,
+      "subType": "Multi-Family",
+      "ownerName": "Amber J. Then",
+      "ownerEmails": [
+        "thenamber@aol.com"
+      ],
+      "search": "3665 old york road philadelphia pa 19140"
+    },
+    {
+      "id": "218539",
+      "street": "3753 North 15th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "formatted": "3753 North 15th Street, Philadelphia, PA 19140",
+      "units": [
+        "1A",
+        "1B",
+        "2A",
+        "2B"
+      ],
+      "unitCount": 4,
+      "subType": "Multi-Family",
+      "ownerName": "Eugene Coulter Jr.",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "3753 north 15th street philadelphia pa 19140"
+    },
+    {
+      "id": "368798",
+      "street": "4002 North Reese Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "formatted": "4002 North Reese Street, Philadelphia, PA 19140",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "",
+      "ownerEmails": [],
+      "search": "4002 north reese street philadelphia pa 19140"
+    },
+    {
+      "id": "559780",
+      "street": "4014 West Ford Road",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19131",
+      "formatted": "4014 West Ford Road, Philadelphia, PA 19131",
+      "units": [
+        "2F"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Estena McGhee",
+      "ownerEmails": [
+        "eam_99@yahoo.com"
+      ],
+      "search": "4014 west ford road philadelphia pa 19131"
+    },
+    {
+      "id": "683465",
+      "street": "408 West 21st Street",
+      "city": "Chester",
+      "state": "PA",
+      "zip": "19013",
+      "formatted": "408 West 21st Street, Chester, PA 19013",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Marlon Barrera",
+      "ownerEmails": [
+        "marlonbarrera88@gmail.com"
+      ],
+      "search": "408 west 21st street chester pa 19013"
+    },
+    {
+      "id": "651082",
+      "street": "4115 Bennington Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "4115 Bennington Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon D. Caceres",
+      "ownerEmails": [
+        "ray.caceres@netzero.net"
+      ],
+      "search": "4115 bennington street philadelphia pa 19124"
+    },
+    {
+      "id": "119001",
+      "street": "415 Dudley St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19148",
+      "formatted": "415 Dudley St, Philadelphia, PA 19148",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Wallace Oliveira",
+      "ownerEmails": [
+        "ihomeresolutions@gmail.com"
+      ],
+      "search": "415 dudley street philadelphia pa 19148"
+    },
+    {
+      "id": "600350",
+      "street": "4317 Claridge Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "4317 Claridge Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Marquez Sterling",
+      "ownerEmails": [
+        "raidernation4921@yahoo.com"
+      ],
+      "search": "4317 claridge street philadelphia pa 19124"
+    },
+    {
+      "id": "504475",
+      "street": "4650 Torresdale Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "4650 Torresdale Avenue, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon Caceres Sr",
+      "ownerEmails": [
+        "ramon.caceres45@gmail.com"
+      ],
+      "search": "4650 torresdale avenue philadelphia pa 19124"
+    },
+    {
+      "id": "482414",
+      "street": "4931 Penn Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "4931 Penn Street, Philadelphia, PA 19124",
+      "units": [
+        "1F",
+        "1R",
+        "2F",
+        "2R",
+        "3F"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "Josephina Barroso",
+      "ownerEmails": [
+        "jjbarroso@optonline.net"
+      ],
+      "search": "4931 penn street philadelphia pa 19124"
+    },
+    {
+      "id": "373462",
+      "street": "4945 North Warnock Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19141",
+      "formatted": "4945 North Warnock Street, Philadelphia, PA 19141",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Paulina Peguero",
+      "ownerEmails": [
+        "paulinapeguero@yahoo.com"
+      ],
+      "search": "4945 north warnock street philadelphia pa 19141"
+    },
+    {
+      "id": "372295",
+      "street": "511 Morse Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19122",
+      "formatted": "511 Morse Street, Philadelphia, PA 19122",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Jeremiah Lewis",
+      "ownerEmails": [
+        "jeremiah.a.lewis@gmail.com"
+      ],
+      "search": "511 morse street philadelphia pa 19122"
+    },
+    {
+      "id": "379748",
+      "street": "5156 Arbor Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19120",
+      "formatted": "5156 Arbor Street, Philadelphia, PA 19120",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Mavis Jackson",
+      "ownerEmails": [
+        "mvsfrysn@aol.com"
+      ],
+      "search": "5156 arbor street philadelphia pa 19120"
+    },
+    {
+      "id": "494746",
+      "street": "5215 Marlowe Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "5215 Marlowe Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Condo/Townhome",
+      "ownerName": "Yelin Jimenez",
+      "ownerEmails": [
+        "yelinjimenez1212@gmail.com"
+      ],
+      "search": "5215 marlowe street philadelphia pa 19124"
+    },
+    {
+      "id": "428573",
+      "street": "5316 Glenloch Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19124",
+      "formatted": "5316 Glenloch Street, Philadelphia, PA 19124",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Ramon D. Caceres",
+      "ownerEmails": [
+        "ray.caceres@netzero.net"
+      ],
+      "search": "5316 glenloch street philadelphia pa 19124"
+    },
+    {
+      "id": "119002",
+      "street": "5628 N 4th St.",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19120",
+      "formatted": "5628 N 4th St., Philadelphia, PA 19120",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Wallace Oliveira",
+      "ownerEmails": [
+        "ihomeresolutions@gmail.com"
+      ],
+      "search": "5628 north 4th street philadelphia pa 19120"
+    },
+    {
+      "id": "635057",
+      "street": "6062 North Camac Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19141",
+      "formatted": "6062 North Camac Street, Philadelphia, PA 19141",
+      "units": [
+        "1",
+        "Lower Level"
+      ],
+      "unitCount": 2,
+      "subType": "Single-Family",
+      "ownerName": "Meirys Ledesma",
+      "ownerEmails": [
+        "meiryscledesma@hotmail.com"
+      ],
+      "search": "6062 north camac street philadelphia pa 19141"
+    },
+    {
+      "id": "418386",
+      "street": "609 Cecil B. Moore Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19122",
+      "formatted": "609 Cecil B. Moore Avenue, Philadelphia, PA 19122",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Amy Kim",
+      "ownerEmails": [
+        "amykim7307@gmail.com"
+      ],
+      "search": "609 cecil b moore avenue philadelphia pa 19122"
+    },
+    {
+      "id": "522983",
+      "street": "6544 North Uber Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19138",
+      "formatted": "6544 North Uber Street, Philadelphia, PA 19138",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "MPS Investments LLC",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "6544 north uber street philadelphia pa 19138"
+    },
+    {
+      "id": "116775",
+      "street": "658 E Annsbury St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19120",
+      "formatted": "658 E Annsbury St, Philadelphia, PA 19120",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Nannette L Edwards",
+      "ownerEmails": [
+        "lucretta02@aol.com"
+      ],
+      "search": "658 east annsbury street philadelphia pa 19120"
+    },
+    {
+      "id": "522985",
+      "street": "6927 Forrest Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19138",
+      "formatted": "6927 Forrest Avenue, Philadelphia, PA 19138",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "MPS Investments LLC",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "6927 forrest avenue philadelphia pa 19138"
+    },
+    {
+      "id": "522984",
+      "street": "6958 Forrest Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19138",
+      "formatted": "6958 Forrest Avenue, Philadelphia, PA 19138",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "MPS Investments LLC",
+      "ownerEmails": [
+        "pspawcio@gmail.com"
+      ],
+      "search": "6958 forrest avenue philadelphia pa 19138"
+    },
+    {
+      "id": "572094",
+      "street": "7033 Montague Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19135",
+      "formatted": "7033 Montague Street, Philadelphia, PA 19135",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Orquidea Properties",
+      "ownerEmails": [
+        "rosarealtypa@gmail.com"
+      ],
+      "search": "7033 montague street philadelphia pa 19135"
+    },
+    {
+      "id": "405371",
+      "street": "7225 Haverford Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19151",
+      "formatted": "7225 Haverford Avenue, Philadelphia, PA 19151",
+      "units": [
+        "1F",
+        "2F",
+        "basement"
+      ],
+      "unitCount": 3,
+      "subType": "Multi-Family",
+      "ownerName": "Joe H. Ngov",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "7225 haverford avenue philadelphia pa 19151"
+    },
+    {
+      "id": "494687",
+      "street": "7242 Ditman Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19135",
+      "formatted": "7242 Ditman Street, Philadelphia, PA 19135",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Condo/Townhome",
+      "ownerName": "Yelin Jimenez",
+      "ownerEmails": [
+        "yelinjimenez1212@gmail.com"
+      ],
+      "search": "7242 ditman street philadelphia pa 19135"
+    },
+    {
+      "id": "457391",
+      "street": "726 Lombard Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19147",
+      "formatted": "726 Lombard Street, Philadelphia, PA 19147",
+      "units": [
+        "1",
+        "2"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Mei Yuen Siu",
+      "ownerEmails": [
+        "cindychen.panda@gmail.com"
+      ],
+      "search": "726 lombard street philadelphia pa 19147"
+    },
+    {
+      "id": "325123",
+      "street": "7318 Ogontz Ave - 2nd Floor",
+      "city": "philadelphia",
+      "state": "PA",
+      "zip": "19138",
+      "formatted": "7318 Ogontz Ave - 2nd Floor, philadelphia, PA 19138",
+      "units": [
+        "1F",
+        "2F"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Adelfi Burgos",
+      "ownerEmails": [
+        "rosarealtypa@gmail.com"
+      ],
+      "search": "7318 ogontz avenue 2nd floor philadelphia pa 19138"
+    },
+    {
+      "id": "522860",
+      "street": "740 East Willard Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19134",
+      "formatted": "740 East Willard Street, Philadelphia, PA 19134",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "PSWH LLC.",
+      "ownerEmails": [
+        "whecht14@gmail.com"
+      ],
+      "search": "740 east willard street philadelphia pa 19134"
+    },
+    {
+      "id": "357467",
+      "street": "748 Marlyn Road",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19151",
+      "formatted": "748 Marlyn Road, Philadelphia, PA 19151",
+      "units": [
+        "1",
+        "2"
+      ],
+      "unitCount": 2,
+      "subType": "Multi-Family",
+      "ownerName": "Janean L Peterson",
+      "ownerEmails": [
+        "janeanlpeterson@gmail.com"
+      ],
+      "search": "748 marlyn road philadelphia pa 19151"
+    },
+    {
+      "id": "642026",
+      "street": "8064 Walker Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19136",
+      "formatted": "8064 Walker Street, Philadelphia, PA 19136",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Multi-Family",
+      "ownerName": "Vanessa Auguste",
+      "ownerEmails": [
+        "augustevanessa21@gmail.com"
+      ],
+      "search": "8064 walker street philadelphia pa 19136"
+    },
+    {
+      "id": "117774",
+      "street": "811 N 6th St",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19123",
+      "formatted": "811 N 6th St, Philadelphia, PA 19123",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Benjamin Peterson",
+      "ownerEmails": [
+        "bishopbfp@hotmail.com"
+      ],
+      "search": "811 north 6th street philadelphia pa 19123"
+    },
+    {
+      "id": "699336",
+      "street": "811 North 15th Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19130",
+      "formatted": "811 North 15th Street, Philadelphia, PA 19130",
+      "units": [
+        "1"
+      ],
+      "unitCount": 1,
+      "subType": "Single-Family",
+      "ownerName": "Eugene Coulter Jr.",
+      "ownerEmails": [
+        "cginoj@yahoo.com"
+      ],
+      "search": "811 north 15th street philadelphia pa 19130"
+    },
+    {
+      "id": "281415",
+      "street": "885 Belmont Avenue",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19104",
+      "formatted": "885 Belmont Avenue, Philadelphia, PA 19104",
+      "units": [
+        "1A",
+        "2A",
+        "2B",
+        "3rd Floor",
+        "1F - alpha"
+      ],
+      "unitCount": 5,
+      "subType": "Multi-Family",
+      "ownerName": "Bayview 806 LLC",
+      "ownerEmails": [
+        "joengov@gmail.com"
+      ],
+      "search": "885 belmont avenue philadelphia pa 19104"
+    },
+    {
+      "id": "699204",
+      "street": "900 North 41st Street",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19104",
+      "formatted": "900 North 41st Street, Philadelphia, PA 19104",
+      "units": [
+        "3"
+      ],
+      "unitCount": 1,
+      "subType": "Multi-Family",
+      "ownerName": "900 N 41st St LLC",
+      "ownerEmails": [],
+      "search": "900 north 41st street philadelphia pa 19104"
+    }
+  ]
+}
