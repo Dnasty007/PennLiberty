@@ -1,8 +1,11 @@
 /**
  * Managed-portfolio address match (Buildium-backed snapshot).
- * Privacy: do not surface a property until the query is "far enough"
- * into that address (~50% of street length, min 5 chars) — or a strong
- * street-number + name prefix match.
+ *
+ * Privacy (strict):
+ * - No single-letter N/E/S/W expansion — users must type full North/East/South/West
+ *   when the managed street uses a direction.
+ * - Suggestions only after ~halfway into the primary street name
+ *   (e.g. Erie → "Er"…), not halfway into the whole address string.
  */
 import portfolio from "@/data/managed-portfolio.json";
 
@@ -33,34 +36,7 @@ const data = portfolio as ManagedPortfolioFile;
 export const MANAGED_PORTFOLIO_AS_OF = data.asOf;
 export const MANAGED_PROPERTIES: ManagedProperty[] = data.properties;
 
-export function normalizeAddressQuery(raw: string): string {
-  let s = (raw || "").toLowerCase().replace(/\./g, " ");
-  s = s.replace(/[^a-z0-9\s]/g, " ");
-  s = ` ${s} `;
-  const reps: Record<string, string> = {
-    " st ": " street ",
-    " ave ": " avenue ",
-    " rd ": " road ",
-    " blvd ": " boulevard ",
-    " dr ": " drive ",
-    " ln ": " lane ",
-    " ct ": " court ",
-    " pl ": " place ",
-    " e ": " east ",
-    " w ": " west ",
-    " n ": " north ",
-    " s ": " south ",
-  };
-  for (const [a, b] of Object.entries(reps)) s = s.split(a).join(b);
-  return s.replace(/\s+/g, " ").trim();
-}
-
-function norm(raw: string): string {
-  return normalizeAddressQuery(raw);
-}
-
-/** Min query length before any managed suggestion shows. */
-export const MANAGED_MIN_CHARS = 5;
+const DIRECTIONS = new Set(["north", "east", "south", "west"]);
 
 const STREET_SUFFIXES = new Set([
   "street",
@@ -75,32 +51,91 @@ const STREET_SUFFIXES = new Set([
   "circle",
   "terrace",
   "highway",
+  "st",
+  "ave",
+  "rd",
+  "blvd",
+  "dr",
+  "ln",
+  "ct",
+  "pl",
 ]);
 
-/**
- * Core street for threshold math: strip type suffix so
- * "1425 West Erie Avenue" → "1425 West Erie" (not bloated by Avenue).
- */
-export function coreStreet(street: string): string {
-  const parts = norm(street).split(" ").filter(Boolean);
-  while (parts.length > 1 && STREET_SUFFIXES.has(parts[parts.length - 1])) {
-    parts.pop();
-  }
-  return parts.join(" ");
-}
+/** Min raw query length (street # + spaces still need something typed). */
+export const MANAGED_MIN_CHARS = 6;
 
 /**
- * Length gate: ~40% of core street (min 5). Strong # + name matches unlock earlier.
+ * Normalize for matching.
+ * Intentionally does NOT expand N/E/S/W single letters into full directions.
  */
-export function thresholdForStreet(street: string): number {
-  const core = coreStreet(street);
-  const t = Math.ceil(core.length * 0.4);
-  return Math.max(MANAGED_MIN_CHARS, t);
+export function normalizeAddressQuery(raw: string): string {
+  let s = (raw || "").toLowerCase().replace(/\./g, " ");
+  s = s.replace(/[^a-z0-9\s]/g, " ");
+  s = ` ${s} `;
+  // Full suffix words only (not single-letter directions)
+  const reps: Record<string, string> = {
+    " st ": " street ",
+    " ave ": " avenue ",
+    " rd ": " road ",
+    " blvd ": " boulevard ",
+    " dr ": " drive ",
+    " ln ": " lane ",
+    " ct ": " court ",
+    " pl ": " place ",
+  };
+  for (const [a, b] of Object.entries(reps)) s = s.split(a).join(b);
+  return s.replace(/\s+/g, " ").trim();
+}
+
+function norm(raw: string): string {
+  return normalizeAddressQuery(raw);
+}
+
+function tokens(s: string): string[] {
+  return norm(s).split(" ").filter(Boolean);
 }
 
 function extractStreetNumber(s: string): string | null {
   const m = s.trim().match(/^(\d+[a-z]?)/i);
   return m ? m[1].toLowerCase() : null;
+}
+
+/** Parse managed street into number, optional direction, primary name tokens. */
+export function parseStreetParts(street: string): {
+  number: string | null;
+  direction: string | null;
+  nameTokens: string[];
+} {
+  const t = tokens(street);
+  if (!t.length) return { number: null, direction: null, nameTokens: [] };
+
+  let i = 0;
+  let number: string | null = null;
+  if (/^\d+[a-z]?$/.test(t[0])) {
+    number = t[0];
+    i = 1;
+  }
+
+  let direction: string | null = null;
+  if (i < t.length && DIRECTIONS.has(t[i])) {
+    direction = t[i];
+    i += 1;
+  }
+
+  const nameTokens: string[] = [];
+  for (; i < t.length; i++) {
+    if (STREET_SUFFIXES.has(t[i])) break;
+    nameTokens.push(t[i]);
+  }
+
+  return { number, direction, nameTokens };
+}
+
+/** Half of primary name (e.g. "erie" → 2 chars → "er"). Min 2. */
+export function nameHalfwayLen(nameTokens: string[]): number {
+  const name = nameTokens.join("");
+  if (!name.length) return 2;
+  return Math.max(2, Math.ceil(name.length * 0.5));
 }
 
 function scoreProperty(q: string, p: ManagedProperty): number {
@@ -110,55 +145,86 @@ function scoreProperty(q: string, p: ManagedProperty): number {
   const streetN = norm(p.street);
 
   if (ns === nq || streetN === nq) return 1000;
-  if (ns.startsWith(nq) || streetN.startsWith(nq)) return 900 - nq.length;
-  if (ns.includes(nq)) return 700 - Math.abs(ns.length - nq.length);
+  if (ns.startsWith(nq) || streetN.startsWith(nq)) return 900;
+  if (ns.includes(nq)) return 700;
 
-  // token overlap (prefix-friendly: "we" → "west")
-  const qt = nq.split(" ").filter(Boolean);
-  const st = ns.split(" ").filter(Boolean);
+  const qt = tokens(q);
+  const st = tokens(p.search);
   let hits = 0;
   for (const t of qt) {
-    if (st.some((s) => s.startsWith(t) || (t.length >= 3 && t.startsWith(s)))) hits++;
+    if (st.some((s) => s === t || s.startsWith(t))) hits++;
   }
   if (hits === 0) return -1;
-  return hits * 40 + (qt.length === hits ? 50 : 0);
+  return hits * 50 + (qt.length === hits ? 40 : 0);
 }
 
-function isUnlocked(q: string, p: ManagedProperty, score: number): boolean {
+/**
+ * Strict privacy unlock:
+ * 1) Street number matches
+ * 2) If property has N/E/S/W — user must type that FULL word (west not we/w)
+ * 3) Primary street name typed to ~50% as a prefix (erie → er…)
+ */
+export function isUnlocked(q: string, p: ManagedProperty): boolean {
   const qTrim = q.trim();
-  const qLen = qTrim.length;
-  if (qLen < MANAGED_MIN_CHARS) return false;
-  if (score <= 0) return false;
+  if (qTrim.length < MANAGED_MIN_CHARS) return false;
 
-  const thresh = thresholdForStreet(p.street);
-  if (qLen >= thresh) return true;
+  const prop = parseStreetParts(p.street);
+  const qParts = parseStreetParts(qTrim);
 
-  // Strong early unlock: same street number + partial street name (2+ chars)
-  // e.g. "1425 We" unlocks "1425 West Erie Avenue"
-  const qNum = extractStreetNumber(qTrim);
-  const pNum = extractStreetNumber(p.street);
-  if (!qNum || !pNum || qNum !== pNum) return false;
+  // Must have a street number in query matching the property
+  if (!prop.number || !qParts.number || prop.number !== qParts.number) return false;
 
-  const after = norm(qTrim).replace(new RegExp(`^${qNum}\\s*`), "").trim();
-  if (after.length < 2) return false;
+  // Direction: full word required when the managed address uses one
+  if (prop.direction) {
+    const qTok = tokens(qTrim);
+    // Accept full direction only (not "we", "w", "nor", etc.)
+    const hasFullDir = qTok.includes(prop.direction);
+    if (!hasFullDir) return false;
+  }
 
-  const nameTokens = coreStreet(p.street)
-    .split(" ")
-    .filter((t) => t && t !== pNum);
+  // Primary name: need ~halfway prefix of the main name string
+  if (!prop.nameTokens.length) {
+    // Number-only style streets — direction (if any) + number is enough
+    return true;
+  }
 
-  // Every typed name fragment must prefix-match some street token
-  const afterTokens = after.split(" ").filter(Boolean);
-  const nameOk = afterTokens.every((at) =>
-    nameTokens.some((nt) => nt.startsWith(at) || at.startsWith(nt)),
-  );
-  return nameOk && score >= 40;
+  const need = nameHalfwayLen(prop.nameTokens);
+  const fullName = prop.nameTokens.join(" ");
+  const fullNameCompact = prop.nameTokens.join("");
+
+  // Typed name tokens = query tokens after number and (optional) full direction
+  const qTok = tokens(qTrim);
+  let i = 0;
+  if (qTok[0] === prop.number) i = 1;
+  if (prop.direction && qTok[i] === prop.direction) i += 1;
+  const typedName = qTok.slice(i).filter((t) => !STREET_SUFFIXES.has(t));
+  if (!typedName.length) return false;
+
+  const typedJoined = typedName.join("");
+  const typedSpaced = typedName.join(" ");
+
+  // Must be a prefix of the street name (erie, er, eri — not random)
+  const nameOk =
+    fullName.startsWith(typedSpaced) ||
+    fullNameCompact.startsWith(typedJoined) ||
+    prop.nameTokens.some((nt, idx) => {
+      // progressive multi-token: first tokens exact, last is prefix
+      if (idx >= typedName.length) return false;
+      return typedName.every((tt, j) => {
+        const target = prop.nameTokens[j];
+        if (!target) return false;
+        if (j < typedName.length - 1) return target === tt;
+        return target.startsWith(tt);
+      });
+    });
+
+  if (!nameOk) return false;
+  return typedJoined.length >= need;
 }
 
 export type ManagedSearchOptions = {
-  /** If set, boost / prefer this owner's properties */
   ownerEmail?: string;
   limit?: number;
-  /** When true, only return properties for that owner (if any match) */
   ownerOnly?: boolean;
 };
 
@@ -179,9 +245,9 @@ export function searchManagedProperties(
 
   const scored: { p: ManagedProperty; score: number; owned: boolean }[] = [];
   for (const p of pool) {
+    if (!isUnlocked(q, p)) continue;
     const score = scoreProperty(q, p);
     if (score < 0) continue;
-    if (!isUnlocked(q, p, score)) continue;
     const owned = email ? p.ownerEmails.includes(email) : false;
     scored.push({ p, score: score + (owned ? 80 : 0), owned });
   }

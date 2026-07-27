@@ -468,8 +468,8 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
 
                   <p className={`text-[12px] leading-relaxed ${footInk}`}>
                     {isUnit
-                      ? "Start typing a managed address (about halfway) — we auto-suggest properties we already manage. Then pick the unit # for each door."
-                      : "Start typing a managed address — we auto-complete houses we already manage. Add a line for each full property."}
+                      ? "Type the street number, full direction (North/South/East/West), then about half the street name (e.g. 1425 West Er…). Pick a managed match, then unit #."
+                      : "Type the street number, full direction when it applies, then about half the street name — we only suggest properties we already manage."}
                   </p>
 
                   <div className="grid gap-1.5">
