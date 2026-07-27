@@ -38,6 +38,14 @@ export const MANAGED_PROPERTIES: ManagedProperty[] = data.properties;
 
 const DIRECTIONS = new Set(["north", "east", "south", "west"]);
 
+/** Full word or standard single-letter abbrev (W / E / N / S). Not "We" / "Wes". */
+const DIRECTION_ALIASES: Record<string, string[]> = {
+  north: ["north", "n"],
+  east: ["east", "e"],
+  south: ["south", "s"],
+  west: ["west", "w"],
+};
+
 const STREET_SUFFIXES = new Set([
   "street",
   "avenue",
@@ -158,33 +166,47 @@ function scoreProperty(q: string, p: ManagedProperty): number {
   return hits * 50 + (qt.length === hits ? 40 : 0);
 }
 
+function directionMatches(propDir: string | null, queryToken: string | undefined): boolean {
+  if (!propDir) return true;
+  if (!queryToken) return false;
+  const aliases = DIRECTION_ALIASES[propDir] || [propDir];
+  return aliases.includes(queryToken);
+}
+
 /**
  * Strict privacy unlock:
  * 1) Street number matches
- * 2) If property has N/E/S/W — user must type that FULL word (west not we/w)
- * 3) Primary street name typed to ~50% as a prefix (erie → er…)
+ * 2) If property has a direction — full word OR single letter (West / W). Not "We"/"Wes".
+ * 3) Primary street name typed to ~50% as a prefix (erie → er… / eri…)
+ *
+ * Examples for 1425 West Erie Avenue:
+ *  - "1425 We"        → no
+ *  - "1425 West"      → no (need half of Erie)
+ *  - "1425 W Er"      → yes
+ *  - "1425 W Eri"     → yes
+ *  - "1425 West Eri"  → yes
  */
 export function isUnlocked(q: string, p: ManagedProperty): boolean {
   const qTrim = q.trim();
   if (qTrim.length < MANAGED_MIN_CHARS) return false;
 
   const prop = parseStreetParts(p.street);
-  const qParts = parseStreetParts(qTrim);
 
   // Must have a street number in query matching the property
-  if (!prop.number || !qParts.number || prop.number !== qParts.number) return false;
+  if (!prop.number) return false;
+  const qTok = tokens(qTrim);
+  if (!qTok.length || qTok[0] !== prop.number) return false;
 
-  // Direction: full word required when the managed address uses one
+  let i = 1; // past street number
+
+  // Direction: full North/East/South/West OR single N/E/S/W
   if (prop.direction) {
-    const qTok = tokens(qTrim);
-    // Accept full direction only (not "we", "w", "nor", etc.)
-    const hasFullDir = qTok.includes(prop.direction);
-    if (!hasFullDir) return false;
+    if (!directionMatches(prop.direction, qTok[i])) return false;
+    i += 1;
   }
 
   // Primary name: need ~halfway prefix of the main name string
   if (!prop.nameTokens.length) {
-    // Number-only style streets — direction (if any) + number is enough
     return true;
   }
 
@@ -192,30 +214,22 @@ export function isUnlocked(q: string, p: ManagedProperty): boolean {
   const fullName = prop.nameTokens.join(" ");
   const fullNameCompact = prop.nameTokens.join("");
 
-  // Typed name tokens = query tokens after number and (optional) full direction
-  const qTok = tokens(qTrim);
-  let i = 0;
-  if (qTok[0] === prop.number) i = 1;
-  if (prop.direction && qTok[i] === prop.direction) i += 1;
-  const typedName = qTok.slice(i).filter((t) => !STREET_SUFFIXES.has(t));
-  if (!typedName.length) return false;
+  const typedName = qTok.slice(i).filter((t) => !STREET_SUFFIXES.has(t) && !DIRECTIONS.has(t));
+  // Don't treat leftover single-letter direction typos as name
+  const typedNameClean = typedName.filter((t) => !(t.length === 1 && "nesw".includes(t)));
+  if (!typedNameClean.length) return false;
 
-  const typedJoined = typedName.join("");
-  const typedSpaced = typedName.join(" ");
+  const typedJoined = typedNameClean.join("");
+  const typedSpaced = typedNameClean.join(" ");
 
-  // Must be a prefix of the street name (erie, er, eri — not random)
   const nameOk =
     fullName.startsWith(typedSpaced) ||
     fullNameCompact.startsWith(typedJoined) ||
-    prop.nameTokens.some((nt, idx) => {
-      // progressive multi-token: first tokens exact, last is prefix
-      if (idx >= typedName.length) return false;
-      return typedName.every((tt, j) => {
-        const target = prop.nameTokens[j];
-        if (!target) return false;
-        if (j < typedName.length - 1) return target === tt;
-        return target.startsWith(tt);
-      });
+    typedNameClean.every((tt, j) => {
+      const target = prop.nameTokens[j];
+      if (!target) return false;
+      if (j < typedNameClean.length - 1) return target === tt;
+      return target.startsWith(tt);
     });
 
   if (!nameOk) return false;

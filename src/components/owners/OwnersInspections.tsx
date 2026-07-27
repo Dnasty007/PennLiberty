@@ -468,8 +468,8 @@ export function OwnersInspections({ lightMode, mutedText, subtleText }: OwnersIn
 
                   <p className={`text-[12px] leading-relaxed ${footInk}`}>
                     {isUnit
-                      ? "Type the street number, full direction (North/South/East/West), then about half the street name (e.g. 1425 West Er…). Pick a managed match, then unit #."
-                      : "Type the street number, full direction when it applies, then about half the street name — we only suggest properties we already manage."}
+                      ? "Type street #, direction (West or W), then about half the street name (e.g. 1425 W Er… or 1425 West Eri…). Pick a managed match, then unit #."
+                      : "Type street #, direction (full or N/E/S/W), then about half the street name — we only suggest properties we already manage."}
                   </p>
 
                   <div className="grid gap-1.5">
