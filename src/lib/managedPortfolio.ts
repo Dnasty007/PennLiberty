@@ -62,12 +62,39 @@ function norm(raw: string): string {
 /** Min query length before any managed suggestion shows. */
 export const MANAGED_MIN_CHARS = 5;
 
+const STREET_SUFFIXES = new Set([
+  "street",
+  "avenue",
+  "road",
+  "boulevard",
+  "drive",
+  "lane",
+  "court",
+  "place",
+  "way",
+  "circle",
+  "terrace",
+  "highway",
+]);
+
 /**
- * Characters required for this property: ~50% of street string, min 5.
- * Strong matches (street # + start of street name) can clear earlier.
+ * Core street for threshold math: strip type suffix so
+ * "1425 West Erie Avenue" → "1425 West Erie" (not bloated by Avenue).
+ */
+export function coreStreet(street: string): string {
+  const parts = norm(street).split(" ").filter(Boolean);
+  while (parts.length > 1 && STREET_SUFFIXES.has(parts[parts.length - 1])) {
+    parts.pop();
+  }
+  return parts.join(" ");
+}
+
+/**
+ * Length gate: ~40% of core street (min 5). Strong # + name matches unlock earlier.
  */
 export function thresholdForStreet(street: string): number {
-  const t = Math.ceil((street || "").trim().length * 0.5);
+  const core = coreStreet(street);
+  const t = Math.ceil(core.length * 0.4);
   return Math.max(MANAGED_MIN_CHARS, t);
 }
 
@@ -86,32 +113,45 @@ function scoreProperty(q: string, p: ManagedProperty): number {
   if (ns.startsWith(nq) || streetN.startsWith(nq)) return 900 - nq.length;
   if (ns.includes(nq)) return 700 - Math.abs(ns.length - nq.length);
 
-  // token overlap
+  // token overlap (prefix-friendly: "we" → "west")
   const qt = nq.split(" ").filter(Boolean);
   const st = ns.split(" ").filter(Boolean);
   let hits = 0;
   for (const t of qt) {
-    if (st.some((s) => s.startsWith(t) || t.startsWith(s))) hits++;
+    if (st.some((s) => s.startsWith(t) || (t.length >= 3 && t.startsWith(s)))) hits++;
   }
   if (hits === 0) return -1;
   return hits * 40 + (qt.length === hits ? 50 : 0);
 }
 
 function isUnlocked(q: string, p: ManagedProperty, score: number): boolean {
-  const qLen = q.trim().length;
+  const qTrim = q.trim();
+  const qLen = qTrim.length;
   if (qLen < MANAGED_MIN_CHARS) return false;
+  if (score <= 0) return false;
 
   const thresh = thresholdForStreet(p.street);
-  if (qLen >= thresh) return score > 0;
+  if (qLen >= thresh) return true;
 
-  // Strong early unlock: same street number + at least 3 chars of name after number
-  const qNum = extractStreetNumber(q);
+  // Strong early unlock: same street number + partial street name (2+ chars)
+  // e.g. "1425 We" unlocks "1425 West Erie Avenue"
+  const qNum = extractStreetNumber(qTrim);
   const pNum = extractStreetNumber(p.street);
-  if (qNum && pNum && qNum === pNum) {
-    const after = norm(q).replace(qNum, "").trim();
-    if (after.length >= 3 && score >= 40) return true;
-  }
-  return false;
+  if (!qNum || !pNum || qNum !== pNum) return false;
+
+  const after = norm(qTrim).replace(new RegExp(`^${qNum}\\s*`), "").trim();
+  if (after.length < 2) return false;
+
+  const nameTokens = coreStreet(p.street)
+    .split(" ")
+    .filter((t) => t && t !== pNum);
+
+  // Every typed name fragment must prefix-match some street token
+  const afterTokens = after.split(" ").filter(Boolean);
+  const nameOk = afterTokens.every((at) =>
+    nameTokens.some((nt) => nt.startsWith(at) || at.startsWith(nt)),
+  );
+  return nameOk && score >= 40;
 }
 
 export type ManagedSearchOptions = {
