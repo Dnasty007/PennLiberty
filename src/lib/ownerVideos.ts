@@ -92,6 +92,9 @@ export const ownerVideos: OwnerVideo[] = [
 /** How many videos show on the mobile For Owners band before “More videos”. */
 export const OWNER_VIDEOS_MOBILE_PREVIEW = 3;
 
+/** Desktop / tablet: first N before “More videos” (side sheet). */
+export const OWNER_VIDEOS_DESKTOP_PREVIEW = 5;
+
 export function formatRuntime(sec: number): string {
   const m = Math.floor(sec / 60);
   const s = Math.round(sec % 60);
@@ -111,13 +114,23 @@ export function getGridOwnerVideos(): OwnerVideo[] {
   return getSortedOwnerVideos().filter((v) => v.id !== featured.id);
 }
 
-/** Mobile band: first N by order. Overflow list is what “More videos” shows. */
-export function getMobilePreviewVideos(
-  limit = OWNER_VIDEOS_MOBILE_PREVIEW,
+/**
+ * First `limit` videos by order (preview shelf).
+ * Overflow list is what “More videos” shows.
+ */
+export function getOwnerVideoPreviews(
+  limit: number,
 ): { preview: OwnerVideo[]; more: OwnerVideo[] } {
   const sorted = getSortedOwnerVideos();
   return {
     preview: sorted.slice(0, limit),
     more: sorted.slice(limit),
   };
+}
+
+/** @deprecated use getOwnerVideoPreviews(OWNER_VIDEOS_MOBILE_PREVIEW) */
+export function getMobilePreviewVideos(
+  limit = OWNER_VIDEOS_MOBILE_PREVIEW,
+): { preview: OwnerVideo[]; more: OwnerVideo[] } {
+  return getOwnerVideoPreviews(limit);
 }

@@ -3,9 +3,9 @@ import { createPortal } from "react-dom";
 import { Play, X, ClipboardCheck, Maximize2, ChevronUp } from "lucide-react";
 import {
   formatRuntime,
-  getFeaturedOwnerVideo,
-  getGridOwnerVideos,
-  getMobilePreviewVideos,
+  getOwnerVideoPreviews,
+  OWNER_VIDEOS_DESKTOP_PREVIEW,
+  OWNER_VIDEOS_MOBILE_PREVIEW,
   type OwnerVideo,
 } from "@/lib/ownerVideos";
 import { PENN_PHONE_DISPLAY, PENN_PHONE_TEL } from "@/lib/brand";
@@ -499,11 +499,18 @@ function MoreVideosSheet({
 }
 
 export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersVideoLibraryProps) {
-  const featured = getFeaturedOwnerVideo();
-  const grid = getGridOwnerVideos();
-  const { preview: mobilePreview, more: mobileMore } = getMobilePreviewVideos();
+  const { preview: mobilePreview, more: mobileMore } = getOwnerVideoPreviews(
+    OWNER_VIDEOS_MOBILE_PREVIEW,
+  );
+  const { preview: desktopPreview, more: desktopMore } = getOwnerVideoPreviews(
+    OWNER_VIDEOS_DESKTOP_PREVIEW,
+  );
   const [active, setActive] = useState<OwnerVideo | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
+  /** Which overflow list the sheet is showing (mobile 3+ or desktop 5+). */
+  const [moreSource, setMoreSource] = useState<"mobile" | "desktop">("mobile");
+
+  const moreVideos = moreSource === "desktop" ? desktopMore : mobileMore;
 
   const open = useCallback((v: OwnerVideo) => {
     setMoreOpen(false);
@@ -538,8 +545,8 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
             Short videos on how we work
           </h2>
           <p className={`mt-4 text-[0.98rem] leading-relaxed md:text-[1.0625rem] ${mutedText}`}>
-            Process explainers for owners — who we are, onboarding, maintenance, placement, and compliance.
-            Click to play. About one minute each.
+            Process explainers for owners — who we are, onboarding, maintenance, placement, inspections,
+            and compliance. Click to play. About one minute each.
           </p>
         </div>
 
@@ -563,7 +570,10 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
           <div className="mt-4 md:hidden">
             <button
               type="button"
-              onClick={() => setMoreOpen(true)}
+              onClick={() => {
+                setMoreSource("mobile");
+                setMoreOpen(true);
+              }}
               className={`flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3.5 text-sm font-semibold transition ${moreBtn}`}
             >
               <ChevronUp className="h-4 w-4 text-[#d6b06a]" aria-hidden />
@@ -573,20 +583,22 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
           </div>
         ) : null}
 
-        {/* Desktop / tablet: full shelf (featured + grid) */}
+        {/* Desktop / tablet: first 5, then More videos sheet (same pattern as mobile) */}
         <div className="mt-9 hidden md:block">
-          <VideoCard
-            video={featured}
-            lightMode={lightMode}
-            mutedText={mutedText}
-            subtleText={subtleText}
-            featured
-            onPlay={open}
-          />
+          {desktopPreview[0] ? (
+            <VideoCard
+              video={desktopPreview[0]}
+              lightMode={lightMode}
+              mutedText={mutedText}
+              subtleText={subtleText}
+              featured
+              onPlay={open}
+            />
+          ) : null}
         </div>
 
-        <ul className="mt-4 hidden gap-3 md:grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-          {grid.map((v) => (
+        <ul className="mt-4 hidden gap-3 md:grid md:grid-cols-2 xl:grid-cols-4">
+          {desktopPreview.slice(1).map((v) => (
             <li key={v.id}>
               <VideoCard
                 video={v}
@@ -598,6 +610,23 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
             </li>
           ))}
         </ul>
+
+        {desktopMore.length > 0 ? (
+          <div className="mt-4 hidden md:block">
+            <button
+              type="button"
+              onClick={() => {
+                setMoreSource("desktop");
+                setMoreOpen(true);
+              }}
+              className={`flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3.5 text-sm font-semibold transition md:max-w-md ${moreBtn}`}
+            >
+              <ChevronUp className="h-4 w-4 text-[#d6b06a]" aria-hidden />
+              More videos
+              <span className={`tabular-nums ${subtleText}`}>({desktopMore.length})</span>
+            </button>
+          </div>
+        ) : null}
 
         <div
           className={`mt-8 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${
@@ -618,9 +647,9 @@ export function OwnersVideoLibrary({ lightMode, mutedText, subtleText }: OwnersV
         </div>
       </div>
 
-      {moreOpen && mobileMore.length > 0 ? (
+      {moreOpen && moreVideos.length > 0 ? (
         <MoreVideosSheet
-          videos={mobileMore}
+          videos={moreVideos}
           lightMode={lightMode}
           mutedText={mutedText}
           subtleText={subtleText}
