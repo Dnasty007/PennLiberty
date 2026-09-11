@@ -154,6 +154,62 @@ export type SaleListing = PropertyDetail & {
 
 export const initialSaleListings: SaleListing[] = [
   {
+    id: 10,
+    slug: "534-w-girard-ave",
+    title: "Fo Me Café — Turnkey Coffee Shop at 6th & Girard",
+    propertyType: "Business Opportunity",
+    price: "$25,000",
+    address: "534 W Girard Ave, Philadelphia, PA 19123",
+    beds: 0,
+    baths: 0,
+    sqft: 0,
+    lat: 39.97014,
+    lng: -75.14647,
+    top: "52%",
+    left: "62%",
+    image: "/sale-media/534-w-girard-ave/IMG_8155.JPEG",
+    gallery: [
+      "/sale-media/534-w-girard-ave/IMG_8155.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8156.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8157.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8158.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8159.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8160.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8161.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8162.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8163.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8164.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8165.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8166.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8167.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8168.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8169.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8170.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8171.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8172.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8173.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8174.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8175.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8176.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8177.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8178.JPEG",
+      "/sale-media/534-w-girard-ave/IMG_8179.JPEG",
+    ],
+    status: "Business Opportunity",
+    brokerage: "Penn Liberty Real Estate",
+    description:
+      "Turnkey coffee shop for sale at 534 W Girard Avenue — 6th & Girard in Philadelphia's 19123 corridor. This offering is the operating café business and all equipment; real estate is not included. Buyer to arrange lease and occupancy with the property owner.\n\nFo Me Café occupies a high-visibility ground-floor storefront with a pressed-tin ceiling, hardwood floors, industrial lighting, and a window bar facing Girard Avenue. The shop is fully fitted out and ready to run: commercial espresso machine and grinders, drip brewing, pastry case, point-of-sale, refrigeration, stainless prep and wash sinks, and a customer restroom. A small rear yard and use of the left side of the basement come with the business.\n\nAsking $25,000. A built-out café on a busy mixed-use block — an opening for an operator who wants a shop already in place at one of North Philadelphia's main east-west corridors, rather than starting from a vacant shell.",
+    highlights: [
+      "Business + all equipment · $25,000",
+      "Real estate not included",
+      "6th & Girard · Philadelphia 19123",
+      "Turnkey café: espresso, grinders, POS, refrigeration",
+      "Pressed-tin ceiling · window bar · customer restroom",
+      "Small rear yard · left-side basement included",
+      "High-visibility Girard Avenue storefront",
+    ],
+  },
+  {
     id: 1,
     slug: "1704-w-diamond",
     title: "Philadelphia Triplex",
@@ -265,48 +321,6 @@ export const initialSaleListings: SaleListing[] = [
     ],
   },
   {
-    id: 3,
-    slug: "621-w-girard-ave",
-    title: "621 W Girard Ave Land Opportunity",
-    propertyType: "Land",
-    price: "$260,000",
-    address: "621 W Girard Ave, Philadelphia, PA 19123",
-    beds: 0,
-    baths: 0,
-    sqft: 1432,
-    lotSqft: 1432,
-    lat: 39.9683,
-    lng: -75.1494,
-    top: "47%",
-    left: "61%",
-    image: "/sale-media/621-w-girard-ave/getmedia.jpeg",
-    gallery: [
-      "/sale-media/621-w-girard-ave/getmedia.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-1.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-2.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-3.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-4.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-5.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-6.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-7.jpeg",
-      "/sale-media/621-w-girard-ave/getmedia-8.jpeg"
-    ],
-    status: "Active Land",
-    mlsNumber: "PAPH2551122",
-    brokerage: "Penn Liberty Real Estate",
-    description:
-      "Discover an exceptional investment opportunity in the heart of Northern Liberties. This prime piece of land offers a unique canvas for investors looking to capitalize on one of Philadelphia's most sought-after neighborhoods. With strong city access, skyline and street views, and proximity to transit, this site is positioned for compelling future development.",
-    highlights: [
-      "1,432 sqft lot",
-      "Northern Liberties location",
-      "CMX2 zoning",
-      "City and street views",
-      "Bus stop directly out front",
-      "Close to commuter rail and subway access",
-      "Can be sold with 623 W Girard Ave"
-    ],
-  },
-  {
     id: 4,
     slug: "1215-w-lehigh-ave",
     title: "1215 W Lehigh Ave Development Opportunity",
@@ -345,59 +359,6 @@ export const initialSaleListings: SaleListing[] = [
       "Business use: apartment building",
       "Close to Broad Street subway",
       "Major rehab / redevelopment opportunity"
-    ],
-  },
-  {
-    id: 5,
-    slug: "205-berbro-ave",
-    title: "205 Berbro Ave — Upper Darby Duplex",
-    propertyType: "Multi-Family",
-    units: 2,
-    price: "$395,000",
-    address: "205 Berbro Ave, Upper Darby, PA 19082",
-    beds: 0,
-    baths: 0,
-    sqft: 1590,
-    lat: 39.9628,
-    lng: -75.2705,
-    top: "58%",
-    left: "18%",
-    image: "/sale-media/205-berbro-ave/cover.jpg",
-    gallery: [
-      "/sale-media/205-berbro-ave/cover.jpg",
-      "/sale-media/205-berbro-ave/gallery-1.jpg",
-      "/sale-media/205-berbro-ave/gallery-2.jpg",
-      "/sale-media/205-berbro-ave/gallery-3.jpg",
-      "/sale-media/205-berbro-ave/gallery-4.jpg",
-      "/sale-media/205-berbro-ave/gallery-5.jpg",
-      "/sale-media/205-berbro-ave/gallery-6.jpg",
-      "/sale-media/205-berbro-ave/gallery-7.jpg",
-    ],
-    status: "Active Multi-Family",
-    mlsNumber: "PADE2117528",
-    brokerage: "Penn Liberty Real Estate",
-    listingAgent: {
-      name: "David Froelich",
-      phone: "215-922-7900",
-      email: "davepennliberty@gmail.com",
-      license: "RS337196",
-    },
-    coListingAgent: {
-      name: "Danilo Burgos",
-      phone: "267-628-8748",
-      email: "danilo@burg-properties.com",
-      license: "RS370004",
-    },
-    description:
-      "Twin/semi-detached duplex in Upper Darby's Beverly Hills neighborhood — two separately leased 2-bedroom, 1-bath units (~795 sq ft each) with projected rents of $675 and $750 per month. Stone and stucco construction (1927) with a full unfinished basement, wall-unit cooling, and baseboard hot-water heat fueled by natural gas. Driveway and on-street parking. Fee-simple ownership in Delaware County with convenient access to West Chester Pike and SEPTA.",
-    highlights: [
-      "2-unit duplex · 1,590 sq ft total",
-      "Each unit: 2 bed · 1 bath · ~795 sq ft",
-      "Twin/semi-detached · built 1927",
-      "Projected rents: $675 / $750 per month",
-      "Full unfinished basement · natural gas heat",
-      "Upper Darby · Beverly Hills · near West Chester Pike",
-      "Possession: 61–90 days from contract",
     ],
   },
   {
@@ -531,59 +492,6 @@ export const initialSaleListings: SaleListing[] = [
       "Sold as-is · below-average condition",
       "Immediate possession · cash or conventional",
       "Appointment-only showings — 24 hr notice",
-    ],
-  },
-  {
-    id: 9,
-    slug: "2811-castor-ave",
-    title: "2811 Castor Ave — Port Richmond Rowhome",
-    propertyType: "Residential",
-    price: "$179,900",
-    address: "2811 Castor Ave, Philadelphia, PA 19134",
-    beds: 2,
-    baths: 1,
-    sqft: 728,
-    lat: 39.9862,
-    lng: -75.0754,
-    top: "45%",
-    left: "72%",
-    image: "/sale-media/2811-castor-ave/cover.jpg",
-    gallery: [
-      "/sale-media/2811-castor-ave/cover.jpg",
-      "/sale-media/2811-castor-ave/gallery-1.jpg",
-      "/sale-media/2811-castor-ave/gallery-2.jpg",
-      "/sale-media/2811-castor-ave/gallery-3.jpg",
-      "/sale-media/2811-castor-ave/gallery-4.jpg",
-      "/sale-media/2811-castor-ave/gallery-5.jpg",
-      "/sale-media/2811-castor-ave/gallery-6.jpg",
-      "/sale-media/2811-castor-ave/gallery-7.jpg",
-      "/sale-media/2811-castor-ave/gallery-8.jpg",
-      "/sale-media/2811-castor-ave/gallery-9.jpg",
-      "/sale-media/2811-castor-ave/gallery-10.jpg",
-      "/sale-media/2811-castor-ave/gallery-11.jpg",
-      "/sale-media/2811-castor-ave/gallery-12.jpg",
-      "/sale-media/2811-castor-ave/gallery-13.jpg",
-      "/sale-media/2811-castor-ave/gallery-14.jpg",
-    ],
-    status: "Active Residential",
-    mlsNumber: "PAPH2622494",
-    brokerage: "Penn Liberty Real Estate",
-    listingAgent: {
-      name: "Richard Machado",
-      phone: "215-275-9204",
-      email: "richardpennliberty@gmail.com",
-      license: "RS282437",
-    },
-    description:
-      "End-of-row home in Port Richmond — two bedrooms, one full bath, and ~728 sq ft with hardwood floors, central air, and fenced front and rear yards. The main level offers open living and dining plus a versatile bonus room (office, gym, or lounge); upstairs are two bedrooms and a full bath. Built in 1955 with natural-gas heat, electric central A/C, and an unfinished basement. Near shopping, dining, I-95, and public transit; off-street parking available on Richmond St. Recently reduced to $179,900.",
-    highlights: [
-      "2 bedrooms · 1 full bath · ~728 sq ft",
-      "End-of-row · built 1955 · Port Richmond",
-      "Hardwood floors · central A/C · fireplace",
-      "Fenced front & rear yards · bonus room",
-      "Near I-95 · transit · Richmond St parking",
-      "Immediate possession",
-      "Recently reduced from $199,000",
     ],
   },
 ];
@@ -726,14 +634,44 @@ export const teamStaff: readonly TeamPerson[] = [
 /** @deprecated Use teamPrincipals + teamStaff for explicit sections */
 export const team = [...teamPrincipals, ...teamStaff] as const;
 
-export const navItems = [
+/** Full page walk order (swipe / arrow keys). Not the same as top-nav labels. */
+export const pageOrder = [
+  "home",
+  "property-management",
+  "rentals",
+  "listings",
+  "team",
+  "contact",
+] as const;
+
+export type PageKey = (typeof pageOrder)[number];
+
+export type NavChild = {
+  label: string;
+  key: PageKey;
+};
+
+export type NavItem = {
+  label: string;
+  key: PageKey;
+  children?: readonly NavChild[];
+};
+
+/** Top nav. Property Management owns rentals; URLs stay /for-owners and /rentals. */
+export const navItems: readonly NavItem[] = [
   { label: "Home", key: "home" },
-  { label: "For Owners", key: "property-management" },
-  { label: "Rentals", key: "rentals" },
+  {
+    label: "Property Management",
+    key: "property-management",
+    children: [
+      { label: "For Owners", key: "property-management" },
+      { label: "Rentals", key: "rentals" },
+    ],
+  },
   { label: "Listings", key: "listings" },
   { label: "About", key: "team" },
   { label: "Contact", key: "contact" },
-] as const;
+];
 
 /** Buildium Resident portal — tenants, owners, and vendors with Penn Liberty sign in here */
 export const manageBuildingResidentLoginUrl =
@@ -766,26 +704,24 @@ export const serviceCards: {
   cta: string;
 }[] = [
   {
-    title: "Property Management",
-    desc: "Full-service management for owners — leasing, rent, maintenance, reporting",
-    page: "property-management",
-    icon: Building2,
-    cta: "Request a free review",
-  },
-  {
-    title: "Find a Rental",
-    desc: "Browse live Philly inventory, tour, and apply with ease",
-    page: "rentals",
-    icon: Home,
-    cta: "Browse rentals",
-  },
-  {
-    title: "Multi-Family & Investment Sales",
-    desc: "Triplexes, land, and portfolio assets with local brokerage support",
+    title: "Sales",
+    desc: "Buying or selling in Philadelphia — straight answers and local knowledge from a family that works these neighborhoods every day.",
     page: "listings",
     icon: Briefcase,
-    cta: "View investment listings",
+    cta: "Browse listings",
+  },
+  {
+    title: "Property Management",
+    desc: "Full-service management for owners. Tenants, maintenance, and rent — so the property performs.",
+    page: "property-management",
+    icon: Building2,
+    cta: "For owners",
+  },
+  {
+    title: "Rentals",
+    desc: "Live Philadelphia inventory from the firm that manages the building. Tour and apply here.",
+    page: "rentals",
+    icon: Home,
+    cta: "See available rentals",
   },
 ];
-
-export type PageKey = (typeof navItems)[number]["key"];

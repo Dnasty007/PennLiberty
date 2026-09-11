@@ -189,6 +189,10 @@ export function propertyOverview(listing: {
     if (lotSize) return `${lotSize.toLocaleString()} sqft lot`;
   }
 
+  if (listing.propertyType === "Business Opportunity") {
+    return "Turnkey business · equipment included";
+  }
+
   if (listing.units && listing.sqft) {
     return `${listing.units} Units • ${listing.sqft.toLocaleString()} sqft`;
   }

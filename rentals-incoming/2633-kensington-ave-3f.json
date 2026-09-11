@@ -1,0 +1,37 @@
+{
+  "slug": "2633-kensington-ave-3f",
+  "title": "2633 Kensington Avenue - 3F",
+  "price": "$2,500/mo",
+  "address": "2633 Kensington Avenue, Philadelphia, PA 19125",
+  "beds": 3,
+  "baths": 2,
+  "sqft": 1400,
+  "meta": "Unit 3F · 3 bed · 2 bath · ~1,400 sq ft · Kensington",
+  "area": "Kensington",
+  "image": "/Rentals/2633-kensington-ave-3f/1.jpg",
+  "gallery": [
+    "/Rentals/2633-kensington-ave-3f/1.jpg",
+    "/Rentals/2633-kensington-ave-3f/2.jpg",
+    "/Rentals/2633-kensington-ave-3f/3.jpg",
+    "/Rentals/2633-kensington-ave-3f/4.jpg",
+    "/Rentals/2633-kensington-ave-3f/5.jpg",
+    "/Rentals/2633-kensington-ave-3f/6.jpg",
+    "/Rentals/2633-kensington-ave-3f/7.jpg"
+  ],
+  "propertyType": "Residential Lease",
+  "status": "Available",
+  "brokerage": "Penn Liberty Real Estate",
+  "securityDeposit": "$2,500",
+  "applicationFee": "$50",
+  "applicationUrl": "https://pennlibertyrentals.managebuilding.com/Resident/rental-application/new?unitId=1652879&buildingId=620610&listingId=325654",
+  "description": "Bright, spacious 3-bedroom, 2-bath unit offering approximately 1,400 sq ft with abundant windows and hardwood flooring throughout the main living and sleeping areas. The home features recessed lighting and a ceiling fan, plus wall-mounted mini-split AC for personalized climate control. Bedrooms include built-in open-wardrobe organizers for streamlined storage. The bathroom showcases floor tile, subway-tile walls, decorative mosaic trim and a glass-enclosed corner shower with a vanity. A granite-look counter and tiled dining nook add durable surfaces and easy upkeep. Schedule a viewing to see this unit in person.",
+  "highlights": [
+    "Unit 3F · 3 bedrooms · 2 baths · ~1,400 sq ft",
+    "Hardwood floors · abundant windows",
+    "Mini-split A/C · recessed lighting · ceiling fan",
+    "Built-in wardrobe organizers in bedrooms",
+    "Tiled bath with glass-enclosed corner shower",
+    "Kensington · Philadelphia 19125",
+    "$2,500 security deposit · $50 application fee"
+  ]
+}

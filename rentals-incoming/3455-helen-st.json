@@ -1,0 +1,32 @@
+{
+  "slug": "3455-helen-st",
+  "title": "3455 Helen Street",
+  "price": "$1,750/mo",
+  "address": "3455 Helen St, Philadelphia, PA 19134",
+  "beds": 3,
+  "baths": 1.5,
+  "sqft": 1017,
+  "meta": "3 bed · 1.5 bath · ~1,017 sq ft · Entire house · Harrowgate",
+  "area": "Harrowgate",
+  "image": "/Rentals/3455-helen-st/cover.jpg",
+  "gallery": [
+    "/Rentals/3455-helen-st/cover.jpg"
+  ],
+  "propertyType": "Residential Lease",
+  "status": "Available",
+  "brokerage": "Penn Liberty Real Estate",
+  "dateAvailable": "09/17/26",
+  "securityDeposit": "$1,750",
+  "applicationFee": "$50",
+  "applicationUrl": "https://pennlibertyrentals.managebuilding.com/Resident/rental-application/new/apply?listingId=269505",
+  "description": "Entire two-story end-of-row masonry home for rent at 3455 Helen Street in Harrowgate — three bedrooms, 1.5 baths, and about 1,017 sq ft. This is the full house, not an apartment. Available September 17, 2026. Pets allowed. On-street parking. Near Kensington Avenue, Allegheny Avenue, shopping, and SEPTA. Contact Penn Liberty Real Estate to apply. $1,750/mo · $1,750 security deposit · $50 application fee. Showings with 24-hour notice.",
+  "highlights": [
+    "Entire house · 3 bedrooms · 1.5 baths · ~1,017 sq ft",
+    "2-story end-of-row · Harrowgate 19134",
+    "Pets allowed",
+    "Near Kensington Ave · Allegheny Ave · SEPTA",
+    "Available 09/17/26",
+    "$1,750 security deposit · $50 application fee",
+    "MLS# PAPH2669356"
+  ]
+}
